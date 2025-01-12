@@ -58,7 +58,7 @@ export default function PropertyForm({ initialData, onSubmit, isLoading, submitL
 
     // Append new images
     imageFiles.forEach((file) => {
-      data.append('images', file);
+      data.append('image', file);
     });
 
     // Append existing image IDs if editing
@@ -407,13 +407,13 @@ export default function PropertyForm({ initialData, onSubmit, isLoading, submitL
               <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
               <div className="flex text-sm text-gray-600">
                 <label
-                  htmlFor="images"
+                  htmlFor="image"
                   className="relative cursor-pointer rounded-md bg-white font-medium text-primary-600 hover:text-primary-500"
                 >
                   <span>Качи снимки</span>
                   <input
-                    id="images"
-                    name="images"
+                    id="image"
+                    name="image"
                     type="file"
                     ref={fileInputRef}
                     className="sr-only"
@@ -424,7 +424,7 @@ export default function PropertyForm({ initialData, onSubmit, isLoading, submitL
                 </label>
                 <p className="pl-1">или ги провлачете тук</p>
               </div>
-              <p className="text-xs text-gray-500">PNG, JPG, GIF до 10MB</p>
+              <p className="text-xs text-gray-500">PNG, JPG, GIF до 20 снимки</p>
             </div>
           </div>
 

@@ -7,6 +7,9 @@ import {
   PhoneIcon,
   EnvelopeIcon,
   ArrowLeftIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { getPropertyById } from '../services/propertyService';
 import { PropertyCardProps } from '../components/properties/PropertyCard';
@@ -22,6 +25,7 @@ export default function PropertyDetails() {
   const navigate = useNavigate();
   const [showContactForm, setShowContactForm] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  const [showFullscreen, setShowFullscreen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -49,6 +53,35 @@ export default function PropertyDetails() {
     console.log('Contact form submitted:', formData);
     setShowContactForm(false);
   };
+
+  const handleImageClick = (index: number) => {
+    setActiveImage(index);
+    setShowFullscreen(true);
+  };
+
+  const handleFullscreenClose = (e: React.MouseEvent) => {
+    // Only close if clicking the backdrop, not the image
+    if (e.target === e.currentTarget) {
+      setShowFullscreen(false);
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (!showFullscreen || !property?.images) return;
+    
+    if (e.key === 'Escape') {
+      setShowFullscreen(false);
+    } else if (e.key === 'ArrowLeft') {
+      setActiveImage((prev) => (prev === 0 ? property.images.length - 1 : prev - 1));
+    } else if (e.key === 'ArrowRight') {
+      setActiveImage((prev) => (prev === property.images.length - 1 ? 0 : prev + 1));
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showFullscreen, property]);
 
   if (isLoading) {
     return (
@@ -86,10 +119,6 @@ export default function PropertyDetails() {
     );
   }
 
-  const handleImageClick = (index: number) => {
-    setActiveImage(index);
-  };
-
   return (
     <div className="min-h-full bg-gray-50 dark:bg-gray-900">
       <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -111,70 +140,94 @@ export default function PropertyDetails() {
           <div className="lg:col-span-2">
             {/* Image Gallery */}
             <div className="space-y-4">
-              <div className="overflow-hidden rounded-lg aspect-w-16 aspect-h-9">
+              <div className="relative overflow-hidden rounded-lg aspect-w-16 aspect-h-9 cursor-pointer group" onClick={() => setShowFullscreen(true)}>
                 <img
                   src={property.images[activeImage]?.url || '/images/property-placeholder.webp'}
                   alt={property.title}
-                  className="object-cover w-full h-full"
+                  className="object-cover w-full h-full transition-opacity duration-300"
                 />
+                {property.images && property.images.length > 1 && (
+                  <>
+                    {/* Previous Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent modal from opening when clicking arrows
+                        setActiveImage((prev) => (prev === 0 ? property.images.length - 1 : prev - 1));
+                      }}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors opacity-0 group-hover:opacity-100"
+                    >
+                      <ChevronLeftIcon className="w-6 h-6" />
+                    </button>
+                    {/* Next Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent modal from opening when clicking arrows
+                        setActiveImage((prev) => (prev === property.images.length - 1 ? 0 : prev + 1));
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors opacity-0 group-hover:opacity-100"
+                    >
+                      <ChevronRightIcon className="w-6 h-6" />
+                    </button>
+                    {/* Image Counter */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 text-white text-sm opacity-0 group-hover:opacity-100">
+                      {activeImage + 1} / {property.images.length}
+                    </div>
+                  </>
+                )}
               </div>
               {property.images && property.images.length > 1 && (
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-6 gap-2">
                   {property.images.map((img: PropertyImage, index: number) => (
-                    <img
+                    <button
                       key={index}
-                      src={img.url}
-                      alt={`Property view ${index + 1}`}
-                      className={`w-24 h-24 object-cover cursor-pointer rounded ${
-                        index === activeImage ? 'border-2 border-primary-600' : ''
-                      }`}
                       onClick={() => handleImageClick(index)}
-                    />
+                      className={`relative aspect-w-16 aspect-h-9 overflow-hidden rounded-lg transition-all ${
+                        index === activeImage ? 'ring-2 ring-primary-600 opacity-100' : 'opacity-60 hover:opacity-100'
+                      }`}
+                    >
+                      <img
+                        src={img.url}
+                        alt={`Property view ${index + 1}`}
+                        className="object-cover w-full h-full"
+                      />
+                    </button>
                   ))}
                 </div>
               )}
             </div>
 
             {/* Property Details */}
-            <div className="p-6 mt-8 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-                Детайли за имота
-              </h2>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="space-y-4">
-                  {property.area_sqm && (
-                    <p className="flex gap-2 items-center text-gray-600 dark:text-gray-300">
-                      <BuildingOfficeIcon className="w-5 h-5" />
-                      <span>Квадратура: {property.area_sqm} кв.м.</span>
-                    </p>
-                  )}
-                  {property.floor && (
-                    <p className="flex gap-2 items-center text-gray-600 dark:text-gray-300">
-                      <HomeIcon className="w-5 h-5" />
-                      <span>Етаж: {property.floor}</span>
-                    </p>
-                  )}
-                  {property.location && (
-                    <p className="flex gap-2 items-center text-gray-600 dark:text-gray-300">
-                      <MapPinIcon className="w-5 h-5" />
-                      <span>Локация: {property.location}</span>
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-4">
-                  {property.construction_type && (
-                    <p className="flex gap-2 items-center text-gray-600 dark:text-gray-300">
-                      <span className="font-semibold">Строителство:</span>
-                      {property.construction_type}
-                    </p>
-                  )}
-                  {property.furnishing && (
-                    <p className="flex gap-2 items-center text-gray-600 dark:text-gray-300">
-                      <span className="font-semibold">Обзавеждане:</span>
-                      {property.furnishing}
-                    </p>
-                  )}
-                </div>
+            <div className="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
+              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Детайли за имота</h2>
+              
+              <div className="space-y-4">
+                {property.area_sqm && (
+                  <div className="flex items-center">
+                    <BuildingOfficeIcon className="mr-2 w-5 h-5 text-gray-500" />
+                    <span className="text-gray-700 dark:text-gray-300">Квадратура: {property.area_sqm} кв.м.</span>
+                  </div>
+                )}
+
+                {property.location && (
+                  <div className="flex items-center">
+                    <MapPinIcon className="mr-2 w-5 h-5 text-gray-500" />
+                    <span className="text-gray-700 dark:text-gray-300">Локация: {property.location}</span>
+                  </div>
+                )}
+
+                {property.construction_type && (
+                  <div className="flex items-center">
+                    <HomeIcon className="mr-2 w-5 h-5 text-gray-500" />
+                    <span className="text-gray-700 dark:text-gray-300">Строителство: {property.construction_type}</span>
+                  </div>
+                )}
+
+                {property.furnishing && (
+                  <div className="flex items-center">
+                    <HomeIcon className="mr-2 w-5 h-5 text-gray-500" />
+                    <span className="text-gray-700 dark:text-gray-300">Обзавеждане: {property.furnishing}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -309,6 +362,88 @@ export default function PropertyDetails() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Fullscreen Image Modal */}
+        {showFullscreen && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+            onClick={handleFullscreenClose}
+          >
+            <div className="relative w-full h-full flex items-center justify-center">
+              {/* Close button */}
+              <button
+                onClick={() => setShowFullscreen(false)}
+                className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors z-50"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </button>
+
+              {/* Main Image */}
+              <div className="relative w-full h-full flex items-center justify-center p-4">
+                <img
+                  src={property.images[activeImage]?.url}
+                  alt={`Property view ${activeImage + 1}`}
+                  className="max-h-full max-w-full object-contain"
+                />
+
+                {property.images && property.images.length > 1 && (
+                  <>
+                    {/* Previous Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveImage((prev) => (prev === 0 ? property.images.length - 1 : prev - 1));
+                      }}
+                      className="absolute left-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors"
+                    >
+                      <ChevronLeftIcon className="w-8 h-8" />
+                    </button>
+
+                    {/* Next Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveImage((prev) => (prev === property.images.length - 1 ? 0 : prev + 1));
+                      }}
+                      className="absolute right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors"
+                    >
+                      <ChevronRightIcon className="w-8 h-8" />
+                    </button>
+
+                    {/* Image Counter */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/50 text-white">
+                      {activeImage + 1} / {property.images.length}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Thumbnails */}
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <div className="flex gap-2 justify-center overflow-x-auto pb-2">
+                  {property.images.map((img: PropertyImage, index: number) => (
+                    <button
+                      key={index}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveImage(index);
+                      }}
+                      className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all ${
+                        index === activeImage ? 'ring-2 ring-white opacity-100' : 'opacity-50 hover:opacity-100'
+                      }`}
+                    >
+                      <img
+                        src={img.url}
+                        alt={`Thumbnail ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         )}

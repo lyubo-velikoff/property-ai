@@ -89,7 +89,7 @@ router.patch(
   '/properties/:id',
   protect,
   restrictTo('ADMIN'),
-  upload.array('images', 10),
+  upload.array('image', 20),
   async (req, res, next) => {
     try {
       const data = propertySchema.parse(req.body);
