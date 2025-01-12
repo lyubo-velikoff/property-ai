@@ -8,6 +8,7 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminProperties from './pages/admin/Properties';
 import EditProperty from './pages/admin/EditProperty';
 import Messages from './pages/admin/Messages';
+import Users from './pages/admin/Users';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import Layout from './components/layout/Layout';
@@ -34,6 +35,7 @@ export default function AppRoutes() {
         <Route path="properties" element={<AdminProperties />} />
         <Route path="properties/:id/edit" element={<EditProperty />} />
         <Route path="messages" element={<Messages />} />
+        <Route path="users" element={<Users />} />
       </Route>
     </Routes>
   );

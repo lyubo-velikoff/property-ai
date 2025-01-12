@@ -1,49 +1,38 @@
 import api from '../lib/api';
-import type { ApiResponse, User, PaginatedResponse } from '../types/api';
+import type { User } from '@prisma/client';
 
-export interface UserFilters {
-  page?: number;
-  limit?: number;
+// The shape of data returned by the API
+interface UsersResponse {
+  users: User[];
+  total: number;
+  page: number;
+  pages: number;
 }
 
-export interface CreateUserData {
-  name: string;
-  email: string;
-  password: string;
-  role?: 'ADMIN' | 'USER';
+interface UserResponse {
+  user: User;
 }
 
-export interface UpdateUserData {
-  name?: string;
-  email?: string;
-  password?: string;
-  role?: 'ADMIN' | 'USER';
+export async function getUsers(page: number, limit: number) {
+  // The axios interceptor transforms response to be the data property from the API response
+  return api.get<UsersResponse>(`/admin/users?page=${page}&limit=${limit}`);
 }
 
-export const getUsers = async (filters: UserFilters = {}): Promise<PaginatedResponse<User>> => {
-  const params = new URLSearchParams();
-  if (filters.page) params.append('page', filters.page.toString());
-  if (filters.limit) params.append('limit', filters.limit.toString());
+export async function getUser(id: string): Promise<User> {
+  const response = await api.get<UserResponse>(`/admin/users/${id}`);
+  return response.user;
+}
 
-  const response = await api.get<ApiResponse<PaginatedResponse<User>>>(`/users?${params}`);
-  return response.data.data;
-};
+export async function createUser(data: Omit<User, 'id' | 'createdAt'>): Promise<User> {
+  const response = await api.post<UserResponse>('/admin/users', data);
+  return response.user;
+}
 
-export const getUser = async (id: string): Promise<User> => {
-  const response = await api.get<ApiResponse<{ user: User }>>(`/users/${id}`);
-  return response.data.data.user;
-};
+export async function updateUser(id: string, data: Partial<Omit<User, 'id' | 'createdAt'>>): Promise<User> {
+  const response = await api.patch<UserResponse>(`/admin/users/${id}`, data);
+  return response.user;
+}
 
-export const createUser = async (data: CreateUserData): Promise<User> => {
-  const response = await api.post<ApiResponse<{ user: User }>>('/users', data);
-  return response.data.data.user;
-};
-
-export const updateUser = async (id: string, data: UpdateUserData): Promise<User> => {
-  const response = await api.patch<ApiResponse<{ user: User }>>(`/users/${id}`, data);
-  return response.data.data.user;
-};
-
-export const deleteUser = async (id: string): Promise<void> => {
-  await api.delete<ApiResponse<null>>(`/users/${id}`);
-}; 
+export async function deleteUser(id: string): Promise<void> {
+  await api.delete(`/admin/users/${id}`);
+} 

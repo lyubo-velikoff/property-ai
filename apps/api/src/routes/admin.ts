@@ -8,6 +8,14 @@ import { propertySchema } from './properties.js';
 
 const router = Router();
 
+// User schema for validation
+const userSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  role: z.enum(['USER', 'ADMIN']).default('USER'),
+});
+
 // Get admin dashboard stats
 router.get('/stats', protect, restrictTo('ADMIN'), async (req, res, next) => {
   try {
@@ -127,5 +135,159 @@ router.patch(
     }
   }
 );
+
+// Get all users (admin)
+router.get('/users', protect, restrictTo('ADMIN'), async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          createdAt: true,
+        },
+      }),
+      prisma.user.count(),
+    ]);
+
+    res.json({
+      status: 'success',
+      data: {
+        users,
+        total,
+        page,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get single user (admin)
+router.get('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: String(req.params.id) },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    res.json({
+      status: 'success',
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Create user (admin)
+router.post('/users', protect, restrictTo('ADMIN'), async (req, res, next) => {
+  try {
+    const data = userSchema.parse(req.body);
+
+    // Check if user with email already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (existingUser) {
+      throw new AppError('User with this email already exists', 400);
+    }
+
+    const user = await prisma.user.create({
+      data,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    res.status(201).json({
+      status: 'success',
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Update user (admin)
+router.patch('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+  try {
+    const data = userSchema.partial().parse(req.body);
+
+    // If email is being updated, check if it's already taken
+    if (data.email) {
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          email: data.email,
+          NOT: { id: String(req.params.id) },
+        },
+      });
+
+      if (existingUser) {
+        throw new AppError('User with this email already exists', 400);
+      }
+    }
+
+    const user = await prisma.user.update({
+      where: { id: String(req.params.id) },
+      data,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    res.json({
+      status: 'success',
+      data: { user },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Delete user (admin)
+router.delete('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+  try {
+    await prisma.user.delete({
+      where: { id: String(req.params.id) },
+    });
+
+    res.json({
+      status: 'success',
+      data: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 export default router; 
