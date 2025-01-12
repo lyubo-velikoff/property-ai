@@ -120,6 +120,7 @@ router.post(
     try {
       const data = propertySchema.parse(req.body);
       const files = req.files as Express.Multer.File[];
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
 
       const property = await prisma.property.create({
         data: {
@@ -129,7 +130,7 @@ router.post(
           },
           images: {
             create: files.map((file) => ({
-              url: `/uploads/${file.filename}`,
+              url: `${baseUrl}/uploads/properties/${file.filename}`,
             })),
           },
         },

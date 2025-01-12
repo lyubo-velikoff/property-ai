@@ -28,13 +28,16 @@ model Property {
   construction_type String?
   furnishing      String?
   location        String
-  category        String
-  type            String
+  category        String      @default("SALE")
+  type            String      @default("APARTMENT")
   featured        Boolean       @default(false)
   images          Image[]
   contact_info    ContactInfo?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+
+  @@index([category])
+  @@index([type])
 }
 
 model Image {

@@ -10,7 +10,8 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:seed": "tsx prisma/seed.ts",
+    "fix:categories": "tsx scripts/fix-property-categories.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

@@ -9,7 +9,7 @@ type FileNameCallback = (error: Error | null, filename: string) => void;
 // Configure multer for image uploads
 const storage = multer.diskStorage({
   destination: (_req: Request, _file: Express.Multer.File, cb: DestinationCallback) => {
-    cb(null, 'uploads/properties');
+    cb(null, path.join(process.cwd(), 'uploads/properties'));
   },
   filename: (_req: Request, file: Express.Multer.File, cb: FileNameCallback) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -30,6 +30,6 @@ export const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
+    fileSize: 10 * 1024 * 1024, // 10MB
   },
 }); 
