@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { getMessages, markMessageAsRead, deleteMessage } from '../../services/contact';
+import { getMessages, markMessageAsRead, deleteMessage } from '../../services/messages';
 import { event } from '../../lib/analytics';
-import type { ContactMessage } from '../../types/api';
+import type { ContactMessage } from '@prisma/client';
 
 export default function Messages() {
   const [page, setPage] = useState(1);
@@ -13,7 +13,7 @@ export default function Messages() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['messages', page],
-    queryFn: () => getMessages({ page, limit }),
+    queryFn: () => getMessages(page, limit),
   });
 
   const markAsReadMutation = useMutation({
