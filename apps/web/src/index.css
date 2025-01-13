@@ -3,64 +3,90 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-primary-50: 239 246 255;
+    --color-primary-100: 219 234 254;
+    --color-primary-200: 191 219 254;
+    --color-primary-300: 147 197 253;
+    --color-primary-400: 96 165 250;
+    --color-primary-500: 59 130 246;
+    --color-primary-600: 37 99 235;
+    --color-primary-700: 29 78 216;
+    --color-primary-800: 30 64 175;
+    --color-primary-900: 30 58 138;
+    --color-primary-950: 23 37 84;
+  }
+
   html {
-    @apply h-full scroll-smooth antialiased;
+    @apply antialiased;
   }
-  
+
   body {
-    @apply h-full bg-white text-gray-900 dark:bg-gray-900 dark:text-white;
+    @apply text-gray-900 dark:text-gray-100;
   }
-  
-  #root {
-    @apply h-full;
+
+  .container {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 }
 
 @layer components {
-  .container {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  .btn {
+    @apply inline-flex justify-center items-center px-4 py-2 text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  
-  .fade-enter {
-    opacity: 0;
-    transform: translateY(10px);
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 dark:bg-primary-500 dark:hover:bg-primary-600;
   }
-  
-  .fade-enter-active {
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 300ms ease-in, transform 300ms ease-out;
+
+  .btn-secondary {
+    @apply bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 focus:ring-primary-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700;
   }
-  
-  .fade-exit {
-    opacity: 1;
-    transform: translateY(0);
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-500 dark:hover:bg-red-600;
   }
-  
-  .fade-exit-active {
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 300ms ease-in, transform 300ms ease-out;
+
+  .input {
+    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700 dark:placeholder:text-gray-500 dark:focus:ring-primary-500;
+  }
+
+  .select {
+    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:max-w-xs sm:text-sm sm:leading-6 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700 dark:focus:ring-primary-500;
+  }
+
+  .textarea {
+    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 dark:bg-gray-800 dark:text-gray-100 dark:ring-gray-700 dark:placeholder:text-gray-500 dark:focus:ring-primary-500;
+  }
+
+  .checkbox {
+    @apply h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-primary-500 dark:focus:ring-primary-500;
+  }
+
+  .radio {
+    @apply h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-600 dark:border-gray-700 dark:bg-gray-800 dark:text-primary-500 dark:focus:ring-primary-500;
+  }
+
+  .label {
+    @apply block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100;
+  }
+
+  .help-text {
+    @apply mt-2 text-sm text-gray-500 dark:text-gray-400;
+  }
+
+  .error-text {
+    @apply mt-2 text-sm text-red-600 dark:text-red-400;
   }
 }
 
-/* Scroll effect for header */
-@media (min-width: 768px) {
-  header nav {
-    height: 5rem; /* 80px - h-20 */
-    transition: height 0.3s ease-in-out;
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
-  header nav img {
-    height: 4rem; /* 64px - h-16 */
-    transition: height 0.3s ease-in-out;
-  }
-
-  :is(html:not(:has(main[data-scroll="0"]))) header nav {
-    height: 4rem; /* 64px - h-16 */
-  }
-
-  :is(html:not(:has(main[data-scroll="0"]))) header nav img {
-    height: 3rem; /* 48px - h-12 */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
