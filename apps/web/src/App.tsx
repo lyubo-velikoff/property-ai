@@ -1,12 +1,14 @@
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import AppRoutes from './AppRoutes';
+import { UserProvider } from './contexts/UserContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: false,
+      retry: 1,
       refetchOnWindowFocus: false,
     },
   },
@@ -14,12 +16,15 @@ const queryClient = new QueryClient({
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
         <ThemeProvider>
-          <AppRoutes />
+          <UserProvider>
+            <AppRoutes />
+          </UserProvider>
         </ThemeProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+      <ReactQueryDevtools />
+    </QueryClientProvider>
   );
 }

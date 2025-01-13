@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { z } from 'zod';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import api from '../../lib/api';
+import { useUser } from '../../contexts/UserContext';
 
 const loginSchema = z.object({
   email: z.string().email('Невалиден имейл адрес'),
@@ -12,21 +12,24 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>;
 
+interface User {
+  id: string;
+  email: string;
+  role: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface LoginResponse {
-  status: string;
-  data: {
-    user: {
-      id: string;
-      email: string;
-      role: string;
-    };
-    token: string;
-  };
+  user: User;
+  token: string;
 }
 
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { setUser } = useUser();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/admin';
 
   const [formData, setFormData] = useState<LoginForm>({
@@ -36,27 +39,21 @@ export default function Login() {
 
   const [errors, setErrors] = useState<Partial<LoginForm>>({});
 
-  const { mutate, isLoading } = useMutation<LoginResponse, Error, LoginForm>({
+  const { mutate, isPending } = useMutation<LoginResponse, Error, LoginForm>({
     mutationFn: async (data: LoginForm) => {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Invalid credentials');
-      }
-
-      return response.json();
+      const response = await api.post<LoginResponse>('/auth/login', data);
+      console.log('API Response:', response.data);
+      return response.data;
     },
     onSuccess: (response) => {
-      localStorage.setItem('token', response.data.token);
-      navigate(from, { replace: true });
+      console.log('Success Response:', response);
+      localStorage.setItem('token', response.token);
+      setUser(response.user);
+      // Force navigation to admin dashboard
+      window.location.href = '/admin';
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Login error:', error);
       setErrors({
         email: 'Невалиден имейл или парола',
         password: 'Невалиден имейл или парола',
@@ -74,7 +71,7 @@ export default function Login() {
     } catch (err) {
       if (err instanceof z.ZodError) {
         const fieldErrors: Partial<LoginForm> = {};
-        err.errors.forEach((error: z.ZodIssue) => {
+        err.errors.forEach((error) => {
           if (error.path[0]) {
             fieldErrors[error.path[0] as keyof LoginForm] = error.message;
           }
@@ -85,15 +82,15 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gray-50 dark:bg-gray-900 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-3xl font-bold text-center text-gray-900 dark:text-white">
             Вход в администрацията
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+          <div className="-space-y-px rounded-md shadow-sm">
             <div>
               <label htmlFor="email" className="sr-only">
                 Имейл
@@ -145,10 +142,10 @@ export default function Login() {
           <div>
             <button
               type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isPending}
+              className="relative flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md group hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Влизане...' : 'Влез'}
+              {isPending ? 'Влизане...' : 'Влез'}
             </button>
           </div>
         </form>

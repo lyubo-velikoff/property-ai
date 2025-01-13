@@ -10,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import ThemeToggle from '../ThemeToggle';
+import { useUser } from '../../contexts/UserContext';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
@@ -25,12 +26,18 @@ function classNames(...classes: string[]) {
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const { user, logout } = useUser();
 
   const isActivePath = (path: string) => {
     if (path === '/admin') {
       return location.pathname === '/admin';
     }
     return location.pathname.startsWith(path);
+  };
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    logout();
   };
 
   return (
@@ -186,9 +193,14 @@ export default function AdminLayout() {
               <Menu as="div" className="relative">
                 <Menu.Button className="-m-1.5 flex items-center p-1.5">
                   <span className="sr-only">Open user menu</span>
+                  <span className="hidden text-sm font-medium text-gray-900 dark:text-gray-300 mr-2 lg:block">
+                    {user?.name}
+                  </span>
                   <img
                     className="w-8 h-8 bg-gray-50 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      user?.name || 'Admin'
+                    )}&background=random`}
                     alt=""
                   />
                 </Menu.Button>
@@ -217,15 +229,15 @@ export default function AdminLayout() {
                     </Menu.Item>
                     <Menu.Item>
                       {({ active }) => (
-                        <Link
-                          to="/logout"
+                        <button
+                          onClick={handleLogout}
                           className={classNames(
                             active ? 'bg-gray-50 dark:bg-gray-700' : '',
-                            'block px-3 py-1 text-sm leading-6 text-gray-900 dark:text-gray-300'
+                            'block w-full text-left px-3 py-1 text-sm leading-6 text-gray-900 dark:text-gray-300'
                           )}
                         >
                           Sign out
-                        </Link>
+                        </button>
                       )}
                     </Menu.Item>
                   </Menu.Items>

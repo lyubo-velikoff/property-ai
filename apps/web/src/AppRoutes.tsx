@@ -14,6 +14,7 @@ import NewUser from './pages/admin/NewUser';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AdminLayout from './components/admin/AdminLayout';
 import Layout from './components/layout/Layout';
+import Login from './pages/admin/Login';
 
 export default function AppRoutes() {
   return (
@@ -25,6 +26,10 @@ export default function AppRoutes() {
         <Route path="/properties" element={<Properties />} />
         <Route path="/properties/:id" element={<PropertyDetails />} />
       </Route>
+
+      {/* Admin Routes */}
+      <Route path="/admin/login" element={<Login />} />
+      
       <Route
         path="/admin"
         element={
