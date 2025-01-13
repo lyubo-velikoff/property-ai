@@ -140,36 +140,33 @@ export default function PropertyDetails() {
           <div className="lg:col-span-2">
             {/* Image Gallery */}
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-lg aspect-w-16 aspect-h-9 cursor-pointer group" onClick={() => setShowFullscreen(true)}>
+            <div className="overflow-hidden relative w-full rounded-lg" onClick={() => setShowFullscreen(true)}>
                 <img
                   src={property.images[activeImage]?.url || '/images/property-placeholder.webp'}
                   alt={property.title}
-                  className="object-cover w-full h-full transition-opacity duration-300"
+                  className="object-cover w-full h-auto rounded-lg"
                 />
                 {property.images && property.images.length > 1 && (
                   <>
-                    {/* Previous Button */}
                     <button
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent modal from opening when clicking arrows
+                        e.stopPropagation();
                         setActiveImage((prev) => (prev === 0 ? property.images.length - 1 : prev - 1));
                       }}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors opacity-0 group-hover:opacity-100"
+                      className="absolute left-2 top-1/2 p-2 text-white rounded-full transition-colors -translate-y-1/2 bg-black/50 hover:bg-black/75"
                     >
                       <ChevronLeftIcon className="w-6 h-6" />
                     </button>
-                    {/* Next Button */}
                     <button
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent modal from opening when clicking arrows
+                        e.stopPropagation();
                         setActiveImage((prev) => (prev === property.images.length - 1 ? 0 : prev + 1));
                       }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors opacity-0 group-hover:opacity-100"
+                      className="absolute right-2 top-1/2 p-2 text-white rounded-full transition-colors -translate-y-1/2 bg-black/50 hover:bg-black/75"
                     >
                       <ChevronRightIcon className="w-6 h-6" />
                     </button>
-                    {/* Image Counter */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 text-white text-sm opacity-0 group-hover:opacity-100">
+                    <div className="absolute bottom-4 left-1/2 px-3 py-1 text-sm text-white rounded-full -translate-x-1/2 bg-black/50">
                       {activeImage + 1} / {property.images.length}
                     </div>
                   </>
@@ -369,24 +366,24 @@ export default function PropertyDetails() {
         {/* Fullscreen Image Modal */}
         {showFullscreen && (
           <div 
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+            className="flex fixed inset-0 z-50 justify-center items-center bg-black/90"
             onClick={handleFullscreenClose}
           >
-            <div className="relative w-full h-full flex items-center justify-center">
+            <div className="flex relative justify-center items-center w-full h-full">
               {/* Close button */}
               <button
                 onClick={() => setShowFullscreen(false)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors z-50"
+                className="absolute top-4 right-4 z-50 p-2 text-white rounded-full transition-colors bg-black/50 hover:bg-black/75"
               >
                 <XMarkIcon className="w-6 h-6" />
               </button>
 
               {/* Main Image */}
-              <div className="relative w-full h-full flex items-center justify-center p-4">
+              <div className="flex relative justify-center items-center p-4 w-full h-full">
                 <img
                   src={property.images[activeImage]?.url}
                   alt={`Property view ${activeImage + 1}`}
-                  className="max-h-full max-w-full object-contain"
+                  className="object-contain max-w-full max-h-full"
                 />
 
                 {property.images && property.images.length > 1 && (
@@ -397,7 +394,7 @@ export default function PropertyDetails() {
                         e.stopPropagation();
                         setActiveImage((prev) => (prev === 0 ? property.images.length - 1 : prev - 1));
                       }}
-                      className="absolute left-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors"
+                      className="absolute left-4 p-2 text-white rounded-full transition-colors bg-black/50 hover:bg-black/75"
                     >
                       <ChevronLeftIcon className="w-8 h-8" />
                     </button>
@@ -408,13 +405,13 @@ export default function PropertyDetails() {
                         e.stopPropagation();
                         setActiveImage((prev) => (prev === property.images.length - 1 ? 0 : prev + 1));
                       }}
-                      className="absolute right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/75 transition-colors"
+                      className="absolute right-4 p-2 text-white rounded-full transition-colors bg-black/50 hover:bg-black/75"
                     >
                       <ChevronRightIcon className="w-8 h-8" />
                     </button>
 
                     {/* Image Counter */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/50 text-white">
+                    <div className="absolute bottom-4 left-1/2 px-4 py-2 text-white rounded-full -translate-x-1/2 bg-black/50">
                       {activeImage + 1} / {property.images.length}
                     </div>
                   </>
@@ -422,8 +419,8 @@ export default function PropertyDetails() {
               </div>
 
               {/* Thumbnails */}
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="flex gap-2 justify-center overflow-x-auto pb-2">
+              <div className="absolute right-0 bottom-0 left-0 p-4">
+                <div className="flex overflow-x-auto gap-2 justify-center pb-2">
                   {property.images.map((img: PropertyImage, index: number) => (
                     <button
                       key={index}
@@ -438,7 +435,7 @@ export default function PropertyDetails() {
                       <img
                         src={img.url}
                         alt={`Thumbnail ${index + 1}`}
-                        className="w-full h-full object-cover"
+                        className="object-cover w-full h-full"
                       />
                     </button>
                   ))}
