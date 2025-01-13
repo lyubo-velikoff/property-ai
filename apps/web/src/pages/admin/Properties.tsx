@@ -91,8 +91,8 @@ export default function Properties() {
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-xl font-semibold text-gray-900">Имоти</h1>
-          <p className="mt-2 text-sm text-gray-700">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Имоти</h1>
+          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
             Списък с всички имоти в системата
           </p>
         </div>
@@ -118,9 +118,12 @@ export default function Properties() {
         <div className="overflow-x-auto -mx-4 -my-2 sm:-mx-6 lg:-mx-8">
           <div className="inline-block py-2 min-w-full align-middle md:px-6 lg:px-8">
             <div className="overflow-hidden ring-1 ring-black ring-opacity-5 shadow md:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+              <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      Изображение
+                    </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Заглавие
                     </th>
@@ -139,12 +142,21 @@ export default function Properties() {
                   {properties.map((property) => (
                     <tr key={property.id}>
                       <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                        {property.images && property.images[0] && (
+                          <img 
+                            src={property.images[0].url} 
+                            alt={property.title}
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        )}
+                      </td>
+                      <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
                         {property.title}
                       </td>
-                      <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
                         {property.type}
                       </td>
-                      <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
                         {new Intl.NumberFormat('bg-BG', {
                           style: 'currency',
                           currency: property.currency || 'BGN'
@@ -176,26 +188,26 @@ export default function Properties() {
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-between items-center px-4 py-3 mt-4 bg-white border-t border-gray-200 sm:px-6">
+        <div className="flex justify-between items-center px-4 py-3 mt-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 sm:px-6">
           <div className="flex flex-1 justify-between sm:hidden">
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="inline-flex relative items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 hover:bg-gray-50"
+              className="inline-flex relative items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
             >
               Предишна
             </button>
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="inline-flex relative items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 hover:bg-gray-50"
+              className="inline-flex relative items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
             >
               Следваща
             </button>
           </div>
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
                 Страница <span className="font-medium">{page}</span> от{' '}
                 <span className="font-medium">{totalPages}</span>
               </p>
@@ -205,7 +217,7 @@ export default function Properties() {
                 <button
                   onClick={() => setPage(p => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="inline-flex relative items-center px-2 py-2 text-gray-400 rounded-l-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                  className="inline-flex relative items-center px-2 py-2 text-gray-400 dark:text-gray-500 rounded-l-md ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                 >
                   <span className="sr-only">Предишна</span>
                   <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -215,7 +227,7 @@ export default function Properties() {
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="inline-flex relative items-center px-2 py-2 text-gray-400 rounded-r-md ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                  className="inline-flex relative items-center px-2 py-2 text-gray-400 dark:text-gray-500 rounded-r-md ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                 >
                   <span className="sr-only">Следваща</span>
                   <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

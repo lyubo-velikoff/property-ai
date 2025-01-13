@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import type { CreatePropertyData } from '../../types/api';
+import type { CreatePropertyData, Property } from '../../types/api';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface PropertyFormProps {
-  initialData?: Partial<CreatePropertyData>;
+  initialData?: Property;
   onSubmit: (data: CreatePropertyData, images: File[]) => Promise<void>;
   isSubmitting?: boolean;
   onCancel?: () => void;
@@ -307,38 +308,109 @@ export default function PropertyForm({
         </div>
 
         <div className="sm:col-span-2">
-          <label htmlFor="images" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Снимки
-          </label>
-          <input
-            type="file"
-            id="images"
-            name="images"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-            className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-primary-900/50 file:text-primary-700 dark:file:text-primary-300 hover:file:bg-primary-100 dark:hover:file:bg-primary-900/75"
-          />
-        </div>
-      </div>
+          {initialData?.images && initialData.images.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Текущи изображения
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {initialData.images.map((image) => (
+                  <div key={image.id} className="relative group">
+                    <img
+                      src={image.url}
+                      alt={initialData.title}
+                      className="w-full h-32 object-cover rounded-lg"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-      <div className="flex justify-end space-x-3">
-        {onCancel && (
+          {/* Image Upload */}
+          <div className="mt-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {initialData?.images?.length ? 'Добави нови изображения' : 'Изображения'}
+            </label>
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md">
+              <div className="space-y-1 text-center">
+                <svg
+                  className="mx-auto h-12 w-12 text-gray-400"
+                  stroke="currentColor"
+                  fill="none"
+                  viewBox="0 0 48 48"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <div className="flex text-sm text-gray-600 dark:text-gray-400">
+                  <label
+                    htmlFor="images"
+                    className="relative cursor-pointer rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500"
+                  >
+                    <span>Качи файлове</span>
+                    <input
+                      id="images"
+                      name="images"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="sr-only"
+                    />
+                  </label>
+                  <p className="pl-1">или ги провлачете тук</p>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  PNG, JPG, WEBP до 10MB
+                </p>
+              </div>
+            </div>
+            {images.length > 0 && (
+              <div className="mt-4">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Избрани файлове:</h4>
+                <ul className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
+                  {Array.from(images).map((file, index) => (
+                    <li key={index} className="py-2 flex items-center justify-between">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => setImages(images.filter((_, i) => i !== index))}
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                      >
+                        <XMarkIcon className="h-5 w-5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="sm:col-span-2 flex justify-end gap-3">
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600"
+            >
+              Отказ
+            </button>
+          )}
           <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600"
+            type="submit"
+            disabled={isSubmitting}
+            className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md border border-transparent shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Отказ
+            {isSubmitting ? 'Запазване...' : submitLabel}
           </button>
-        )}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md shadow-sm hover:bg-primary-700 disabled:opacity-50"
-        >
-          {isSubmitting ? 'Запазване...' : submitLabel}
-        </button>
+        </div>
       </div>
     </form>
   );

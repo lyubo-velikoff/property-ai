@@ -100,16 +100,35 @@ router.patch(
   upload.array('image', 20),
   async (req, res, next) => {
     try {
-      const data = propertySchema.parse(req.body);
+      const data = propertySchema.parse({
+        ...req.body,
+        contact_info: typeof req.body.contact_info === 'string' 
+          ? JSON.parse(req.body.contact_info)
+          : req.body.contact_info
+      });
       const files = req.files as Express.Multer.File[];
       const baseUrl = `${req.protocol}://${req.get('host')}`;
 
+      // Get the existing property to get the contact info ID
+      const existingProperty = await prisma.property.findUnique({
+        where: { id: req.params.id },
+        include: { contact_info: true },
+      });
+
+      if (!existingProperty) {
+        throw new AppError(404, 'Property not found');
+      }
+
+      // Update the property with the correct contact info reference
       const property = await prisma.property.update({
         where: { id: req.params.id },
         data: {
           ...data,
           contact_info: {
-            update: data.contact_info,
+            update: {
+              phone: data.contact_info.phone,
+              email: data.contact_info.email,
+            },
           },
           ...(files.length > 0 && {
             images: {

@@ -10,16 +10,19 @@ const router = Router();
 export const propertySchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
-  price: z.string().transform((val) => Number(val)),
+  price: z.coerce.number(),
   currency: z.enum(['BGN', 'EUR', 'USD']).default('EUR'),
-  area_sqm: z.string().transform((val) => Number(val)),
-  floor: z.string().transform((val) => val ? Number(val) : undefined).optional(),
+  area_sqm: z.coerce.number(),
+  floor: z.coerce.number().nullable().optional(),
   construction_type: z.string().optional(),
   furnishing: z.string().optional(),
   location: z.string().min(3, 'Location must be at least 3 characters'),
-  category: z.string().transform((val) => val.toUpperCase()).pipe(z.enum(['SALE', 'RENT'])),
-  type: z.string().transform((val) => val.toUpperCase()).pipe(z.enum(['APARTMENT', 'HOUSE', 'OFFICE', 'STORE', 'LAND'])),
-  contact_info: z.string().transform((val) => JSON.parse(val)),
+  category: z.enum(['SALE', 'RENT']),
+  type: z.enum(['APARTMENT', 'HOUSE', 'OFFICE', 'STORE', 'LAND']),
+  contact_info: z.object({
+    phone: z.string(),
+    email: z.string().email(),
+  }),
 });
 
 // Get all properties with filtering
@@ -160,6 +163,7 @@ router.patch(
     try {
       const data = propertySchema.parse(req.body);
       const files = req.files as Express.Multer.File[];
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
 
       const property = await prisma.property.update({
         where: { id: req.params.id },
@@ -172,7 +176,7 @@ router.patch(
             images: {
               deleteMany: {},
               create: files.map((file) => ({
-                url: `/uploads/${file.filename}`,
+                url: `${baseUrl}/uploads/properties/${file.filename}`,
               })),
             },
           }),
