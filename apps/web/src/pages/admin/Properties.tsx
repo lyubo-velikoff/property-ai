@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
-import { getAdminProperties, deleteProperty } from '../../services/properties';
+import { getProperties, deleteProperty } from '../../services/properties';
 import { event } from '../../lib/analytics';
-import type { Property, PaginatedResponse } from '../../types/api';
+import type { Property } from '../../types/api';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 export default function Properties() {
   const [page, setPage] = useState(1);
@@ -12,18 +13,19 @@ export default function Properties() {
 
   const queryClient = useQueryClient();
 
-  const { data, isLoading, error, refetch } = useQuery<PaginatedResponse<Property>>({
-    queryKey: ['admin-properties', page],
-    queryFn: () => getAdminProperties({ page, limit }),
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['properties', page],
+    queryFn: () => getProperties(page, limit),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const properties = data?.properties || [];
-  const totalPages = Math.ceil((data?.total || 0) / limit);
+  const totalPages = data?.pages || 0;
 
   const { mutate: deletePropertyMutation, isPending: isDeleting } = useMutation({
     mutationFn: deleteProperty,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-properties'] });
+      queryClient.invalidateQueries({ queryKey: ['properties'] });
       
       event({
         action: 'property_delete',
@@ -49,7 +51,7 @@ export default function Properties() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="w-12 h-12 rounded-full border-b-2 border-red-600 animate-spin"></div>
+        <LoadingSpinner />
       </div>
     );
   }

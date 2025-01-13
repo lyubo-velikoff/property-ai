@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createUser } from '../../services/users';
 import type { CreateUserData } from '../../types/api';
 
 export default function NewUser() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  
   const [formData, setFormData] = useState<CreateUserData>({
     name: '',
     email: '',
@@ -17,6 +19,8 @@ export default function NewUser() {
   const createMutation = useMutation({
     mutationFn: createUser,
     onSuccess: () => {
+      // Invalidate users query to refetch the list
+      queryClient.invalidateQueries({ queryKey: ['users'] });
       navigate('/admin/users');
     },
     onError: (error: any) => {

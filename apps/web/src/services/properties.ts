@@ -1,58 +1,45 @@
 import api from '../lib/api';
-import type { ApiResponse, Property, PaginatedResponse } from '../types/api';
+import type { Property, CreatePropertyData } from '../types/api';
 
-export interface PropertyFilters {
-  type?: string;
-  category?: string;
-  location?: string;
-  page?: number;
-  limit?: number;
+interface PropertiesResponse {
+  properties: Property[];
+  total: number;
+  page: number;
+  pages: number;
 }
 
-export async function getProperties(filters: PropertyFilters = {}) {
-  const params = new URLSearchParams();
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value) params.append(key, String(value));
-  });
+interface PropertyResponse {
+  property: Property;
+}
 
-  const response = await api.get<ApiResponse<PaginatedResponse<Property>>>(`/properties?${params}`);
+export async function getProperties(page: number, limit: number): Promise<PropertiesResponse> {
+  const response = await api.get<PropertiesResponse>(`/admin/properties?page=${page}&limit=${limit}`);
   return response.data;
 }
 
-export async function getAdminProperties(filters: PropertyFilters = {}) {
-  const params = new URLSearchParams();
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value) params.append(key, String(value));
-  });
-
-  const response = await api.get<PaginatedResponse<Property>>(`/admin/properties?${params}`);
-  return response.data;
+export async function getProperty(id: string): Promise<Property> {
+  const response = await api.get<PropertyResponse>(`/admin/properties/${id}`);
+  return response.data.property;
 }
 
-export async function getProperty(id: string) {
-  const response = await api.get<{ property: Property }>(`/admin/properties/${id}`);
-  return response.data;
-}
-
-export async function createProperty(data: FormData) {
-  const response = await api.post<ApiResponse<Property>>('/admin/properties', data, {
+export async function createProperty(data: FormData): Promise<Property> {
+  const response = await api.post<PropertyResponse>('/admin/properties', data, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   });
-  return response.data;
+  return response.data.property;
 }
 
-export async function updateProperty(id: string, data: FormData) {
-  const response = await api.patch<ApiResponse<Property>>(`/admin/properties/${id}`, data, {
+export async function updateProperty(id: string, data: FormData): Promise<Property> {
+  const response = await api.patch<PropertyResponse>(`/admin/properties/${id}`, data, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
   });
-  return response.data;
+  return response.data.property;
 }
 
-export async function deleteProperty(id: string) {
-  const response = await api.delete<ApiResponse<void>>(`/admin/properties/${id}`);
-  return response.data;
+export async function deleteProperty(id: string): Promise<void> {
+  await api.delete(`/admin/properties/${id}`);
 } 

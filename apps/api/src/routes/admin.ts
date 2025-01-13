@@ -290,4 +290,46 @@ router.delete('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next)
   }
 });
 
+// Create property (admin only)
+router.post(
+  '/properties',
+  protect,
+  restrictTo('ADMIN'),
+  upload.array('image', 20),
+  async (req, res, next) => {
+    try {
+      const data = propertySchema.parse(req.body);
+      const files = req.files as Express.Multer.File[];
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+      const property = await prisma.property.create({
+        data: {
+          ...data,
+          contact_info: {
+            create: data.contact_info,
+          },
+          ...(files.length > 0 && {
+            images: {
+              create: files.map((file) => ({
+                url: `${baseUrl}/uploads/properties/${file.filename}`,
+              })),
+            },
+          }),
+        },
+        include: {
+          images: true,
+          contact_info: true,
+        },
+      });
+
+      res.status(201).json({
+        status: 'success',
+        data: { property },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 export default router; 

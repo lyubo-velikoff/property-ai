@@ -35,6 +35,24 @@ export interface Property {
   updatedAt: string;
 }
 
+export interface CreatePropertyData {
+  title: string;
+  description: string;
+  price: number;
+  currency: 'BGN' | 'EUR' | 'USD';
+  area_sqm: number;
+  floor?: number;
+  construction_type?: string;
+  furnishing?: string;
+  location: string;
+  category: 'SALE' | 'RENT';
+  type: 'APARTMENT' | 'HOUSE' | 'OFFICE' | 'STORE' | 'LAND';
+  contact_info: {
+    phone: string;
+    email: string;
+  };
+}
+
 export interface Image {
   id: string;
   url: string;
@@ -48,8 +66,6 @@ export interface ContactInfo {
   phone: string;
   email: string;
   propertyId: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface ContactMessage {
@@ -79,7 +95,7 @@ export interface CreateUserData {
   name: string;
   email: string;
   password: string;
-  role: 'USER' | 'ADMIN';
+  role: 'ADMIN' | 'USER';
 }
 
 export interface PropertyFormData {
