@@ -20,6 +20,10 @@ interface PropertyImage {
   url: string;
 }
 
+function formatPrice(price: number) {
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
 export default function PropertyDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -234,7 +238,7 @@ export default function PropertyDetails() {
             {/* Price Card */}
             <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
               <div className="mb-4 text-3xl font-bold text-red-600">
-                {property.price}
+                {formatPrice(property.price)}
                 <span className="ml-1 text-xl">{property.currency}</span>
               </div>
               <div className="space-y-4">
