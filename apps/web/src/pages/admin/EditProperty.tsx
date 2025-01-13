@@ -58,8 +58,8 @@ export default function EditProperty() {
   if (!property) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-semibold text-gray-900">Имотът не е намерен</h2>
-        <p className="mt-2 text-gray-600">Този имот не съществува или е бил изтрит</p>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Имотът не е намерен</h2>
+        <p className="mt-2 text-gray-600 dark:text-gray-400">Този имот не съществува или е бил изтрит</p>
         <button
           onClick={() => navigate('/admin/properties')}
           className="mt-4 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700"
@@ -73,13 +73,13 @@ export default function EditProperty() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Редактиране на имот</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Редактиране на имот</h1>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Редактирайте информацията за имота
         </p>
       </div>
 
-      <div className="bg-white shadow-md rounded-lg p-6">
+      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
         <PropertyForm
           initialData={property}
           onSubmit={handleSubmit}
