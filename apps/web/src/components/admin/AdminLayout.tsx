@@ -6,6 +6,7 @@ import {
   UsersIcon,
   BuildingOfficeIcon,
   XMarkIcon,
+  EnvelopeIcon,
 } from '@heroicons/react/24/outline';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import ThemeToggle from '../ThemeToggle';
@@ -14,6 +15,7 @@ const navigation = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
   { name: 'Properties', href: '/admin/properties', icon: BuildingOfficeIcon },
   { name: 'Users', href: '/admin/users', icon: UsersIcon },
+  { name: 'Messages', href: '/admin/messages', icon: EnvelopeIcon },
 ];
 
 function classNames(...classes: string[]) {
@@ -47,7 +49,7 @@ export default function AdminLayout() {
             <div className="fixed inset-0 bg-gray-900/80" />
           </Transition.Child>
 
-          <div className="fixed inset-0 flex">
+          <div className="flex fixed inset-0">
             <Transition.Child
               as={Fragment}
               enter="transition ease-in-out duration-300 transform"
@@ -57,7 +59,7 @@ export default function AdminLayout() {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <Dialog.Panel className="relative flex flex-1 w-full max-w-xs mr-16">
+              <Dialog.Panel className="flex relative flex-1 mr-16 w-full max-w-xs">
                 <Transition.Child
                   as={Fragment}
                   enter="ease-in-out duration-300"
@@ -67,7 +69,7 @@ export default function AdminLayout() {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <div className="absolute top-0 flex justify-center items-center w-16 pt-5 left-full">
+                  <div className="flex absolute top-0 left-full justify-center items-center pt-5 w-16">
                     <button
                       type="button"
                       className="-m-2.5 p-2.5"
@@ -79,12 +81,12 @@ export default function AdminLayout() {
                   </div>
                 </Transition.Child>
                 {/* Sidebar component, swap this element with another sidebar if you like */}
-                <div className="flex flex-col px-6 pb-4 overflow-y-auto grow bg-white dark:bg-gray-800">
-                  <div className="flex h-16 shrink-0 items-center">
+                <div className="flex overflow-y-auto flex-col px-6 pb-4 bg-white grow dark:bg-gray-800">
+                  <div className="flex items-center h-16 shrink-0">
                     <img className="w-auto h-8" src="/images/logo.png" alt="Avalon" />
                   </div>
-                  <nav className="flex flex-1 flex-col">
-                    <ul role="list" className="flex flex-1 flex-col gap-y-7">
+                  <nav className="flex flex-col flex-1">
+                    <ul role="list" className="flex flex-col flex-1 gap-y-7">
                       <li>
                         <ul role="list" className="-mx-2 space-y-1">
                           {navigation.map((item) => (
@@ -125,12 +127,12 @@ export default function AdminLayout() {
       {/* Static sidebar for desktop */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         {/* Sidebar component, swap this element with another sidebar if you like */}
-        <div className="flex flex-col px-6 pb-4 overflow-y-auto grow border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          <div className="flex h-16 shrink-0 items-center">
+        <div className="flex overflow-y-auto flex-col px-6 pb-4 bg-white border-r border-gray-200 grow dark:border-gray-700 dark:bg-gray-800">
+          <div className="flex items-center h-16 shrink-0">
             <img className="w-auto h-8" src="/images/logo.png" alt="Avalon" />
           </div>
-          <nav className="flex flex-1 flex-col">
-            <ul role="list" className="flex flex-1 flex-col gap-y-7">
+          <nav className="flex flex-col flex-1">
+            <ul role="list" className="flex flex-col flex-1 gap-y-7">
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
                   {navigation.map((item) => (
@@ -165,27 +167,27 @@ export default function AdminLayout() {
       </div>
 
       <div className="lg:pl-72">
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="flex sticky top-0 z-40 gap-x-4 items-center px-4 h-16 bg-white border-b border-gray-200 shadow-sm shrink-0 dark:border-gray-700 dark:bg-gray-800 sm:gap-x-6 sm:px-6 lg:px-8">
           <button
             type="button"
             className="-m-2.5 p-2.5 text-gray-700 dark:text-gray-300 lg:hidden"
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
-            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+            <Bars3Icon className="w-6 h-6" aria-hidden="true" />
           </button>
 
           {/* Separator */}
-          <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 lg:hidden" aria-hidden="true" />
+          <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 lg:hidden" aria-hidden="true" />
 
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <div className="flex items-center gap-x-4 lg:gap-x-6 ml-auto">
+            <div className="flex gap-x-4 items-center ml-auto lg:gap-x-6">
               <ThemeToggle />
               <Menu as="div" className="relative">
                 <Menu.Button className="-m-1.5 flex items-center p-1.5">
                   <span className="sr-only">Open user menu</span>
                   <img
-                    className="h-8 w-8 rounded-full bg-gray-50"
+                    className="w-8 h-8 bg-gray-50 rounded-full"
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                     alt=""
                   />

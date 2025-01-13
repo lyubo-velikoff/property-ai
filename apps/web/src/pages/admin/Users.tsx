@@ -19,8 +19,6 @@ export default function Users() {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  console.log('Component data:', data?.data?.users);
-
   const deleteMutation = useMutation({
     mutationFn: deleteUser,
     onSuccess: () => {
@@ -60,13 +58,13 @@ export default function Users() {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
-            <h1 className="text-xl font-semibold text-gray-900">Потребители</h1>
-            <p className="mt-2 text-sm text-gray-700">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Потребители</h1>
+            <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
               Списък с всички потребители в системата
             </p>
           </div>
         </div>
-        <div className="p-4 text-center text-gray-600">
+        <div className="p-4 text-center text-gray-600 dark:text-gray-400">
           Зареждане на потребители...
         </div>
       </div>
@@ -79,13 +77,13 @@ export default function Users() {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
-            <h1 className="text-xl font-semibold text-gray-900">Потребители</h1>
-            <p className="mt-2 text-sm text-gray-700">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Потребители</h1>
+            <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
               Списък с всички потребители в системата
             </p>
           </div>
         </div>
-        <div className="p-4 text-center text-red-600">
+        <div className="p-4 text-center text-red-600 dark:text-red-400">
           Възникна грешка при зареждането на потребителите: {error instanceof Error ? error.message : 'Unknown error'}
         </div>
       </div>
@@ -98,8 +96,8 @@ export default function Users() {
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
-            <h1 className="text-xl font-semibold text-gray-900">Потребители</h1>
-            <p className="mt-2 text-sm text-gray-700">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Потребители</h1>
+            <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
               Списък с всички потребители в системата
             </p>
           </div>
@@ -114,7 +112,7 @@ export default function Users() {
             </Link>
           </div>
         </div>
-        <div className="p-4 text-center text-gray-600">
+        <div className="p-4 text-center text-gray-600 dark:text-gray-400">
           Няма намерени потребители
         </div>
       </div>
@@ -126,8 +124,8 @@ export default function Users() {
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-xl font-semibold text-gray-900">Потребители</h1>
-          <p className="mt-2 text-sm text-gray-700">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Потребители</h1>
+          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
             Списък с всички потребители в системата
           </p>
         </div>
@@ -147,19 +145,19 @@ export default function Users() {
         <div className="overflow-x-auto -mx-4 -my-2 sm:-mx-6 lg:-mx-8">
           <div className="inline-block py-2 min-w-full align-middle md:px-6 lg:px-8">
             <div className="overflow-hidden ring-1 ring-black ring-opacity-5 shadow md:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Име
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Имейл
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Роля
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Дата на регистрация
                     </th>
                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -167,24 +165,24 @@ export default function Users() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
                   {data?.data?.users.map((user: User) => (
                     <tr key={user.id}>
-                      <td className="py-4 pr-3 pl-4 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-6">
+                      <td className="py-4 pr-3 pl-4 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-gray-100 sm:pl-6">
                         {user.name}
                       </td>
-                      <td className="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">{user.email}</td>
-                      <td className="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                      <td className="px-3 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">{user.email}</td>
+                      <td className="px-3 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
                         {user.role === 'ADMIN' ? 'Администратор' : 'Потребител'}
                       </td>
-                      <td className="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                      <td className="px-3 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400">
                         {new Date(user.createdAt).toLocaleDateString('bg-BG')}
                       </td>
                       <td className="relative py-4 pr-4 pl-3 text-sm font-medium text-right whitespace-nowrap sm:pr-6">
                         {user.role !== 'ADMIN' && (
                           <button
                             onClick={() => handleDelete(user.id)}
-                            className="text-red-600 hover:text-red-900"
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                           >
                             Изтрий
                           </button>
@@ -196,25 +194,6 @@ export default function Users() {
               </table>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
-        <div className="flex flex-1 justify-between sm:hidden">
-          <button
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
-            className="inline-flex relative items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 hover:bg-gray-50"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => setPage(p => p + 1)}
-            disabled={page >= (data?.data?.pages || 1)}
-            className="inline-flex relative items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 hover:bg-gray-50"
-          >
-            Next
-          </button>
         </div>
       </div>
     </div>

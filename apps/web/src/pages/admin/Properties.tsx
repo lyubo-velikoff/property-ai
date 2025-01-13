@@ -118,16 +118,16 @@ export default function Properties() {
         <div className="overflow-x-auto -mx-4 -my-2 sm:-mx-6 lg:-mx-8">
           <div className="inline-block py-2 min-w-full align-middle md:px-6 lg:px-8">
             <div className="overflow-hidden ring-1 ring-black ring-opacity-5 shadow md:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Заглавие
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Тип
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Цена
                     </th>
                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -135,16 +135,16 @@ export default function Properties() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
                   {properties.map((property) => (
                     <tr key={property.id}>
-                      <td className="px-3 py-4 text-sm text-gray-900 whitespace-nowrap">
+                      <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
                         {property.title}
                       </td>
-                      <td className="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                      <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                         {property.type}
                       </td>
-                      <td className="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                      <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                         {new Intl.NumberFormat('bg-BG', {
                           style: 'currency',
                           currency: property.currency || 'BGN'
@@ -154,13 +154,13 @@ export default function Properties() {
                         <div className="flex gap-2 justify-end items-center">
                           <Link
                             to={`/admin/properties/${property.id}/edit`}
-                            className="text-indigo-600 hover:text-indigo-900"
+                            className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                           >
                             <PencilIcon className="w-5 h-5" aria-hidden="true" />
                           </Link>
                           <button
                             onClick={() => handleDelete(property.id)}
-                            className="text-red-600 hover:text-red-900"
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                           >
                             <TrashIcon className="w-5 h-5" aria-hidden="true" />
                           </button>
