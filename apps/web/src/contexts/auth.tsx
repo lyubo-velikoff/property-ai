@@ -36,6 +36,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const userData = await getCurrentUser();
         console.log('User data received:', userData);
         setUser(userData);
+        // If we're on the login page and verification succeeds, redirect to admin
+        if (window.location.pathname === '/admin/login') {
+          navigate('/admin');
+        }
       } catch (error) {
         console.error('Auth verification failed:', error);
         // Clear both token and user on auth error
@@ -112,7 +116,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      <div data-testid="auth-provider" data-user={JSON.stringify({ user })}>
+        {children}
+      </div>
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
