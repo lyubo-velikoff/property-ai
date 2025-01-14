@@ -1,6 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Dialog } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect } from 'react';
 import ThemeToggle from '../ThemeToggle';
 import { useAuth } from '../../contexts/auth';
@@ -39,14 +39,6 @@ export default function Layout() {
                   {item.name}
                 </Link>
               ))}
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-500"
-                >
-                  Администрация
-                </Link>
-              )}
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -94,15 +86,6 @@ export default function Layout() {
                     {item.name}
                   </Link>
                 ))}
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Администрация
-                  </Link>
-                )}
               </div>
               <div className="py-6">
                 <ThemeToggle />
@@ -158,6 +141,15 @@ export default function Layout() {
           </div>
         </div>
       </footer>
+      {isAdmin && (
+        <Link
+          to="/admin"
+          className="fixed bottom-24 right-6 p-3 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50"
+          title="Admin Panel"
+        >
+          <Cog6ToothIcon className="h-6 w-6" aria-hidden="true" />
+        </Link>
+      )}
     </div>
   );
 } 
