@@ -1,13 +1,8 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../lib/api';
-
-interface User {
-  id: string;
-  email: string;
-  role: string;
-  name: string;
-}
+import { useAuth } from '../../contexts/auth';
+import LoadingSpinner from '../LoadingSpinner';
 
 interface Props {
   children: React.ReactNode;
@@ -15,35 +10,34 @@ interface Props {
 
 export default function ProtectedRoute({ children }: Props) {
   const location = useLocation();
-  const token = localStorage.getItem('token');
+  const { setUser } = useAuth();
 
-  const { data: user, isLoading, isError } = useQuery<User>({
+  const { isLoading, isError, error } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: async () => {
+      const token = localStorage.getItem('token');
       if (!token) throw new Error('No token');
-      const response = await api.get('/auth/me');
-      console.log('Full API Response:', response);
-      console.log('Response data:', response.data);
-      return response.data.user;
+      
+      try {
+        const response = await api.get('/auth/me');
+        const user = response.data.user;
+        setUser(user);
+        return user;
+      } catch (err) {
+        console.error('Error in /auth/me request:', err);
+        throw err;
+      }
     },
     retry: false,
-    enabled: !!token,
   });
 
-  if (!token) {
-    return <Navigate to="/admin/login" state={{ from: location }} replace />;
-  }
-
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-t-2 border-b-2 border-red-600 rounded-full animate-spin"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
-  if (isError || !user) {
+  if (isError) {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 

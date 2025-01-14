@@ -5,8 +5,8 @@ import {
   ChatBubbleLeftRightIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import api from '../../lib/api';
+import type { ApiResponse } from '../../types/api';
 
 interface Stats {
   properties: number;
@@ -15,20 +15,17 @@ interface Stats {
 }
 
 export default function Dashboard() {
-  const { data: stats, isLoading } = useQuery<Stats>({
+  const { data: stats, isLoading, error } = useQuery<Stats>({
     queryKey: ['admin', 'stats'],
     queryFn: async () => {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/admin/stats`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch stats');
+      const response = await api.get<Stats>('/admin/stats');
+      console.log('Full API Response:', response);
+      console.log('Response data:', response.data);
+      
+      if (!response.data) {
+        throw new Error('Invalid response structure');
       }
-      const data = await response.json();
-      return data.data;
+      return response.data;
     },
   });
 

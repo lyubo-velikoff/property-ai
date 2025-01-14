@@ -19,9 +19,27 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [isLoading, setIsLoading] = useState(true);
 
+  // Sync user to localStorage
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+      // Only remove token if we're explicitly setting user to null
+      // This prevents token removal during initial load
+      if (!isLoading) {
+        localStorage.removeItem('token');
+      }
+    }
+  }, [user, isLoading]);
+
+  // Initial auth check
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -30,7 +48,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUser(data);
         })
         .catch(() => {
+          // Clear both token and user on auth error
           localStorage.removeItem('token');
+          localStorage.removeItem('user');
           setUser(null);
         })
         .finally(() => {
@@ -43,6 +63,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (data: LoginData) => {
     const response = await loginApi(data);
+    // Set token first
+    localStorage.setItem('token', response.token);
+    // Then update user state
     setUser(response.user);
     navigate('/admin');
   };
@@ -55,6 +78,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     logoutApi();
+    // Clear both token and user
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
   };
 
