@@ -15,6 +15,7 @@ import { getPropertyById } from '../services/propertyService';
 import { PropertyCardProps } from '../components/properties/PropertyCard';
 import GoogleMap from '../components/maps/GoogleMap';
 import { useQuery } from '@tanstack/react-query';
+import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../constants/property';
 
 interface PropertyImage {
   url: string;
@@ -200,33 +201,45 @@ export default function PropertyDetails() {
             {/* Property Details */}
             <div className="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
               <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Детайли за имота</h2>
-              
-              <div className="space-y-4">
-                {property.area_sqm && (
-                  <div className="flex items-center">
-                    <BuildingOfficeIcon className="mr-2 w-5 h-5 text-gray-500" />
-                    <span className="text-gray-700 dark:text-gray-300">Квадратура: {property.area_sqm} кв.м.</span>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Тип имот</h3>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                    {propertyTypeLabels[property.type] || property.type}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Категория</h3>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                    {categoryLabels[property.category] || property.category}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Тип локация</h3>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                    {locationTypeLabels[property.location_type] || property.location_type}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Площ</h3>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.area_sqm} м²</p>
+                </div>
+                {property.floor && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Етаж</h3>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.floor}</p>
                   </div>
                 )}
-
-                {property.location && (
-                  <div className="flex items-center">
-                    <MapPinIcon className="mr-2 w-5 h-5 text-gray-500" />
-                    <span className="text-gray-700 dark:text-gray-300">Локация: {property.location}</span>
-                  </div>
-                )}
-
                 {property.construction_type && (
-                  <div className="flex items-center">
-                    <HomeIcon className="mr-2 w-5 h-5 text-gray-500" />
-                    <span className="text-gray-700 dark:text-gray-300">Строителство: {property.construction_type}</span>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Строителство</h3>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.construction_type}</p>
                   </div>
                 )}
-
                 {property.furnishing && (
-                  <div className="flex items-center">
-                    <HomeIcon className="mr-2 w-5 h-5 text-gray-500" />
-                    <span className="text-gray-700 dark:text-gray-300">Обзавеждане: {property.furnishing}</span>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Обзавеждане</h3>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.furnishing}</p>
                   </div>
                 )}
               </div>

@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { CreatePropertyData, Property } from '../../types/api';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { useQuery } from '@tanstack/react-query';
+import { getRegions, getNeighborhoods, getFeatures } from '../../services/locationService';
+import { constructionTypes, furnishingTypes, propertyTypes, locationTypes, categories, currencies } from '../../constants/property';
 
 interface PropertyFormProps {
   initialData?: Property;
@@ -17,30 +20,92 @@ export default function PropertyForm({
   onCancel,
   submitLabel = 'Запази'
 }: PropertyFormProps) {
+  // Prepare initial data by converting Property type to CreatePropertyData type
+  const prepareInitialData = (data?: Property): Partial<CreatePropertyData> => {
+    if (!data) return {};
+    const { id, createdAt, updatedAt, features, ...rest } = data;
+    return {
+      ...rest,
+      features: features?.map(f => f.featureId),
+    };
+  };
+
   const [data, setData] = useState<CreatePropertyData>({
     title: '',
     description: '',
     price: 0,
     currency: 'BGN',
     area_sqm: 0,
-    location: '',
+    land_area_sqm: undefined,
+    floor: undefined,
+    total_floors: undefined,
+    construction_type: undefined,
+    furnishing: undefined,
+    location_type: 'CITY',
+    regionId: undefined,
+    neighborhoodId: undefined,
+    has_regulation: false,
     category: 'SALE',
     type: 'APARTMENT',
+    featured: false,
     contact_info: {
       phone: '',
       email: '',
     },
-    ...initialData,
+    ...prepareInitialData(initialData),
   });
+
   const [images, setImages] = useState<File[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [selectedFeatures, setSelectedFeatures] = useState<number[]>(
+    initialData?.features?.map(f => f.featureId) || []
+  );
+
+  const { 
+    data: regions = [], 
+    isLoading: regionsLoading, 
+    error: regionsError 
+  } = useQuery({
+    queryKey: ['regions'],
+    queryFn: getRegions,
+    retry: 3,
+    staleTime: 300000, // 5 minutes
+  });
+
+  const { 
+    data: neighborhoods = [], 
+    isLoading: neighborhoodsLoading, 
+    error: neighborhoodsError 
+  } = useQuery({
+    queryKey: ['neighborhoods'],
+    queryFn: getNeighborhoods,
+    retry: 3,
+    staleTime: 300000, // 5 minutes
+  });
+
+  const { 
+    data: features = [], 
+    isLoading: featuresLoading, 
+    error: featuresError 
+  } = useQuery({
+    queryKey: ['features'],
+    queryFn: getFeatures,
+    retry: 3,
+    staleTime: 300000, // 5 minutes
+  });
+
+  useEffect(() => {
+    if (regionsError) console.error('Regions error:', regionsError);
+    if (neighborhoodsError) console.error('Neighborhoods error:', neighborhoodsError);
+    if (featuresError) console.error('Features error:', featuresError);
+  }, [regionsError, neighborhoodsError, featuresError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
 
     try {
-      await onSubmit(data, images);
+      await onSubmit({ ...data, features: selectedFeatures }, images);
     } catch (error: any) {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
@@ -61,9 +126,23 @@ export default function PropertyForm({
           [field]: value,
         },
       }));
+    } else if (name === 'has_regulation' || name === 'featured') {
+      setData(prev => ({ ...prev, [name]: (e.target as HTMLInputElement).checked }));
     } else {
-      setData(prev => ({ ...prev, [name]: value }));
+      setData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
     }
+  };
+
+  const handleFeatureChange = (featureId: number) => {
+    setSelectedFeatures(prev => {
+      if (prev.includes(featureId)) {
+        return prev.filter(id => id !== featureId);
+      }
+      return [...prev, featureId];
+    });
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,9 +202,9 @@ export default function PropertyForm({
               onChange={handleChange}
               className="rounded-r-md border-l-0 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
             >
-              <option value="BGN">лв.</option>
-              <option value="EUR">€</option>
-              <option value="USD">$</option>
+              {currencies.map(currency => (
+                <option key={currency.value} value={currency.value}>{currency.label}</option>
+              ))}
             </select>
           </div>
           {errors.price && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.price}</p>}
@@ -151,6 +230,20 @@ export default function PropertyForm({
         </div>
 
         <div>
+          <label htmlFor="land_area_sqm" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Площ на парцела (кв.м)
+          </label>
+          <input
+            type="number"
+            id="land_area_sqm"
+            name="land_area_sqm"
+            value={data.land_area_sqm || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          />
+        </div>
+
+        <div>
           <label htmlFor="floor" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Етаж
           </label>
@@ -165,22 +258,39 @@ export default function PropertyForm({
         </div>
 
         <div>
-          <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Локация
+          <label htmlFor="total_floors" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Общо етажи
           </label>
           <input
-            type="text"
-            id="location"
-            name="location"
-            value={data.location}
+            type="number"
+            id="total_floors"
+            name="total_floors"
+            value={data.total_floors || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="location_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Тип локация
+          </label>
+          <select
+            id="location_type"
+            name="location_type"
+            value={data.location_type}
             onChange={handleChange}
             className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
-              errors.location 
+              errors.location_type 
                 ? 'border-red-500 dark:border-red-500' 
                 : 'border-gray-300 dark:border-gray-600'
             } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
-          />
-          {errors.location && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location}</p>}
+          >
+            {locationTypes.map(type => (
+              <option key={type.value} value={type.value}>{type.label}</option>
+            ))}
+          </select>
+          {errors.location_type && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location_type}</p>}
         </div>
 
         <div>
@@ -194,11 +304,9 @@ export default function PropertyForm({
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
           >
-            <option value="APARTMENT">Апартамент</option>
-            <option value="HOUSE">Къща</option>
-            <option value="OFFICE">Офис</option>
-            <option value="STORE">Магазин</option>
-            <option value="LAND">Парцел</option>
+            {propertyTypes.map(type => (
+              <option key={type.value} value={type.value}>{type.label}</option>
+            ))}
           </select>
         </div>
 
@@ -213,8 +321,9 @@ export default function PropertyForm({
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
           >
-            <option value="SALE">Продажба</option>
-            <option value="RENT">Наем</option>
+            {categories.map(category => (
+              <option key={category.value} value={category.value}>{category.label}</option>
+            ))}
           </select>
         </div>
 
@@ -222,28 +331,118 @@ export default function PropertyForm({
           <label htmlFor="construction_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Вид строителство
           </label>
-          <input
-            type="text"
+          <select
             id="construction_type"
             name="construction_type"
             value={data.construction_type || ''}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          />
+          >
+            <option value="">Изберете</option>
+            {constructionTypes.map(type => (
+              <option key={type.value} value={type.value}>{type.label}</option>
+            ))}
+          </select>
         </div>
 
         <div>
           <label htmlFor="furnishing" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Обзавеждане
           </label>
-          <input
-            type="text"
+          <select
             id="furnishing"
             name="furnishing"
             value={data.furnishing || ''}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          />
+          >
+            <option value="">Изберете</option>
+            {furnishingTypes.map(type => (
+              <option key={type.value} value={type.value}>{type.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="regionId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Регион
+          </label>
+          <select
+            id="regionId"
+            name="regionId"
+            value={data.regionId || ''}
+            onChange={handleChange}
+            disabled={regionsLoading}
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          >
+            <option value="">Изберете</option>
+            {regionsLoading ? (
+              <option disabled>Зареждане...</option>
+            ) : regions?.map(region => (
+              <option key={region.id} value={region.id}>{region.name}</option>
+            ))}
+          </select>
+          {regionsError && (
+            <p className="mt-1 text-sm text-red-600">Грешка при зареждане на регионите</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="neighborhoodId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Квартал
+          </label>
+          <select
+            id="neighborhoodId"
+            name="neighborhoodId"
+            value={data.neighborhoodId || ''}
+            onChange={handleChange}
+            disabled={neighborhoodsLoading}
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          >
+            <option value="">Изберете</option>
+            {neighborhoodsLoading ? (
+              <option disabled>Зареждане...</option>
+            ) : neighborhoods?.map(neighborhood => (
+              <option key={neighborhood.id} value={neighborhood.id}>{neighborhood.name}</option>
+            ))}
+          </select>
+          {neighborhoodsError && (
+            <p className="mt-1 text-sm text-red-600">Грешка при зареждане на кварталите</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Характеристики
+          </label>
+          {featuresLoading ? (
+            <p className="text-sm text-gray-500">Зареждане на характеристики...</p>
+          ) : features?.map(feature => (
+            <div key={feature.id} className="flex items-center mt-2">
+              <input
+                type="checkbox"
+                id={`feature-${feature.id}`}
+                checked={selectedFeatures.includes(feature.id)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedFeatures(prev => [...prev, feature.id]);
+                  } else {
+                    setSelectedFeatures(prev => prev.filter(id => id !== feature.id));
+                  }
+                }}
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor={`feature-${feature.id}`}
+                className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+              >
+                {feature.name}
+              </label>
+            </div>
+          ))}
+          {featuresError && (
+            <p className="mt-1 text-sm text-red-600">Грешка при зареждане на характеристиките</p>
+          )}
         </div>
 
         <div className="sm:col-span-2">
@@ -305,6 +504,32 @@ export default function PropertyForm({
           {errors['contact_info.email'] && (
             <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.email']}</p>
           )}
+        </div>
+
+        <div className="sm:col-span-2">
+          <div className="flex items-center space-x-6">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="has_regulation"
+                checked={data.has_regulation || false}
+                onChange={handleChange}
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Има регулация</span>
+            </label>
+
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="featured"
+                checked={data.featured || false}
+                onChange={handleChange}
+                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Препоръчан</span>
+            </label>
+          </div>
         </div>
 
         <div className="sm:col-span-2">
@@ -405,7 +630,7 @@ export default function PropertyForm({
           )}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || regionsLoading || neighborhoodsLoading || featuresLoading}
             className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md border border-transparent shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Запазване...' : submitLabel}

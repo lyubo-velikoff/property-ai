@@ -20,6 +20,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api', locationRoutes);
+app.use('/api/locations', locationRoutes);
 
 export default app; 

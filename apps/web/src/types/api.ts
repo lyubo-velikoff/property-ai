@@ -23,12 +23,19 @@ export interface Property {
   price: number;
   currency: 'BGN' | 'EUR' | 'USD';
   area_sqm: number;
+  land_area_sqm?: number;
   floor?: number;
+  total_floors?: number;
   construction_type?: string;
   furnishing?: string;
-  location: string;
+  location_type: 'CITY' | 'REGION';
+  regionId?: number;
+  neighborhoodId?: number;
+  has_regulation?: boolean;
   category: 'SALE' | 'RENT';
-  type: 'APARTMENT' | 'HOUSE' | 'OFFICE' | 'STORE' | 'LAND';
+  type: 'APARTMENT' | 'HOUSE' | 'PLOT' | 'COMMERCIAL' | 'INDUSTRIAL';
+  featured?: boolean;
+  features: { featureId: number }[];
   images: Image[];
   contact_info: ContactInfo;
   createdAt: string;
@@ -41,12 +48,19 @@ export interface CreatePropertyData {
   price: number;
   currency: 'BGN' | 'EUR' | 'USD';
   area_sqm: number;
+  land_area_sqm?: number;
   floor?: number;
+  total_floors?: number;
   construction_type?: string;
   furnishing?: string;
-  location: string;
+  location_type: 'CITY' | 'REGION';
+  regionId?: number;
+  neighborhoodId?: number;
+  has_regulation?: boolean;
   category: 'SALE' | 'RENT';
-  type: 'APARTMENT' | 'HOUSE' | 'OFFICE' | 'STORE' | 'LAND';
+  type: 'APARTMENT' | 'HOUSE' | 'PLOT' | 'COMMERCIAL' | 'INDUSTRIAL';
+  featured?: boolean;
+  features?: number[];
   contact_info: {
     phone: string;
     email: string;
@@ -107,9 +121,9 @@ export interface PropertyFormData {
   floor?: number;
   construction_type?: string;
   furnishing?: string;
-  location: string;
+  location_type: 'CITY' | 'REGION';
   category: 'SALE' | 'RENT';
-  type: 'APARTMENT' | 'HOUSE' | 'OFFICE' | 'STORE' | 'LAND';
+  type: 'APARTMENT' | 'HOUSE' | 'PLOT' | 'COMMERCIAL' | 'INDUSTRIAL';
   contact_info: {
     phone: string;
     email: string;

@@ -5,23 +5,7 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import PropertyCard, { PropertyCardProps } from '../components/properties/PropertyCard';
 import PropertyCardSkeleton from '../components/properties/PropertyCardSkeleton';
 import { getProperties, PropertyFilters } from '../services/propertyService';
-
-const propertyTypes = [
-  'Всички типове',
-  'APARTMENT',
-  'HOUSE',
-  'OFFICE',
-  'STORE',
-  'LAND'
-];
-
-const propertyTypeLabels: Record<string, string> = {
-  'APARTMENT': 'Апартамент',
-  'HOUSE': 'Къща',
-  'OFFICE': 'Офис',
-  'STORE': 'Магазин',
-  'LAND': 'Парцел'
-};
+import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../constants/property';
 
 const regions = [
   'Всички райони',
@@ -51,6 +35,7 @@ export default function Properties() {
   const currentCategory = searchParams.get('category') as 'RENT' | 'SALE' | undefined;
   const currentMinPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : undefined;
   const currentMaxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined;
+  const currentLocationType = searchParams.get('location_type') || '';
 
   useEffect(() => {
     const loadProperties = async () => {
@@ -64,6 +49,7 @@ export default function Properties() {
           category: currentCategory,
           minPrice: currentMinPrice,
           maxPrice: currentMaxPrice,
+          location_type: currentLocationType,
         };
 
         const response = await getProperties(filters, currentPage);
@@ -86,7 +72,7 @@ export default function Properties() {
     };
 
     loadProperties();
-  }, [currentPage, currentType, currentRegion, currentCategory, currentMinPrice, currentMaxPrice]);
+  }, [currentPage, currentType, currentRegion, currentCategory, currentMinPrice, currentMaxPrice, currentLocationType]);
 
   const handleFilterChange = (filters: Partial<PropertyFilters>) => {
     const newParams = new URLSearchParams(searchParams);
@@ -153,6 +139,26 @@ export default function Properties() {
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  Тип локация
+                </label>
+                <select
+                  value={currentLocationType}
+                  onChange={(e) => handleFilterChange({ location_type: e.target.value })}
+                  disabled={isLoading}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <option value="">Всички локации</option>
+                  {Object.entries(locationTypeLabels).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   Район

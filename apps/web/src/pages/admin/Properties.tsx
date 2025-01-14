@@ -2,49 +2,38 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
-import { getProperties, deleteProperty } from '../../services/properties';
+import { getProperties, deleteProperty, type Property, type PropertyFilters } from '../../services/propertyService';
 import { event } from '../../lib/analytics';
-import type { Property } from '../../types/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../../constants/property';
 
 export default function Properties() {
-  const [page, setPage] = useState(1);
-  const limit = 10;
-
+  const [currentPage, setCurrentPage] = useState(1);
   const queryClient = useQueryClient();
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['properties', page],
-    queryFn: () => getProperties(page, limit),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    queryKey: ['properties', currentPage],
+    queryFn: () => getProperties({} as PropertyFilters, currentPage),
   });
 
   const properties = data?.properties || [];
-  const totalPages = data?.pages || 0;
+  const totalPages = data?.pages || 1;
 
-  const { mutate: deletePropertyMutation, isPending: isDeleting } = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: deleteProperty,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['properties'] });
-      
-      event({
-        action: 'property_delete',
-        category: 'Admin',
-        label: 'Success'
-      });
     },
-    onError: (error: any) => {
-      event({
-        action: 'property_delete_error',
-        category: 'Admin',
-        label: error.message || 'Unknown error'
-      });
-    }
   });
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Сигурни ли сте, че искате да изтриете този имот?')) {
-      deletePropertyMutation(id);
+      try {
+        await deleteMutation.mutateAsync(id);
+      } catch (error) {
+        console.error('Failed to delete property:', error);
+        alert('Възникна грешка при изтриването на имота');
+      }
     }
   };
 
@@ -131,6 +120,9 @@ export default function Properties() {
                       Тип
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      Локация
+                    </th>
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                       Цена
                     </th>
                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -154,7 +146,10 @@ export default function Properties() {
                         {property.title}
                       </td>
                       <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                        {property.type}
+                        {propertyTypeLabels[property.type] || property.type}
+                      </td>
+                      <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                        {locationTypeLabels[property.location_type] || property.location_type}
                       </td>
                       <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
                         {new Intl.NumberFormat('bg-BG', {
@@ -191,15 +186,15 @@ export default function Properties() {
         <div className="flex justify-between items-center px-4 py-3 mt-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 sm:px-6">
           <div className="flex flex-1 justify-between sm:hidden">
             <button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
               className="inline-flex relative items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
             >
               Предишна
             </button>
             <button
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
               className="inline-flex relative items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
             >
               Следваща
@@ -208,15 +203,15 @@ export default function Properties() {
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                Страница <span className="font-medium">{page}</span> от{' '}
+                Страница <span className="font-medium">{currentPage}</span> от{' '}
                 <span className="font-medium">{totalPages}</span>
               </p>
             </div>
             <div>
               <nav className="inline-flex isolate -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                 <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
                   className="inline-flex relative items-center px-2 py-2 text-gray-400 dark:text-gray-500 rounded-l-md ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                 >
                   <span className="sr-only">Предишна</span>
@@ -225,8 +220,8 @@ export default function Properties() {
                   </svg>
                 </button>
                 <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
                   className="inline-flex relative items-center px-2 py-2 text-gray-400 dark:text-gray-500 rounded-r-md ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
                 >
                   <span className="sr-only">Следваща</span>

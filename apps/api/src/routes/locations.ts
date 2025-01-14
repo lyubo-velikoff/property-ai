@@ -7,7 +7,7 @@ import { AppError } from '../middleware/error.js';
 const router = Router();
 
 // Get all regions
-router.get('/regions', async (req, res, next) => {
+router.get('/regions', protect, async (req, res, next) => {
   try {
     const regions = await prisma.region.findMany({
       orderBy: { name: 'asc' },
@@ -23,7 +23,7 @@ router.get('/regions', async (req, res, next) => {
 });
 
 // Get all neighborhoods
-router.get('/neighborhoods', async (req, res, next) => {
+router.get('/neighborhoods', protect, async (req, res, next) => {
   try {
     const neighborhoods = await prisma.neighborhood.findMany({
       orderBy: { name: 'asc' },
@@ -39,7 +39,7 @@ router.get('/neighborhoods', async (req, res, next) => {
 });
 
 // Get all features
-router.get('/features', async (req, res, next) => {
+router.get('/features', protect, async (req, res, next) => {
   try {
     const features = await prisma.feature.findMany({
       orderBy: [
@@ -244,4 +244,4 @@ router.delete('/features/:id', protect, restrictTo('ADMIN'), async (req, res, ne
   }
 });
 
-export const locationRoutes = router; 
+export { router as locationRoutes }; 

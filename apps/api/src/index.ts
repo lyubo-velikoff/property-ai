@@ -5,6 +5,7 @@ import { authRoutes } from './routes/auth.js';
 import { propertyRoutes } from './routes/properties.js';
 import contactRoutes from './routes/contact.js';
 import adminRoutes from './routes/admin.js';
+import { locationRoutes } from './routes/locations.js';
 import path from 'path';
 
 const app = express();
@@ -21,11 +22,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/locations', locationRoutes);
 
 // Error handling
 app.use(errorHandler);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 }); 
