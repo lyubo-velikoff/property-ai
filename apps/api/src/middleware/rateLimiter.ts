@@ -1,6 +1,6 @@
 import rateLimit from 'express-rate-limit';
-import { AppError } from './error.js';
-import logger from '../lib/logger.js';
+import { AppError } from './error';
+import logger from '../lib/logger';
 
 // Rate limiter for contact form
 export const contactFormLimiter = rateLimit({

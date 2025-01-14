@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import request from 'supertest';
-import app from '../../server.js';
-import prisma from '../../lib/prisma.js';
+import app from '../../server';
+import prisma from '../../lib/prisma';
 import jwt from 'jsonwebtoken';
 
 describe('Property Routes', () => {

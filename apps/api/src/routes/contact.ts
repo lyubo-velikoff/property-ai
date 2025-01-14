@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { ContactFormSchema, type ContactFormResponse } from '../types/contact.js';
-import { sendContactEmail } from '../lib/contact.js';
-import { AppError } from '../middleware/error.js';
-import { contactFormLimiter } from '../middleware/rateLimiter.js';
-import logger from '../lib/logger.js';
-import { protect, restrictTo } from '../middleware/auth.js';
-import prisma from '../lib/prisma.js';
+import { ContactFormSchema, type ContactFormResponse } from '../types/contact';
+import { sendContactEmail } from '../lib/contact';
+import { AppError } from '../middleware/error';
+import { contactFormLimiter } from '../middleware/rateLimiter';
+import logger from '../lib/logger';
+import { protect, restrictTo } from '../middleware/auth';
+import prisma from '../lib/prisma';
 
 const router = Router();
 

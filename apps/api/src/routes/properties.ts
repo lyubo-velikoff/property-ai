@@ -2,10 +2,10 @@ import express from 'express';
 import { z } from 'zod';
 import { PrismaClient, Prisma } from '@prisma/client';
 import multer from 'multer';
-import { protect, restrictTo } from '../middleware/auth.js';
-import prisma from '../lib/prisma.js';
-import { AppError } from '../middleware/error.js';
-import { upload } from '../config/multer.js';
+import { protect, restrictTo } from '../middleware/auth';
+import prisma from '../lib/prisma';
+import { AppError } from '../middleware/error';
+import { upload } from '../config/multer';
 
 const router = express.Router();
 

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import prisma from '../lib/prisma.js';
-import { protect, restrictTo } from '../middleware/auth.js';
-import { AppError } from '../middleware/error.js';
+import prisma from '../lib/prisma';
+import { protect, restrictTo } from '../middleware/auth';
+import { AppError } from '../middleware/error';
 
 const router = Router();
 

@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
-import { ContactFormData } from '../types/contact.js';
-import { AppError } from '../middleware/error.js';
+import { ContactFormData } from '../types/contact';
+import { AppError } from '../middleware/error';
 
 // Configure nodemailer with environment variables
 const transporter = nodemailer.createTransport({
