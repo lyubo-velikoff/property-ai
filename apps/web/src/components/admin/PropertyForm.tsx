@@ -154,397 +154,440 @@ export default function PropertyForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {errors.general && (
-        <div className="p-4 text-sm text-red-700 dark:text-red-200 bg-red-100 dark:bg-red-900/50 rounded-lg">
+        <div className="p-4 text-sm text-red-700 bg-red-100 rounded-lg dark:text-red-200 dark:bg-red-900/50">
           {errors.general}
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Заглавие
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={data.title}
-            onChange={handleChange}
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
-              errors.title 
-                ? 'border-red-500 dark:border-red-500' 
-                : 'border-gray-300 dark:border-gray-600'
-            } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
-          />
-          {errors.title && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Цена
-          </label>
-          <div className="mt-1 flex rounded-md shadow-sm">
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={data.price}
-              onChange={handleChange}
-              className={`block w-full rounded-l-md shadow-sm sm:text-sm ${
-                errors.price 
-                  ? 'border-red-500 dark:border-red-500' 
-                  : 'border-gray-300 dark:border-gray-600'
-              } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
-            />
-            <select
-              name="currency"
-              value={data.currency}
-              onChange={handleChange}
-              className="rounded-r-md border-l-0 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-            >
-              {currencies.map(currency => (
-                <option key={currency.value} value={currency.value}>{currency.label}</option>
-              ))}
-            </select>
-          </div>
-          {errors.price && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.price}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="area_sqm" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Площ (кв.м)
-          </label>
-          <input
-            type="number"
-            id="area_sqm"
-            name="area_sqm"
-            value={data.area_sqm}
-            onChange={handleChange}
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
-              errors.area_sqm 
-                ? 'border-red-500 dark:border-red-500' 
-                : 'border-gray-300 dark:border-gray-600'
-            } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
-          />
-          {errors.area_sqm && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.area_sqm}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="land_area_sqm" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Площ на парцела (кв.м)
-          </label>
-          <input
-            type="number"
-            id="land_area_sqm"
-            name="land_area_sqm"
-            value={data.land_area_sqm || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="floor" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Етаж
-          </label>
-          <input
-            type="number"
-            id="floor"
-            name="floor"
-            value={data.floor || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="total_floors" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Общо етажи
-          </label>
-          <input
-            type="number"
-            id="total_floors"
-            name="total_floors"
-            value={data.total_floors || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="location_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Тип локация
-          </label>
-          <select
-            id="location_type"
-            name="location_type"
-            value={data.location_type}
-            onChange={handleChange}
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
-              errors.location_type 
-                ? 'border-red-500 dark:border-red-500' 
-                : 'border-gray-300 dark:border-gray-600'
-            } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
-          >
-            {locationTypes.map(type => (
-              <option key={type.value} value={type.value}>{type.label}</option>
-            ))}
-          </select>
-          {errors.location_type && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location_type}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Тип имот
-          </label>
-          <select
-            id="type"
-            name="type"
-            value={data.type}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          >
-            {propertyTypes.map(type => (
-              <option key={type.value} value={type.value}>{type.label}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Категория
-          </label>
-          <select
-            id="category"
-            name="category"
-            value={data.category}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          >
-            {categories.map(category => (
-              <option key={category.value} value={category.value}>{category.label}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="construction_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Вид строителство
-          </label>
-          <select
-            id="construction_type"
-            name="construction_type"
-            value={data.construction_type || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          >
-            <option value="">Изберете</option>
-            {constructionTypes.map(type => (
-              <option key={type.value} value={type.value}>{type.label}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="furnishing" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Обзавеждане
-          </label>
-          <select
-            id="furnishing"
-            name="furnishing"
-            value={data.furnishing || ''}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          >
-            <option value="">Изберете</option>
-            {furnishingTypes.map(type => (
-              <option key={type.value} value={type.value}>{type.label}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="regionId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Регион
-          </label>
-          <select
-            id="regionId"
-            name="regionId"
-            value={data.regionId || ''}
-            onChange={handleChange}
-            disabled={regionsLoading}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          >
-            <option value="">Изберете</option>
-            {regionsLoading ? (
-              <option disabled>Зареждане...</option>
-            ) : regions?.map(region => (
-              <option key={region.id} value={region.id}>{region.name}</option>
-            ))}
-          </select>
-          {regionsError && (
-            <p className="mt-1 text-sm text-red-600">Грешка при зареждане на регионите</p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="neighborhoodId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Квартал
-          </label>
-          <select
-            id="neighborhoodId"
-            name="neighborhoodId"
-            value={data.neighborhoodId || ''}
-            onChange={handleChange}
-            disabled={neighborhoodsLoading}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-          >
-            <option value="">Изберете</option>
-            {neighborhoodsLoading ? (
-              <option disabled>Зареждане...</option>
-            ) : neighborhoods?.map(neighborhood => (
-              <option key={neighborhood.id} value={neighborhood.id}>{neighborhood.name}</option>
-            ))}
-          </select>
-          {neighborhoodsError && (
-            <p className="mt-1 text-sm text-red-600">Грешка при зареждане на кварталите</p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Характеристики
-          </label>
-          {featuresLoading ? (
-            <p className="text-sm text-gray-500">Зареждане на характеристики...</p>
-          ) : features?.map(feature => (
-            <div key={feature.id} className="flex items-center mt-2">
+      <div className="space-y-4">
+        {/* Basic Info Section */}
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Основна информация</h3>
+          <div className="grid grid-cols-1 gap-6">
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Заглавие
+              </label>
               <input
-                type="checkbox"
-                id={`feature-${feature.id}`}
-                checked={selectedFeatures.includes(feature.id)}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedFeatures(prev => [...prev, feature.id]);
-                  } else {
-                    setSelectedFeatures(prev => prev.filter(id => id !== feature.id));
-                  }
-                }}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                type="text"
+                id="title"
+                name="title"
+                value={data.title}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
+                  errors.title 
+                    ? 'border-red-500 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
               />
-              <label
-                htmlFor={`feature-${feature.id}`}
-                className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+              {errors.title && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Описание
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={data.description}
+                onChange={handleChange}
+                rows={4}
+                className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
+                  errors.description 
+                    ? 'border-red-500 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+              />
+              {errors.description && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Price & Area Section */}
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Цена и площ</h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Цена
+              </label>
+              <div className="flex mt-1 rounded-md shadow-sm">
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  value={data.price}
+                  onChange={handleChange}
+                  className={`block w-full rounded-l-md shadow-sm sm:text-sm ${
+                    errors.price 
+                      ? 'border-red-500 dark:border-red-500' 
+                      : 'border-gray-300 dark:border-gray-600'
+                  } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+                />
+                <select
+                  name="currency"
+                  value={data.currency}
+                  onChange={handleChange}
+                  className="border-l-0 border-gray-300 rounded-r-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:ring-primary-500 focus:border-primary-500"
+                >
+                  {currencies.map(currency => (
+                    <option key={currency.value} value={currency.value}>{currency.label}</option>
+                  ))}
+                </select>
+              </div>
+              {errors.price && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.price}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="area_sqm" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Площ (кв.м)
+              </label>
+              <input
+                type="number"
+                id="area_sqm"
+                name="area_sqm"
+                value={data.area_sqm}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
+                  errors.area_sqm 
+                    ? 'border-red-500 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+              />
+              {errors.area_sqm && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.area_sqm}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="land_area_sqm" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Площ на парцела (кв.м)
+              </label>
+              <input
+                type="number"
+                id="land_area_sqm"
+                name="land_area_sqm"
+                value={data.land_area_sqm || ''}
+                onChange={handleChange}
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Location Section */}
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Локация</h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div>
+              <label htmlFor="location_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Тип локация
+              </label>
+              <select
+                id="location_type"
+                name="location_type"
+                value={data.location_type}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
+                  errors.location_type 
+                    ? 'border-red-500 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
               >
-                {feature.name}
+                {locationTypes.map(type => (
+                  <option key={type.value} value={type.value}>{type.label}</option>
+                ))}
+              </select>
+              {errors.location_type && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location_type}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="regionId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Регион
+              </label>
+              <select
+                id="regionId"
+                name="regionId"
+                value={data.regionId || ''}
+                onChange={handleChange}
+                disabled={regionsLoading}
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value="">Изберете</option>
+                {regionsLoading ? (
+                  <option disabled>Зареждане...</option>
+                ) : regions?.map(region => (
+                  <option key={region.id} value={region.id}>{region.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="neighborhoodId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Квартал
+              </label>
+              <select
+                id="neighborhoodId"
+                name="neighborhoodId"
+                value={data.neighborhoodId || ''}
+                onChange={handleChange}
+                disabled={neighborhoodsLoading}
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value="">Изберете</option>
+                {neighborhoodsLoading ? (
+                  <option disabled>Зареждане...</option>
+                ) : neighborhoods?.map(neighborhood => (
+                  <option key={neighborhood.id} value={neighborhood.id}>{neighborhood.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Property Details Section */}
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Детайли за имота</h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Тип имот
+              </label>
+              <select
+                id="type"
+                name="type"
+                value={data.type}
+                onChange={handleChange}
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                {propertyTypes.map(type => (
+                  <option key={type.value} value={type.value}>{type.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Категория
+              </label>
+              <select
+                id="category"
+                name="category"
+                value={data.category}
+                onChange={handleChange}
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                {categories.map(category => (
+                  <option key={category.value} value={category.value}>{category.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="construction_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Вид строителство
+              </label>
+              <select
+                id="construction_type"
+                name="construction_type"
+                value={data.construction_type || ''}
+                onChange={handleChange}
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value="">Изберете</option>
+                {constructionTypes.map(type => (
+                  <option key={type.value} value={type.value}>{type.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="furnishing" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Обзавеждане
+              </label>
+              <select
+                id="furnishing"
+                name="furnishing"
+                value={data.furnishing || ''}
+                onChange={handleChange}
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value="">Изберете</option>
+                {furnishingTypes.map(type => (
+                  <option key={type.value} value={type.value}>{type.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Floor Info & Additional Info */}
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Етажност и допълнителна информация</h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
+            <div>
+              <label htmlFor="floor" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Етаж
+              </label>
+              <input
+                type="number"
+                id="floor"
+                name="floor"
+                value={data.floor || ''}
+                onChange={handleChange}
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="total_floors" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Общо етажи
+              </label>
+              <input
+                type="number"
+                id="total_floors"
+                name="total_floors"
+                value={data.total_floors || ''}
+                onChange={handleChange}
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="has_regulation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Има регулация
+              </label>
+              <select
+                id="has_regulation"
+                name="has_regulation"
+                value={data.has_regulation ? 'yes' : 'no'}
+                onChange={(e) => {
+                  setData(prev => ({
+                    ...prev,
+                    has_regulation: e.target.value === 'yes'
+                  }));
+                }}
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              >
+                <option value="yes">Да</option>
+                <option value="no">Не</option>
+              </select>
+            </div>
+
+            <div className="flex items-center pt-6">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="featured"
+                  checked={data.featured || false}
+                  onChange={handleChange}
+                  className="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:border-gray-600"
+                />
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Препоръчан</span>
               </label>
             </div>
-          ))}
+          </div>
+        </div>
+
+        {/* Contact Info */}
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Контактна информация</h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label htmlFor="contact_info.phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Телефон за контакт
+              </label>
+              <input
+                type="tel"
+                id="contact_info.phone"
+                name="contact_info.phone"
+                value={data.contact_info.phone}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
+                  errors['contact_info.phone'] 
+                    ? 'border-red-500 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+              />
+              {errors['contact_info.phone'] && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.phone']}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="contact_info.email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Имейл за контакт
+              </label>
+              <input
+                type="email"
+                id="contact_info.email"
+                name="contact_info.email"
+                value={data.contact_info.email}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
+                  errors['contact_info.email'] 
+                    ? 'border-red-500 dark:border-red-500' 
+                    : 'border-gray-300 dark:border-gray-600'
+                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+              />
+              {errors['contact_info.email'] && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.email']}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Features Section */}
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Характеристики</h3>
+          {featuresLoading ? (
+            <p className="text-sm text-gray-500">Зареждане на характеристики...</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {features?.map(feature => (
+                <div key={feature.id} className="flex items-center p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <input
+                    type="checkbox"
+                    id={`feature-${feature.id}`}
+                    checked={selectedFeatures.includes(feature.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedFeatures(prev => [...prev, feature.id]);
+                      } else {
+                        setSelectedFeatures(prev => prev.filter(id => id !== feature.id));
+                      }
+                    }}
+                    className="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-500"
+                  />
+                  <label
+                    htmlFor={`feature-${feature.id}`}
+                    className="block ml-2 text-sm text-gray-700 cursor-pointer dark:text-gray-300"
+                  >
+                    {feature.name}
+                  </label>
+                </div>
+              ))}
+            </div>
+          )}
           {featuresError && (
             <p className="mt-1 text-sm text-red-600">Грешка при зареждане на характеристиките</p>
           )}
         </div>
 
-        <div className="sm:col-span-2">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Описание
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={data.description}
-            onChange={handleChange}
-            rows={4}
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
-              errors.description 
-                ? 'border-red-500 dark:border-red-500' 
-                : 'border-gray-300 dark:border-gray-600'
-            } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
-          />
-          {errors.description && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="contact_info.phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Телефон за контакт
-          </label>
-          <input
-            type="tel"
-            id="contact_info.phone"
-            name="contact_info.phone"
-            value={data.contact_info.phone}
-            onChange={handleChange}
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
-              errors['contact_info.phone'] 
-                ? 'border-red-500 dark:border-red-500' 
-                : 'border-gray-300 dark:border-gray-600'
-            } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
-          />
-          {errors['contact_info.phone'] && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.phone']}</p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="contact_info.email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Имейл за контакт
-          </label>
-          <input
-            type="email"
-            id="contact_info.email"
-            name="contact_info.email"
-            value={data.contact_info.email}
-            onChange={handleChange}
-            className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
-              errors['contact_info.email'] 
-                ? 'border-red-500 dark:border-red-500' 
-                : 'border-gray-300 dark:border-gray-600'
-            } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
-          />
-          {errors['contact_info.email'] && (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.email']}</p>
-          )}
-        </div>
-
-        <div className="sm:col-span-2">
-          <div className="flex items-center space-x-6">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="has_regulation"
-                checked={data.has_regulation || false}
-                onChange={handleChange}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
-              />
-              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Има регулация</span>
-            </label>
-
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="featured"
-                checked={data.featured || false}
-                onChange={handleChange}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded"
-              />
-              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Препоръчан</span>
-            </label>
-          </div>
-        </div>
-
-        <div className="sm:col-span-2">
+        {/* Images Section */}
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Изображения</h3>
           {initialData?.images && initialData.images.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 Текущи изображения
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                 {initialData.images.map((image) => (
                   <div key={image.id} className="relative group">
                     <img
                       src={image.url}
                       alt={initialData.title}
-                      className="w-full h-32 object-cover rounded-lg"
+                      className="object-cover w-full h-32 rounded-lg"
                     />
                   </div>
                 ))}
@@ -557,10 +600,10 @@ export default function PropertyForm({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {initialData?.images?.length ? 'Добави нови изображения' : 'Изображения'}
             </label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md">
+            <div className="flex justify-center px-6 pt-5 pb-6 mt-1 border-2 border-gray-300 border-dashed rounded-md dark:border-gray-600">
               <div className="space-y-1 text-center">
                 <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
+                  className="w-12 h-12 mx-auto text-gray-400"
                   stroke="currentColor"
                   fill="none"
                   viewBox="0 0 48 48"
@@ -576,7 +619,7 @@ export default function PropertyForm({
                 <div className="flex text-sm text-gray-600 dark:text-gray-400">
                   <label
                     htmlFor="images"
-                    className="relative cursor-pointer rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500"
+                    className="relative font-medium rounded-md cursor-pointer text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500"
                   >
                     <span>Качи файлове</span>
                     <input
@@ -601,14 +644,14 @@ export default function PropertyForm({
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Избрани файлове:</h4>
                 <ul className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
                   {Array.from(images).map((file, index) => (
-                    <li key={index} className="py-2 flex items-center justify-between">
+                    <li key={index} className="flex items-center justify-between py-2">
                       <span className="text-sm text-gray-500 dark:text-gray-400">{file.name}</span>
                       <button
                         type="button"
                         onClick={() => setImages(images.filter((_, i) => i !== index))}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                       >
-                        <XMarkIcon className="h-5 w-5" />
+                        <XMarkIcon className="w-5 h-5" />
                       </button>
                     </li>
                   ))}
@@ -618,12 +661,12 @@ export default function PropertyForm({
           </div>
         </div>
 
-        <div className="sm:col-span-2 flex justify-end gap-3">
+        <div className="flex justify-end gap-3 sm:col-span-2">
           {onCancel && (
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:text-gray-200 dark:bg-gray-700 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
             >
               Отказ
             </button>
@@ -631,7 +674,7 @@ export default function PropertyForm({
           <button
             type="submit"
             disabled={isSubmitting || regionsLoading || neighborhoodsLoading || featuresLoading}
-            className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md border border-transparent shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Запазване...' : submitLabel}
           </button>
