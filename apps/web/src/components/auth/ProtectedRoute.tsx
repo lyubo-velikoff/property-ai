@@ -22,6 +22,8 @@ export default function ProtectedRoute({ children }: Props) {
     queryFn: async () => {
       if (!token) throw new Error('No token');
       const response = await api.get('/auth/me');
+      console.log('Full API Response:', response);
+      console.log('Response data:', response.data);
       return response.data.user;
     },
     retry: false,

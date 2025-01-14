@@ -46,14 +46,15 @@ export default function Login() {
 
   const { mutate, isPending } = useMutation<LoginResponse, Error, LoginForm>({
     mutationFn: async (data: LoginForm) => {
-      const response = await api.post<{ status: string; data: LoginResponse }>('/auth/login', data);
-      return response.data.data;
+      const response = await api.post<LoginResponse>('/auth/login', data);
+      console.log('API Response:', response.data);
+      return response.data;
     },
-    onSuccess: (response) => {
-      localStorage.setItem('token', response.token);
+    onSuccess: (data) => {
+      localStorage.setItem('token', data.token);
       setUser({
-        ...response.user,
-        role: response.user.role.toUpperCase() as 'ADMIN' | 'USER'
+        ...data.user,
+        role: data.user.role.toUpperCase() as 'ADMIN' | 'USER'
       });
       navigate(from);
     },
