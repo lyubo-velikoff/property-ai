@@ -20,12 +20,21 @@ api.interceptors.request.use((config) => {
 
 // Add a response interceptor to handle errors
 api.interceptors.response.use(
-  (response) => response.data,
+  (response) => {
+    // Return the entire response data
+    return response.data;
+  },
   (error) => {
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
+      // Clear token and redirect to login
       localStorage.removeItem('token');
-      window.location.href = '/admin/login';
+      
+      // Only redirect to login if we're on an admin page
+      if (window.location.pathname.startsWith('/admin')) {
+        window.location.href = '/admin/login';
+      }
+      
       return Promise.reject(new Error('Unauthorized - Please log in'));
     }
     
@@ -35,7 +44,15 @@ api.interceptors.response.use(
     }
     
     // Handle other API errors
-    return Promise.reject(error.response.data?.message || 'An error occurred');
+    const errorMessage = error.response.data?.message || 'An error occurred';
+    console.error('API Error:', {
+      status: error.response.status,
+      message: errorMessage,
+      path: error.config?.url,
+      method: error.config?.method
+    });
+    
+    return Promise.reject(new Error(errorMessage));
   }
 );
 

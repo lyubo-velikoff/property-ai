@@ -13,25 +13,29 @@ export interface RegisterData {
 }
 
 export const login = async (data: LoginData): Promise<AuthResponse> => {
-  const response = await api.post<{ status: string; data: AuthResponse }>('/auth/login', data);
-  const { token, user } = response.data.data;
-  localStorage.setItem('token', token);
-  return { token, user };
+  const response = await api.post<{ user: User; token: string }>('/auth/login', data);
+  console.log('Raw API Response:', response);
+  console.log('Response data:', response.data);
+  return response.data;
 };
 
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
   const response = await api.post<ApiResponse<AuthResponse>>('/auth/register', data);
-  const { token, user } = response.data.data;
-  localStorage.setItem('token', token);
-  return { token, user };
+  return response.data.data;
 };
 
 export const getCurrentUser = async (): Promise<User> => {
-  const response = await api.get<ApiResponse<{ user: User }>>('/auth/me');
-  return response.data.data.user;
+  try {
+    const response = await api.get<{ user: User }>('/auth/me');
+    console.log('Get current user response:', response);
+    return response.data.user;
+  } catch (error) {
+    console.error('Failed to get current user:', error);
+    throw error;
+  }
 };
 
 export const logout = () => {
   localStorage.removeItem('token');
-  window.location.href = '/login';
+  window.location.href = '/admin/login';
 }; 

@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { z } from 'zod';
-import api from '../../lib/api';
+import { login as loginApi } from '../../services/auth';
 import { useAuth } from '../../contexts/auth';
+import type { AuthResponse } from '../../types/api';
 
 const loginSchema = z.object({
   email: z.string().email('Невалиден имейл адрес'),
@@ -12,29 +13,10 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>;
 
-interface ApiResponse<T> {
-  status: string;
-  data: T;
-}
-
-interface User {
-  id: string;
-  email: string;
-  role: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface LoginResponse {
-  user: User;
-  token: string;
-}
-
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, setUser } = useAuth();
+  const { setUser } = useAuth();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/admin';
 
   const [formData, setFormData] = useState<LoginForm>({
@@ -44,13 +26,10 @@ export default function Login() {
 
   const [errors, setErrors] = useState<Partial<LoginForm>>({});
 
-  const { mutate, isPending } = useMutation<LoginResponse, Error, LoginForm>({
-    mutationFn: async (data: LoginForm) => {
-      const response = await api.post<LoginResponse>('/auth/login', data);
-      console.log('API Response:', response.data);
-      return response.data;
-    },
+  const { mutate, isPending } = useMutation<AuthResponse, Error, LoginForm>({
+    mutationFn: loginApi,
     onSuccess: (data) => {
+      console.log('Mutation success response:', data);
       localStorage.setItem('token', data.token);
       setUser({
         ...data.user,
@@ -149,7 +128,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isPending}
-              className="group relative flex w-full justify-center rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:opacity-50"
+              className="relative flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md group bg-primary-600 hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:opacity-50"
             >
               {isPending ? 'Влизане...' : 'Вход'}
             </button>
