@@ -207,7 +207,10 @@ export default function AdminLayout() {
                 <Menu.Button className="-m-1.5 flex items-center p-1.5">
                   <span className="sr-only">Open user menu</span>
                   <span className="hidden lg:flex lg:items-center">
-                    <span className="ml-4 text-sm font-semibold leading-6 text-gray-900 dark:text-white" aria-hidden="true">
+                    <span className="flex items-center justify-center h-8 w-8 rounded-full bg-primary-600 text-white text-sm font-medium">
+                      {user?.name?.split(' ').map(n => n[0]).join('')}
+                    </span>
+                    <span className="ml-2 text-sm font-semibold leading-6 text-gray-900 dark:text-white" aria-hidden="true">
                       {user?.name}
                     </span>
                   </span>
