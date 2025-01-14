@@ -36,9 +36,9 @@ export const propertySchema = z.object({
   floor: z.coerce.number().optional(),
   construction_type: z.nativeEnum(ConstructionType).optional(),
   furnishing: z.nativeEnum(FurnishingType).optional(),
-  location_type: z.nativeEnum(LocationType).optional().default(LocationType.CITY),
-  category: z.nativeEnum(PropertyCategory).optional().default(PropertyCategory.SALE),
-  type: z.nativeEnum(PropertyType).optional().default(PropertyType.APARTMENT),
+  location_type: z.nativeEnum(LocationType).optional(),
+  category: z.nativeEnum(PropertyCategory).optional(),
+  type: z.nativeEnum(PropertyType).optional(),
   featured: z.coerce.boolean().optional(),
   contact_info: z.object({
     phone: z.string(),
@@ -252,7 +252,15 @@ router.post(
   upload.array('image', 20),
   async (req, res: Response) => {
     try {
-      const data = propertySchema.parse(req.body);
+      // Parse fields from multipart/form-data
+      const parsedBody = {
+        ...req.body,
+        price: req.body.price ? parseInt(req.body.price) : undefined,
+        area_sqm: req.body.area_sqm ? parseInt(req.body.area_sqm) : undefined,
+        contact_info: req.body.contact_info ? JSON.parse(req.body.contact_info) : undefined,
+      };
+
+      const data = propertySchema.parse(parsedBody);
       const files = req.files as Express.Multer.File[];
       const baseUrl = `${req.protocol}://${req.get('host')}`;
 

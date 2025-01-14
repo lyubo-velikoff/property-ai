@@ -15,7 +15,22 @@ export * from './contact';
 export * from './location';
 
 // User exports
-export * from './user';
+export {
+  UserRole,
+  User,
+  CreateUserInput,
+  UpdateUserInput,
+  UserResponse,
+  UsersResponse
+} from './user';
 
 // Admin exports
-export * from './admin'; 
+export * from './admin';
+
+// Auth exports
+export {
+  RegisterInput,
+  LoginInput,
+  AuthResponse,
+  MeResponse
+} from './auth'; 

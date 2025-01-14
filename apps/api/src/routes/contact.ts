@@ -169,4 +169,4 @@ router.delete('/messages/:id', protect, restrictTo(UserRole.ADMIN), async (req, 
   }
 });
 
-export default router; 
+export const contactRoutes = router; 

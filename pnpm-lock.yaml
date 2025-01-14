@@ -78,6 +78,9 @@ importers:
       '@jest/globals':
         specifier: ^29.7.0
         version: 29.7.0
+      '@jest/types':
+        specifier: ^29.6.3
+        version: 29.6.3
       '@types/bcryptjs':
         specifier: ^2.4.6
         version: 2.4.6

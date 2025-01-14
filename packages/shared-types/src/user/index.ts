@@ -36,13 +36,4 @@ export interface UsersResponse {
     hasNextPage: boolean;
     hasPreviousPage: boolean;
   };
-}
-
-export interface MeResponse {
-  user: User;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
 } 
