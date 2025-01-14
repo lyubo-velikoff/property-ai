@@ -73,11 +73,13 @@ export default function AdminLayout() {
                 </Transition.Child>
                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-800 px-6 pb-4">
                   <div className="flex h-16 shrink-0 items-center">
-                    <img
-                      className="h-8 w-auto"
-                      src="/images/logo.png"
-                      alt="Avalon Properties"
-                    />
+                    <Link to="/admin">
+                      <img
+                        className="h-8 w-auto"
+                        src="/images/logo.png"
+                        alt="Avalon Properties"
+                      />
+                    </Link>
                   </div>
                   <nav className="flex flex-1 flex-col">
                     <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -134,8 +136,12 @@ export default function AdminLayout() {
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center">
-            <Link to="/admin" className="text-xl font-semibold text-gray-900 dark:text-white">
-              Property AI
+            <Link to="/admin">
+              <img
+                className="h-8 w-auto"
+                src="/images/logo.png"
+                alt="Avalon Properties"
+              />
             </Link>
           </div>
           <nav className="flex flex-1 flex-col">
