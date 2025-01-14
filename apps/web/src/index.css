@@ -16,7 +16,25 @@
     --color-primary-900: 127 29 29;
     --color-primary-950: 69 10 10;
 
-    /* YouTube Dark Theme Colors */
+    /* Default light theme colors */
+    --color-dark-bg: 255 255 255;
+    --color-dark-bg-secondary: 249 250 251;
+    --color-dark-text: 17 24 39;
+    --color-dark-text-secondary: 107 114 128;
+    --color-dark-border: 229 231 235;
+  }
+
+  /* Dark theme - Vercel-like */
+  :root.dark:not(.gray) {
+    --color-dark-bg: 0 0 0;
+    --color-dark-bg-secondary: 17 17 17;
+    --color-dark-text: 255 255 255;
+    --color-dark-text-secondary: 153 153 153;
+    --color-dark-border: 38 38 38;
+  }
+
+  /* YouTube Dark Theme Colors */
+  :root.dark.gray {
     --color-dark-bg: 15 15 15;
     --color-dark-bg-secondary: 33 33 33;
     --color-dark-text: 241 241 241;
@@ -29,7 +47,7 @@
   }
 
   body {
-    @apply text-gray-900 dark:text-[rgb(var(--color-dark-text))];
+    @apply bg-white text-gray-900 dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))];
   }
 
   .container {
@@ -43,35 +61,48 @@
   }
 
   .btn-primary {
-    @apply text-white bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 dark:bg-primary-500 dark:hover:bg-primary-600;
+    @apply text-white bg-primary-600 hover:bg-primary-700 focus:ring-primary-500;
   }
 
   .btn-secondary {
-    @apply text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-primary-500 dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:text-[rgb(var(--color-dark-text))] dark:border-[rgb(var(--color-dark-border))] dark:hover:bg-[rgb(var(--color-dark-border))];
+    @apply text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-primary-500 
+           dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:text-[rgb(var(--color-dark-text))] 
+           dark:border-[rgb(var(--color-dark-border))] dark:hover:bg-[rgb(var(--color-dark-border))];
   }
 
   .btn-danger {
-    @apply text-white bg-red-600 hover:bg-red-700 focus:ring-red-500 dark:bg-red-500 dark:hover:bg-red-600;
+    @apply text-white bg-red-600 hover:bg-red-700 focus:ring-red-500;
   }
 
   .input {
-    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:text-[rgb(var(--color-dark-text))] dark:ring-[rgb(var(--color-dark-border))] dark:placeholder:text-[rgb(var(--color-dark-text-secondary))] dark:focus:ring-primary-500;
+    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 
+           placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 
+           dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:text-[rgb(var(--color-dark-text))] 
+           dark:ring-[rgb(var(--color-dark-border))] dark:placeholder:text-[rgb(var(--color-dark-text-secondary))];
   }
 
   .select {
-    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:max-w-xs sm:text-sm sm:leading-6 dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:text-[rgb(var(--color-dark-text))] dark:ring-[rgb(var(--color-dark-border))] dark:focus:ring-primary-500;
+    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 
+           focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:max-w-xs sm:text-sm sm:leading-6 
+           dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:text-[rgb(var(--color-dark-text))] 
+           dark:ring-[rgb(var(--color-dark-border))];
   }
 
   .textarea {
-    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:text-[rgb(var(--color-dark-text))] dark:ring-[rgb(var(--color-dark-border))] dark:placeholder:text-[rgb(var(--color-dark-text-secondary))] dark:focus:ring-primary-500;
+    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 
+           placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 
+           dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:text-[rgb(var(--color-dark-text))] 
+           dark:ring-[rgb(var(--color-dark-border))] dark:placeholder:text-[rgb(var(--color-dark-text-secondary))];
   }
 
   .checkbox {
-    @apply w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-600 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:text-primary-500 dark:focus:ring-primary-500;
+    @apply w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-600 
+           dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg-secondary))];
   }
 
   .radio {
-    @apply w-4 h-4 border-gray-300 text-primary-600 focus:ring-primary-600 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:text-primary-500 dark:focus:ring-primary-500;
+    @apply w-4 h-4 border-gray-300 text-primary-600 focus:ring-primary-600 
+           dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg-secondary))];
   }
 
   .label {
@@ -83,7 +114,7 @@
   }
 
   .error-text {
-    @apply mt-2 text-sm text-red-600 dark:text-red-400;
+    @apply mt-2 text-sm text-red-600;
   }
 }
 

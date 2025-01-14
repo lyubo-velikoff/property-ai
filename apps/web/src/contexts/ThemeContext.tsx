@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'light' | 'dark';
+type Theme = 'light' | 'dark' | 'gray';
 
 interface ThemeContextType {
   theme: Theme;
+  setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
 }
 
@@ -12,8 +13,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-      return savedTheme;
+    if (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'gray') {
+      return savedTheme as Theme;
     }
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
@@ -23,10 +24,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
+    const root = document.documentElement;
+    root.classList.remove('light', 'dark', 'gray');
+    
+    if (theme === 'gray') {
+      root.classList.add('dark', 'gray');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.add(theme);
     }
   }, [theme]);
 
@@ -40,11 +44,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+    setTheme((prevTheme) => {
+      switch (prevTheme) {
+        case 'light':
+          return 'dark';
+        case 'dark':
+          return 'gray';
+        case 'gray':
+          return 'light';
+        default:
+          return 'light';
+      }
+    });
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -55,5 +70,8 @@ export function useTheme() {
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
-  return context;
+  return {
+    ...context,
+    isDark: context.theme === 'dark' || context.theme === 'gray'
+  };
 } 
