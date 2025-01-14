@@ -1,19 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PencilIcon, TrashIcon, PlusIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, TrashIcon, PlusIcon, ArrowLeftIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { getProperties, deleteProperty, type Property, type PropertyFilters } from '../../services/propertyService';
 import { event } from '../../lib/analytics';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../../constants/property';
+import { useDebounce } from '../../hooks/useDebounce';
 
 export default function Properties() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const queryClient = useQueryClient();
 
+  const filters = useMemo(() => ({
+    search: debouncedSearch,
+  }), [debouncedSearch]);
+
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['properties', currentPage],
-    queryFn: () => getProperties({} as PropertyFilters, currentPage),
+    queryKey: ['properties', currentPage, debouncedSearch],
+    queryFn: () => getProperties(filters, currentPage),
   });
 
   const properties = data?.properties || [];
@@ -37,45 +44,6 @@ export default function Properties() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-        <p className="mb-4 text-center text-red-600">
-          {error instanceof Error ? error.message : 'Възникна грешка при зареждането на имотите'}
-        </p>
-        <button
-          onClick={() => refetch()}
-          className="px-4 py-2 text-white bg-red-600 rounded transition-colors hover:bg-red-700"
-        >
-          Опитайте отново
-        </button>
-      </div>
-    );
-  }
-
-  if (properties.length === 0) {
-    return (
-      <div className="p-8 text-center">
-        <h3 className="mb-4 text-lg font-medium text-gray-900">Няма намерени имоти</h3>
-        <Link
-          to="/admin/properties/new"
-          className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md border border-transparent shadow-sm hover:bg-red-700"
-        >
-          <PlusIcon className="mr-2 -ml-1 w-5 h-5" aria-hidden="true" />
-          Добави нов имот
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <div className="py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
@@ -92,94 +60,141 @@ export default function Properties() {
           </Link>
         </div>
 
-        <div className="flex flex-col mt-8">
-          <div className="overflow-x-auto -mx-4 -my-2 sm:-mx-6 lg:-mx-8">
-            <div className="inline-block py-2 min-w-full align-middle md:px-6 lg:px-8">
-              <div className="overflow-hidden ring-1 ring-black ring-opacity-5 shadow md:rounded-lg">
-                <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
-                  <thead className="bg-gray-50 dark:bg-gray-800">
-                    <tr>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Изображение
-                      </th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Заглавие
-                      </th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Тип
-                      </th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Локация
-                      </th>
-                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Цена
-                      </th>
-                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                        <span className="sr-only">Действия</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-                    {properties.map((property) => (
-                      <tr key={property.id}>
-                        <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                          {property.images && property.images[0] && (
-                            <img 
-                              src={property.images[0].url || '/images/property-placeholder.webp'} 
-                              alt={property.title}
-                              className="w-16 h-16 object-cover rounded"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.onerror = null;
-                                target.src = '/images/property-placeholder.webp';
-                              }}
-                            />
-                          )}
-                        </td>
-                        <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                          <Link
-                            to={`/admin/properties/${property.id}/edit`}
-                            className="hover:text-primary-600 dark:hover:text-primary-400"
-                          >
-                            {property.title}
-                          </Link>
-                        </td>
-                        <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                          {propertyTypeLabels[property.type] || property.type}
-                        </td>
-                        <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                          {locationTypeLabels[property.location_type] || property.location_type}
-                        </td>
-                        <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                          {new Intl.NumberFormat('bg-BG', {
-                            style: 'currency',
-                            currency: property.currency || 'BGN'
-                          }).format(property.price)}
-                        </td>
-                        <td className="relative py-4 pr-4 pl-3 text-sm font-medium text-right whitespace-nowrap sm:pr-6">
-                          <div className="flex gap-2 justify-end items-center">
+        <div className="mt-4">
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+            </div>
+            <input
+              type="text"
+              placeholder="Търсене на имот..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="block w-full rounded-md border-0 py-2 pl-10 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 dark:bg-gray-800 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center items-center min-h-[400px]">
+            <LoadingSpinner />
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+            <p className="mb-4 text-center text-red-600">
+              {error instanceof Error ? error.message : 'Възникна грешка при зареждането на имотите'}
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="px-4 py-2 text-white bg-red-600 rounded transition-colors hover:bg-red-700"
+            >
+              Опитайте отново
+            </button>
+          </div>
+        ) : properties.length === 0 ? (
+          <div className="p-8 text-center">
+            <h3 className="mb-4 text-lg font-medium text-gray-900">Няма намерени имоти</h3>
+            <Link
+              to="/admin/properties/new"
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md border border-transparent shadow-sm hover:bg-red-700"
+            >
+              <PlusIcon className="mr-2 -ml-1 w-5 h-5" aria-hidden="true" />
+              Добави нов имот
+            </Link>
+          </div>
+        ) : (
+          <div className="flex flex-col mt-8">
+            <div className="overflow-x-auto -mx-4 -my-2 sm:-mx-6 lg:-mx-8">
+              <div className="inline-block py-2 min-w-full align-middle md:px-6 lg:px-8">
+                <div className="overflow-hidden ring-1 ring-black ring-opacity-5 shadow md:rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
+                    <thead className="bg-gray-50 dark:bg-gray-800">
+                      <tr>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          Изображение
+                        </th>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          Заглавие
+                        </th>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          Тип
+                        </th>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          Локация
+                        </th>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          Цена
+                        </th>
+                        <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                          <span className="sr-only">Действия</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                      {properties.map((property) => (
+                        <tr key={property.id}>
+                          <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                            {property.images && property.images[0] && (
+                              <img 
+                                src={property.images[0].url || '/images/property-placeholder.webp'} 
+                                alt={property.title}
+                                className="w-16 h-16 object-cover rounded"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.onerror = null;
+                                  target.src = '/images/property-placeholder.webp';
+                                }}
+                              />
+                            )}
+                          </td>
+                          <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
                             <Link
                               to={`/admin/properties/${property.id}/edit`}
-                              className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                              className="hover:text-primary-600 dark:hover:text-primary-400"
                             >
-                              <PencilIcon className="w-5 h-5" aria-hidden="true" />
+                              {property.title}
                             </Link>
-                            <button
-                              onClick={() => handleDelete(property.id)}
-                              className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                            >
-                              <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          </td>
+                          <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                            {propertyTypeLabels[property.type] || property.type}
+                          </td>
+                          <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                            {locationTypeLabels[property.location_type] || property.location_type}
+                          </td>
+                          <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                            {new Intl.NumberFormat('bg-BG', {
+                              style: 'currency',
+                              currency: property.currency || 'BGN'
+                            }).format(property.price)}
+                          </td>
+                          <td className="relative py-4 pr-4 pl-3 text-sm font-medium text-right whitespace-nowrap sm:pr-6">
+                            <div className="flex gap-2 justify-end items-center">
+                              <Link
+                                to={`/admin/properties/${property.id}/edit`}
+                                className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                              >
+                                <PencilIcon className="w-5 h-5" aria-hidden="true" />
+                              </Link>
+                              <button
+                                onClick={() => handleDelete(property.id)}
+                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                              >
+                                <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {totalPages > 1 && (
           <div className="flex justify-between items-center px-4 py-3 mt-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 sm:px-6">

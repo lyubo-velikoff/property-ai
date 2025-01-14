@@ -4,11 +4,12 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export interface PropertyFilters {
   type?: string;
+  location_type?: 'CITY' | 'REGION';
   region?: string;
   minPrice?: number;
   maxPrice?: number;
   category?: 'RENT' | 'SALE';
-  location_type?: 'CITY' | 'REGION';
+  search?: string;
 }
 
 export interface PropertyResponse {
@@ -60,6 +61,7 @@ export async function getProperties(
   if (filters.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
   if (filters.category) params.append('category', filters.category);
   if (filters.location_type) params.append('location_type', filters.location_type);
+  if (filters.search) params.append('search', filters.search);
   
   // Add pagination params
   params.append('page', page.toString());

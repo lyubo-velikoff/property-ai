@@ -73,6 +73,7 @@ router.get('/', async (req: express.Request, res: express.Response) => {
       max_price,
       min_area,
       max_area,
+      search,
       page = '1', 
       limit = '10' 
     } = req.query;
@@ -85,6 +86,12 @@ router.get('/', async (req: express.Request, res: express.Response) => {
       ...(regionId && { regionId: parseInt(regionId as string) }),
       ...(neighborhoodId && { neighborhoodId: parseInt(neighborhoodId as string) }),
       ...(location_type && { location_type: location_type as string }),
+      ...(search && {
+        OR: [
+          { title: { contains: search as string } },
+          { description: { contains: search as string } }
+        ]
+      }),
       ...(features && {
         features: {
           some: {
