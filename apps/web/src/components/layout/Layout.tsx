@@ -158,10 +158,13 @@ export default function Layout() {
       {isAdmin && (
         <Link
           to="/admin"
-          className="fixed bottom-24 right-6 p-3 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 z-50"
+          className="fixed bottom-24 -right-1 group flex items-center p-3 bg-primary-600 text-white shadow-lg transition-all duration-300 ease-in-out z-50 rounded-l-full hover:pr-6 hover:right-0 hover:bg-primary-700 hover:shadow-xl hover:translate-x-1"
           title="Admin Panel"
         >
-          <Cog6ToothIcon className="h-6 w-6" aria-hidden="true" />
+          <Cog6ToothIcon className="h-6 w-6 transform transition-transform duration-300 ease-in-out group-hover:rotate-90" aria-hidden="true" />
+          <span className="text-sm font-medium max-w-0 group-hover:max-w-[200px] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden">
+            Admin Panel
+          </span>
         </Link>
       )}
     </div>

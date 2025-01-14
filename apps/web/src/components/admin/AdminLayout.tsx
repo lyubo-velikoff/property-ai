@@ -111,18 +111,6 @@ export default function AdminLayout() {
                           ))}
                         </ul>
                       </li>
-                      <li className="mt-auto">
-                        <Link
-                          to="/"
-                          className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
-                        >
-                          <HomeIcon
-                            className="h-6 w-6 shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white"
-                            aria-hidden="true"
-                          />
-                          Към сайта
-                        </Link>
-                      </li>
                     </ul>
                   </nav>
                 </div>
@@ -173,18 +161,6 @@ export default function AdminLayout() {
                     </li>
                   ))}
                 </ul>
-              </li>
-              <li className="mt-auto">
-                <Link
-                  to="/"
-                  className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
-                >
-                  <HomeIcon
-                    className="h-6 w-6 shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white"
-                    aria-hidden="true"
-                  />
-                  Към сайта
-                </Link>
               </li>
             </ul>
           </nav>
@@ -251,6 +227,16 @@ export default function AdminLayout() {
           </div>
         </main>
       </div>
+      <Link
+        to="/"
+        className="fixed bottom-24 -right-1 group flex items-center p-3 bg-primary-600 text-white shadow-lg transition-all duration-300 ease-in-out z-50 rounded-l-full hover:pr-6 hover:right-0 hover:bg-primary-700 hover:shadow-xl hover:translate-x-1"
+        title="Към сайта"
+      >
+        <HomeIcon className="h-6 w-6 transform transition-transform duration-300 ease-in-out group-hover:-rotate-90" aria-hidden="true" />
+        <span className="text-sm font-medium max-w-0 group-hover:max-w-[200px] opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden">
+          Към сайта
+        </span>
+      </Link>
     </div>
   );
 } 
