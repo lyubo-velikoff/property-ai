@@ -4,6 +4,8 @@ import { Bars3Icon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline
 import { useState, useEffect } from 'react';
 import ThemeToggle from '../ThemeToggle';
 import { useAuth } from '../../contexts/auth';
+import { useTheme } from '../../hooks/useTheme';
+import Logo from '../Logo';
 
 const navigation = [
   { name: 'Начало', href: '/' },
@@ -17,6 +19,7 @@ export default function Layout() {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const { isAdmin } = useAuth();
+  const { isDark } = useTheme();
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -37,11 +40,7 @@ export default function Layout() {
         <nav className="container flex justify-between items-center h-full transition-all duration-300">
           <div className="flex gap-8 items-center">
             <Link to="/" className="flex items-center">
-              <img 
-                src="/images/logo.png" 
-                alt="Property AI" 
-                className={`w-auto transition-all duration-300 ${isScrolled ? 'h-12' : 'h-16'}`}
-              />
+              <Logo className={`w-auto transition-all duration-300 ${isScrolled ? 'h-12' : 'h-16'}`} />
             </Link>
             <div className="hidden md:flex md:gap-6">
               {navigation.map((item) => (
@@ -76,7 +75,7 @@ export default function Layout() {
         <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white dark:bg-gray-800 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
-              <img src="/images/logo.png" alt="Property AI" className="w-auto h-12" />
+              <Logo className="w-auto h-12" />
             </Link>
             <button
               type="button"

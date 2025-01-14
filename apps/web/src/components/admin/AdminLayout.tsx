@@ -11,6 +11,8 @@ import {
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import ThemeToggle from '../ThemeToggle';
 import { useAuth } from '../../contexts/auth';
+import { useTheme } from '../../hooks/useTheme';
+import Logo from '../Logo';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin', icon: HomeIcon },
@@ -27,6 +29,7 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { isDark } = useTheme();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -74,11 +77,7 @@ export default function AdminLayout() {
                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-800 px-6 pb-4">
                   <div className="flex h-16 shrink-0 items-center">
                     <Link to="/admin">
-                      <img
-                        className="h-8 w-auto"
-                        src="/images/logo.png"
-                        alt="Avalon Properties"
-                      />
+                      <Logo className="h-8 w-auto" />
                     </Link>
                   </div>
                   <nav className="flex flex-1 flex-col">
@@ -125,11 +124,7 @@ export default function AdminLayout() {
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center">
             <Link to="/admin">
-              <img
-                className="h-8 w-auto"
-                src="/images/logo.png"
-                alt="Avalon Properties"
-              />
+              <Logo className="h-8 w-auto" />
             </Link>
           </div>
           <nav className="flex flex-1 flex-col">
