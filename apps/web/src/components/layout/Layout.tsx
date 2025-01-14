@@ -14,6 +14,7 @@ const navigation = [
 
 export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const { isAdmin } = useAuth();
 
@@ -21,13 +22,26 @@ export default function Layout() {
     setMobileMenuOpen(false);
   }, [location]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <nav className="container flex justify-between items-center h-20 transition-all duration-300">
+      <header className={`sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-300 ${isScrolled ? 'h-16' : 'h-20'}`}>
+        <nav className="container flex justify-between items-center h-full transition-all duration-300">
           <div className="flex gap-8 items-center">
             <Link to="/" className="flex items-center">
-              <img src="/images/logo.png" alt="Property AI" className="w-auto h-16 transition-all duration-300" />
+              <img 
+                src="/images/logo.png" 
+                alt="Property AI" 
+                className={`w-auto transition-all duration-300 ${isScrolled ? 'h-12' : 'h-16'}`}
+              />
             </Link>
             <div className="hidden md:flex md:gap-6">
               {navigation.map((item) => (
