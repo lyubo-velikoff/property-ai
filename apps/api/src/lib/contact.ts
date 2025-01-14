@@ -34,13 +34,15 @@ export async function verifyRecaptcha(token: string): Promise<boolean> {
   }
 }
 
-export async function sendContactEmail(formData: ContactFormData): Promise<void> {
+export async function sendContactEmail(formData: ContactFormData & { recaptchaToken?: string }): Promise<void> {
   const { name, email, message } = formData;
 
-  // Verify reCAPTCHA token
-  const isValidRecaptcha = await verifyRecaptcha(formData.recaptchaToken);
-  if (!isValidRecaptcha) {
-    throw new AppError(400, 'reCAPTCHA verification failed');
+  // Verify reCAPTCHA token if provided
+  if (formData.recaptchaToken) {
+    const isValidRecaptcha = await verifyRecaptcha(formData.recaptchaToken);
+    if (!isValidRecaptcha) {
+      throw new AppError(400, 'reCAPTCHA verification failed');
+    }
   }
 
   try {

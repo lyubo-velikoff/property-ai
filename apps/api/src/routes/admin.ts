@@ -123,13 +123,24 @@ router.patch(
       const property = await prisma.property.update({
         where: { id: req.params.id },
         data: {
-          ...data,
-          contact_info: {
+          title: data.title,
+          description: data.description,
+          price: data.price,
+          currency: data.currency,
+          area_sqm: data.area_sqm,
+          floor: data.floor,
+          construction_type: data.construction_type,
+          furnishing: data.furnishing,
+          location_type: data.location_type,
+          category: data.category,
+          type: data.type,
+          featured: data.featured,
+          contact_info: data.contact_info ? {
             update: {
               phone: data.contact_info.phone,
               email: data.contact_info.email,
             },
-          },
+          } : undefined,
           ...(files.length > 0 && {
             images: {
               deleteMany: {},
@@ -207,7 +218,7 @@ router.get('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next) =>
     });
 
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new AppError(404, 'User not found');
     }
 
     res.json({
@@ -230,7 +241,7 @@ router.post('/users', protect, restrictTo('ADMIN'), async (req, res, next) => {
     });
 
     if (existingUser) {
-      throw new AppError('User with this email already exists', 400);
+      throw new AppError(400, 'User with this email already exists');
     }
 
     const user = await prisma.user.create({
@@ -268,7 +279,7 @@ router.patch('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next) 
       });
 
       if (existingUser) {
-        throw new AppError('User with this email already exists', 400);
+        throw new AppError(400, 'User with this email already exists');
       }
     }
 
@@ -323,10 +334,24 @@ router.post(
 
       const property = await prisma.property.create({
         data: {
-          ...data,
-          contact_info: {
-            create: data.contact_info,
-          },
+          title: data.title,
+          description: data.description,
+          price: data.price,
+          currency: data.currency,
+          area_sqm: data.area_sqm,
+          floor: data.floor,
+          construction_type: data.construction_type,
+          furnishing: data.furnishing,
+          location_type: data.location_type,
+          category: data.category,
+          type: data.type,
+          featured: data.featured,
+          contact_info: data.contact_info ? {
+            create: {
+              phone: data.contact_info.phone,
+              email: data.contact_info.email,
+            },
+          } : undefined,
           ...(files.length > 0 && {
             images: {
               create: files.map((file) => ({

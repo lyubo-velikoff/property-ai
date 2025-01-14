@@ -17,27 +17,73 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+model Region {
+  id         Int        @id
+  name       String
+  properties Property[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Neighborhood {
+  id         Int        @id
+  name       String
+  properties Property[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Feature {
+  id          Int               @id @default(autoincrement())
+  name        String
+  type        String            // 'INFRASTRUCTURE' or 'BUILDING'
+  properties  PropertyFeature[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
 model Property {
-  id               String      @id @default(cuid())
-  title           String
-  description     String
-  price           Float
-  currency        String      @default("EUR")
-  area_sqm        Float
-  floor           Int?
-  construction_type String?
-  furnishing      String?
-  location        String
-  category        String      @default("SALE")
-  type            String      @default("APARTMENT")
-  featured        Boolean       @default(false)
-  images          Image[]
-  contact_info    ContactInfo?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id               String            @id @default(cuid())
+  title            String
+  description      String
+  price            Float
+  currency         String            @default("BGN") // BGN or EUR
+  area_sqm         Float
+  land_area_sqm    Float?
+  floor            Int?
+  total_floors     Int?
+  construction_type String?          // BRICK, EPK, PK, PANEL, WOOD_FLOOR
+  furnishing       String?           // FURNISHED, PARTIALLY_FURNISHED, UNFURNISHED
+  location_type    String            @default("CITY") // CITY or REGION
+  region           Region?           @relation(fields: [regionId], references: [id])
+  regionId         Int?
+  neighborhood     Neighborhood?     @relation(fields: [neighborhoodId], references: [id])
+  neighborhoodId   Int?
+  has_regulation   Boolean?
+  category         String            @default("SALE") // SALE or RENT
+  type             String            @default("APARTMENT") // APARTMENT, HOUSE, LAND, COMMERCIAL, INDUSTRIAL
+  featured         Boolean           @default(false)
+  images           Image[]
+  contact_info     ContactInfo?
+  features         PropertyFeature[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   @@index([category])
   @@index([type])
+  @@index([regionId])
+  @@index([neighborhoodId])
+}
+
+model PropertyFeature {
+  propertyId String
+  featureId  Int
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  feature    Feature  @relation(fields: [featureId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@id([propertyId, featureId])
 }
 
 model Image {
