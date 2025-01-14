@@ -42,7 +42,7 @@ export default function PropertyCard({
   return (
     <Link
       to={`/properties/${id}`}
-      className="flex flex-col overflow-hidden transition-all bg-white rounded-lg shadow-lg hover:shadow-xl dark:shadow-gray-800 dark:bg-gray-800 group"
+      className="flex flex-col overflow-hidden transition-all bg-white rounded-lg shadow-lg hover:shadow-xl dark:shadow-[rgb(var(--color-dark-bg))] dark:bg-[rgb(var(--color-dark-bg-secondary))] group"
     >
       <div className="relative flex-shrink-0 h-48 overflow-hidden">
         <img
@@ -51,32 +51,32 @@ export default function PropertyCard({
           className="object-cover w-full h-full transition-transform duration-300 ease-in-out group-hover:scale-110"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.onerror = null; // Prevent infinite loop
+            target.onerror = null;
             target.src = '/images/property-placeholder.webp';
           }}
         />
       </div>
       <div className="z-10 mr-3 -mt-3 text-right">
-          <span className="inline-flex px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md shadow-sm">
-            {categoryLabels[category] || category}
-          </span>
-        </div>
+        <span className="inline-flex px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md shadow-sm">
+          {categoryLabels[category] || category}
+        </span>
+      </div>
       <div className="flex flex-col flex-1 p-4">
         <div className="flex-1">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
             {title}
           </h3>
         </div>
         <div className="mt-4">
           <div className="flex items-center justify-between">
-            <span className="text-lg font-medium text-gray-900 dark:text-white">
+            <span className="text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
               {formattedPrice}
             </span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">
               {area_sqm} м²
             </span>
           </div>
-          <div className="flex items-center justify-between mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-between mt-2 text-sm text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">
             <span>{propertyTypeLabels[type] || type}</span>
             <span>{locationTypeLabels[location_type] || location_type}</span>
           </div>

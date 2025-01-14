@@ -161,11 +161,11 @@ export default function PropertyForm({
 
       <div className="space-y-4">
         {/* Basic Info Section */}
-        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Основна информация</h3>
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Основна информация</h3>
           <div className="grid grid-cols-1 gap-6">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Заглавие
               </label>
               <input
@@ -177,14 +177,14 @@ export default function PropertyForm({
                 className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                   errors.title 
                     ? 'border-red-500 dark:border-red-500' 
-                    : 'border-gray-300 dark:border-gray-600'
-                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+                    : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
+                } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
               />
               {errors.title && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title}</p>}
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Описание
               </label>
               <textarea
@@ -196,8 +196,8 @@ export default function PropertyForm({
                 className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                   errors.description 
                     ? 'border-red-500 dark:border-red-500' 
-                    : 'border-gray-300 dark:border-gray-600'
-                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+                    : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
+                } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
               />
               {errors.description && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>}
             </div>
@@ -205,11 +205,11 @@ export default function PropertyForm({
         </div>
 
         {/* Price & Area Section */}
-        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Цена и площ</h3>
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Цена и площ</h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Цена
               </label>
               <div className="flex mt-1 rounded-md shadow-sm">
@@ -222,14 +222,14 @@ export default function PropertyForm({
                   className={`block w-full rounded-l-md shadow-sm sm:text-sm ${
                     errors.price 
                       ? 'border-red-500 dark:border-red-500' 
-                      : 'border-gray-300 dark:border-gray-600'
-                  } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+                      : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
+                  } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
                 />
                 <select
                   name="currency"
                   value={data.currency}
                   onChange={handleChange}
-                  className="border-l-0 border-gray-300 rounded-r-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:ring-primary-500 focus:border-primary-500"
+                  className="border-l-0 border-gray-300 rounded-r-md dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:ring-primary-500 focus:border-primary-500"
                 >
                   {currencies.map(currency => (
                     <option key={currency.value} value={currency.value}>{currency.label}</option>
@@ -240,7 +240,7 @@ export default function PropertyForm({
             </div>
 
             <div>
-              <label htmlFor="area_sqm" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="area_sqm" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Площ (кв.м)
               </label>
               <input
@@ -252,14 +252,14 @@ export default function PropertyForm({
                 className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                   errors.area_sqm 
                     ? 'border-red-500 dark:border-red-500' 
-                    : 'border-gray-300 dark:border-gray-600'
-                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+                    : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
+                } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
               />
               {errors.area_sqm && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.area_sqm}</p>}
             </div>
 
             <div>
-              <label htmlFor="land_area_sqm" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="land_area_sqm" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Площ на парцела (кв.м)
               </label>
               <input
@@ -268,18 +268,18 @@ export default function PropertyForm({
                 name="land_area_sqm"
                 value={data.land_area_sqm || ''}
                 onChange={handleChange}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               />
             </div>
           </div>
         </div>
 
         {/* Location Section */}
-        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Локация</h3>
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Локация</h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             <div>
-              <label htmlFor="location_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="location_type" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Тип локация
               </label>
               <select
@@ -290,8 +290,8 @@ export default function PropertyForm({
                 className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                   errors.location_type 
                     ? 'border-red-500 dark:border-red-500' 
-                    : 'border-gray-300 dark:border-gray-600'
-                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+                    : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
+                } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
               >
                 {locationTypes.map(type => (
                   <option key={type.value} value={type.value}>{type.label}</option>
@@ -301,7 +301,7 @@ export default function PropertyForm({
             </div>
 
             <div>
-              <label htmlFor="regionId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="regionId" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Регион
               </label>
               <select
@@ -310,7 +310,7 @@ export default function PropertyForm({
                 value={data.regionId || ''}
                 onChange={handleChange}
                 disabled={regionsLoading}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
                 <option value="">Изберете</option>
                 {regionsLoading ? (
@@ -322,7 +322,7 @@ export default function PropertyForm({
             </div>
 
             <div>
-              <label htmlFor="neighborhoodId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="neighborhoodId" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Квартал
               </label>
               <select
@@ -331,7 +331,7 @@ export default function PropertyForm({
                 value={data.neighborhoodId || ''}
                 onChange={handleChange}
                 disabled={neighborhoodsLoading}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
                 <option value="">Изберете</option>
                 {neighborhoodsLoading ? (
@@ -345,11 +345,11 @@ export default function PropertyForm({
         </div>
 
         {/* Property Details Section */}
-        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Детайли за имота</h3>
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Детайли за имота</h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Тип имот
               </label>
               <select
@@ -357,7 +357,7 @@ export default function PropertyForm({
                 name="type"
                 value={data.type}
                 onChange={handleChange}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
                 {propertyTypes.map(type => (
                   <option key={type.value} value={type.value}>{type.label}</option>
@@ -366,7 +366,7 @@ export default function PropertyForm({
             </div>
 
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Категория
               </label>
               <select
@@ -374,7 +374,7 @@ export default function PropertyForm({
                 name="category"
                 value={data.category}
                 onChange={handleChange}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
                 {categories.map(category => (
                   <option key={category.value} value={category.value}>{category.label}</option>
@@ -383,7 +383,7 @@ export default function PropertyForm({
             </div>
 
             <div>
-              <label htmlFor="construction_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="construction_type" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Вид строителство
               </label>
               <select
@@ -391,7 +391,7 @@ export default function PropertyForm({
                 name="construction_type"
                 value={data.construction_type || ''}
                 onChange={handleChange}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
                 <option value="">Изберете</option>
                 {constructionTypes.map(type => (
@@ -401,7 +401,7 @@ export default function PropertyForm({
             </div>
 
             <div>
-              <label htmlFor="furnishing" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="furnishing" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Обзавеждане
               </label>
               <select
@@ -409,7 +409,7 @@ export default function PropertyForm({
                 name="furnishing"
                 value={data.furnishing || ''}
                 onChange={handleChange}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
                 <option value="">Изберете</option>
                 {furnishingTypes.map(type => (
@@ -421,11 +421,11 @@ export default function PropertyForm({
         </div>
 
         {/* Floor Info & Additional Info */}
-        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Етажност и допълнителна информация</h3>
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Етажност и допълнителна информация</h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
             <div>
-              <label htmlFor="floor" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="floor" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Етаж
               </label>
               <input
@@ -434,12 +434,12 @@ export default function PropertyForm({
                 name="floor"
                 value={data.floor || ''}
                 onChange={handleChange}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               />
             </div>
 
             <div>
-              <label htmlFor="total_floors" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="total_floors" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Общо етажи
               </label>
               <input
@@ -448,12 +448,12 @@ export default function PropertyForm({
                 name="total_floors"
                 value={data.total_floors || ''}
                 onChange={handleChange}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               />
             </div>
 
             <div>
-              <label htmlFor="has_regulation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="has_regulation" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Има регулация
               </label>
               <select
@@ -466,7 +466,7 @@ export default function PropertyForm({
                     has_regulation: e.target.value === 'yes'
                   }));
                 }}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
                 <option value="yes">Да</option>
                 <option value="no">Не</option>
@@ -480,20 +480,20 @@ export default function PropertyForm({
                   name="featured"
                   checked={data.featured || false}
                   onChange={handleChange}
-                  className="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:border-gray-600"
+                  className="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:border-[rgb(var(--color-dark-border))]"
                 />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Препоръчан</span>
+                <span className="ml-2 text-sm text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">Препоръчан</span>
               </label>
             </div>
           </div>
         </div>
 
         {/* Contact Info */}
-        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Контактна информация</h3>
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Контактна информация</h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
-              <label htmlFor="contact_info.phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="contact_info.phone" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Телефон за контакт
               </label>
               <input
@@ -505,8 +505,8 @@ export default function PropertyForm({
                 className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                   errors['contact_info.phone'] 
                     ? 'border-red-500 dark:border-red-500' 
-                    : 'border-gray-300 dark:border-gray-600'
-                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+                    : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
+                } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
               />
               {errors['contact_info.phone'] && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.phone']}</p>
@@ -514,7 +514,7 @@ export default function PropertyForm({
             </div>
 
             <div>
-              <label htmlFor="contact_info.email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="contact_info.email" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Имейл за контакт
               </label>
               <input
@@ -526,8 +526,8 @@ export default function PropertyForm({
                 className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                   errors['contact_info.email'] 
                     ? 'border-red-500 dark:border-red-500' 
-                    : 'border-gray-300 dark:border-gray-600'
-                } dark:bg-gray-700 dark:text-gray-100 focus:border-primary-500 focus:ring-primary-500`}
+                    : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
+                } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
               />
               {errors['contact_info.email'] && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.email']}</p>
@@ -537,14 +537,14 @@ export default function PropertyForm({
         </div>
 
         {/* Features Section */}
-        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Характеристики</h3>
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Характеристики</h3>
           {featuresLoading ? (
-            <p className="text-sm text-gray-500">Зареждане на характеристики...</p>
+            <p className="text-sm text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Зареждане на характеристики...</p>
           ) : (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {features?.map(feature => (
-                <div key={feature.id} className="flex items-center p-2 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div key={feature.id} className="flex items-center p-2 rounded-md hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))]">
                   <input
                     type="checkbox"
                     id={`feature-${feature.id}`}
@@ -556,11 +556,11 @@ export default function PropertyForm({
                         setSelectedFeatures(prev => prev.filter(id => id !== feature.id));
                       }
                     }}
-                    className="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-500"
+                    className="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:border-[rgb(var(--color-dark-border))]"
                   />
                   <label
                     htmlFor={`feature-${feature.id}`}
-                    className="block ml-2 text-sm text-gray-700 cursor-pointer dark:text-gray-300"
+                    className="block ml-2 text-sm text-gray-700 cursor-pointer dark:text-[rgb(var(--color-dark-text-secondary))]"
                   >
                     {feature.name}
                   </label>
@@ -569,16 +569,16 @@ export default function PropertyForm({
             </div>
           )}
           {featuresError && (
-            <p className="mt-1 text-sm text-red-600">Грешка при зареждане на характеристиките</p>
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">Грешка при зареждане на характеристиките</p>
           )}
         </div>
 
         {/* Images Section */}
-        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Изображения</h3>
+        <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Изображения</h3>
           {initialData?.images && initialData.images.length > 0 && (
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Текущи изображения
               </label>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
@@ -602,7 +602,7 @@ export default function PropertyForm({
 
           {/* Image Upload */}
           <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
               {initialData?.images?.length ? 'Добави нови изображения' : 'Изображения'}
             </label>
             <div className="flex justify-center px-6 pt-5 pb-6 mt-1 border-2 border-gray-300 border-dashed rounded-md dark:border-gray-600">
@@ -646,11 +646,11 @@ export default function PropertyForm({
             </div>
             {images.length > 0 && (
               <div className="mt-4">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Избрани файлове:</h4>
+                <h4 className="text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">Избрани файлове:</h4>
                 <ul className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
                   {Array.from(images).map((file, index) => (
                     <li key={index} className="flex items-center justify-between py-2">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">{file.name}</span>
+                      <span className="text-sm text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">{file.name}</span>
                       <button
                         type="button"
                         onClick={() => setImages(images.filter((_, i) => i !== index))}
@@ -671,7 +671,7 @@ export default function PropertyForm({
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm dark:text-gray-200 dark:bg-gray-700 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text))] bg-white dark:bg-[rgb(var(--color-dark-bg))] border border-gray-300 dark:border-[rgb(var(--color-dark-border))] rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-[rgb(var(--color-dark-bg-secondary))]"
             >
               Отказ
             </button>

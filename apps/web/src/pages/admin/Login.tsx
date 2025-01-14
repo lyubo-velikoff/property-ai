@@ -67,10 +67,10 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-gray-50 dark:bg-gray-900 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center min-h-screen px-4 py-12 bg-white dark:bg-[rgb(var(--color-dark-bg))] sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div>
-          <h2 className="mt-6 text-3xl font-bold text-center text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-3xl font-bold text-center text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
             Вход в администрацията
           </h2>
         </div>
@@ -90,13 +90,13 @@ export default function Login() {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
                   errors.email
-                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                    : 'border-gray-300 dark:border-gray-600 focus:ring-red-500 focus:border-red-500'
-                } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 rounded-t-md focus:outline-none focus:z-10 sm:text-sm`}
+                    ? 'border-red-300 dark:border-red-500 focus:ring-red-500 focus:border-red-500'
+                    : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))] focus:ring-primary-500 focus:border-primary-500'
+                } placeholder-gray-500 dark:placeholder-[rgb(var(--color-dark-text-secondary))] text-gray-900 dark:text-[rgb(var(--color-dark-text))] dark:bg-[rgb(var(--color-dark-bg))] rounded-t-md focus:outline-none focus:z-10 sm:text-sm`}
                 placeholder="Имейл адрес"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
               )}
             </div>
             <div>
@@ -113,13 +113,13 @@ export default function Login() {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${
                   errors.password
-                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                    : 'border-gray-300 dark:border-gray-600 focus:ring-red-500 focus:border-red-500'
-                } placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-gray-700 rounded-b-md focus:outline-none focus:z-10 sm:text-sm`}
+                    ? 'border-red-300 dark:border-red-500 focus:ring-red-500 focus:border-red-500'
+                    : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))] focus:ring-primary-500 focus:border-primary-500'
+                } placeholder-gray-500 dark:placeholder-[rgb(var(--color-dark-text-secondary))] text-gray-900 dark:text-[rgb(var(--color-dark-text))] dark:bg-[rgb(var(--color-dark-bg))] rounded-b-md focus:outline-none focus:z-10 sm:text-sm`}
                 placeholder="Парола"
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
               )}
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isPending}
-              className="relative flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md group bg-primary-600 hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:opacity-50"
+              className="relative flex justify-center w-full px-3 py-2 text-sm font-semibold text-white rounded-md group bg-primary-600 hover:bg-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:opacity-50 dark:focus-visible:outline-offset-[rgb(var(--color-dark-bg))]"
             >
               {isPending ? 'Влизане...' : 'Вход'}
             </button>

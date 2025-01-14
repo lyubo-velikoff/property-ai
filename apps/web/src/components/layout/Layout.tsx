@@ -35,8 +35,8 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className={`sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-300 ${isScrolled ? 'h-16' : 'h-20'}`}>
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-[rgb(var(--color-dark-bg))]">
+      <header className={`sticky top-0 z-50 bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] border-b border-gray-200 dark:border-[rgb(var(--color-dark-border))] shadow-sm transition-all duration-300 ${isScrolled ? 'h-16' : 'h-20'}`}>
         <nav className="container flex justify-between items-center h-full transition-all duration-300">
           <div className="flex gap-8 items-center">
             <Link to="/" className="flex items-center">
@@ -47,7 +47,7 @@ export default function Layout() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-500"
+                  className="text-sm font-semibold leading-6 text-gray-900 dark:text-[rgb(var(--color-dark-text))] hover:text-primary-600 dark:hover:text-primary-500"
                 >
                   {item.name}
                 </Link>
@@ -59,7 +59,7 @@ export default function Layout() {
             <div className="flex md:hidden">
               <button
                 type="button"
-                className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700 dark:text-gray-200"
+                className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700 dark:text-[rgb(var(--color-dark-text))]"
                 onClick={() => setMobileMenuOpen(true)}
               >
                 <span className="sr-only">Open main menu</span>
@@ -72,14 +72,14 @@ export default function Layout() {
 
       <Dialog as="div" className="md:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
         <div className="fixed inset-0 z-50" />
-        <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white dark:bg-gray-800 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+        <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
               <Logo className="w-auto h-12" />
             </Link>
             <button
               type="button"
-              className="-m-2.5 rounded-md p-2.5 text-gray-700 dark:text-gray-200"
+              className="-m-2.5 rounded-md p-2.5 text-gray-700 dark:text-[rgb(var(--color-dark-text))]"
               onClick={() => setMobileMenuOpen(false)}
             >
               <span className="sr-only">Close menu</span>
@@ -93,7 +93,7 @@ export default function Layout() {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 dark:text-[rgb(var(--color-dark-text))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))]"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.name}
@@ -114,42 +114,42 @@ export default function Layout() {
         </div>
       </main>
 
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <footer className="bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] border-t border-gray-200 dark:border-[rgb(var(--color-dark-border))]">
         <div className="container py-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Контакти</h3>
-              <ul className="mt-4 space-y-4 text-sm text-gray-600 dark:text-gray-300">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Контакти</h3>
+              <ul className="mt-4 space-y-4 text-sm text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 <li>Телефон: +359 82 82 82 82</li>
                 <li>Имейл: office@propertyai.bg</li>
                 <li>Адрес: Русе, България</li>
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Работно време</h3>
-              <ul className="mt-4 space-y-4 text-sm text-gray-600 dark:text-gray-300">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Работно време</h3>
+              <ul className="mt-4 space-y-4 text-sm text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 <li>Понеделник - Петък: 9:00 - 18:00</li>
                 <li>Събота: 10:00 - 14:00</li>
                 <li>Неделя: Затворено</li>
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Последвайте ни</h3>
-              <ul className="mt-4 space-y-4 text-sm text-gray-600 dark:text-gray-300">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Последвайте ни</h3>
+              <ul className="mt-4 space-y-4 text-sm text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 <li>
-                  <a href="#" className="hover:text-gray-900 dark:hover:text-white">
+                  <a href="#" className="hover:text-gray-900 dark:hover:text-[rgb(var(--color-dark-text))]">
                     Facebook
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-gray-900 dark:hover:text-white">
+                  <a href="#" className="hover:text-gray-900 dark:hover:text-[rgb(var(--color-dark-text))]">
                     Instagram
                   </a>
                 </li>
               </ul>
             </div>
           </div>
-          <div className="pt-8 mt-8 text-sm text-center text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
+          <div className="pt-8 mt-8 text-sm text-center text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))] border-t border-gray-200 dark:border-[rgb(var(--color-dark-border))]">
             © {new Date().getFullYear()} Property AI. All rights reserved.
           </div>
         </div>

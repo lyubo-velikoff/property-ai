@@ -58,25 +58,25 @@ export default function Dashboard() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Табло</h1>
+      <h1 className="text-2xl font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Табло</h1>
 
       <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (
           <Link
             key={card.name}
             to={card.to}
-            className="relative overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 py-5 shadow sm:px-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+            className="relative overflow-hidden rounded-lg bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] px-4 py-5 shadow sm:px-6 hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))] transition-colors duration-200"
           >
             <dt>
               <div className={`absolute rounded-md p-3 ${card.color}`}>
                 <card.icon className="h-6 w-6 text-white" aria-hidden="true" />
               </div>
-              <p className="ml-16 truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+              <p className="ml-16 truncate text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 {card.name}
               </p>
             </dt>
             <dd className="ml-16 flex items-baseline">
-              <p className="text-2xl font-semibold text-gray-900 dark:text-white">{card.value}</p>
+              <p className="text-2xl font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">{card.value}</p>
             </dd>
           </Link>
         ))}
@@ -84,13 +84,13 @@ export default function Dashboard() {
 
       {/* Recent Activity */}
       <div className="mt-8">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white">Последна активност</h2>
-        <div className="mt-4 bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+        <h2 className="text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Последна активност</h2>
+        <div className="mt-4 bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] shadow overflow-hidden sm:rounded-md">
+          <ul className="divide-y divide-gray-200 dark:divide-[rgb(var(--color-dark-border))]">
             {/* Add recent activity items here */}
             <li className="px-4 py-4 sm:px-6">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <p className="text-sm font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))] truncate">
                   Скоро ще бъде добавена информация за последната активност
                 </p>
               </div>

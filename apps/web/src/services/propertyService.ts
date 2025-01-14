@@ -43,6 +43,14 @@ export interface Property {
     phone: string;
     email: string;
   };
+  region?: {
+    id: number;
+    name: string;
+  };
+  neighborhood?: {
+    id: number;
+    name: string;
+  };
   createdAt: string;
   updatedAt: string;
 }

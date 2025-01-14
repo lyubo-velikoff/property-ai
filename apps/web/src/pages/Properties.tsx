@@ -5,7 +5,11 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import PropertyCard, { PropertyCardProps } from '../components/properties/PropertyCard';
 import PropertyCardSkeleton from '../components/properties/PropertyCardSkeleton';
 import { getProperties, PropertyFilters } from '../services/propertyService';
-import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../constants/property';
+import { propertyTypeLabels, locationTypeLabels, categoryLabels, locationTypes } from '../constants/property';
+
+declare module 'react-transition-group';
+
+type LocationType = 'CITY' | 'REGION';
 
 const regions = [
   'Всички райони',
@@ -99,170 +103,176 @@ export default function Properties() {
   };
 
   return (
-    <div className="min-h-full bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {currentCategory === 'RENT' ? 'Имоти под наем' : 
-             currentCategory === 'SALE' ? 'Имоти за продажба' : 
-             'Всички имоти'}
-          </h1>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-red-600 dark:hover:text-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <FunnelIcon className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
-            Филтри
-          </button>
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-[rgb(var(--color-dark-bg))]">
+      <div className="py-8 mx-auto">
+        <div className="flex flex-col gap-8 lg:flex-row">
+          {/* Filters */}
+          <div className="w-full lg:w-1/5">
+            <div className="sticky top-24 bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] rounded-lg shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))] p-4 border-b border-gray-200 dark:border-[rgb(var(--color-dark-border))]">Филтри</h2>
+              <div className="p-4 space-y-4">
+                <div>
+                  <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                    Тип имот
+                  </label>
+                  <select
+                    id="type"
+                    value={currentType}
+                    onChange={(e) => handleFilterChange({ type: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  >
+                    <option value="">Всички</option>
+                    {Object.entries(propertyTypeLabels).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-        {/* Filters */}
-        {showFilters && (
-          <div className="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Тип имот
-                </label>
-                <select
-                  value={currentType}
-                  onChange={(e) => handleFilterChange({ type: e.target.value })}
-                  disabled={isLoading}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <option value="">Всички типове</option>
-                  {Object.entries(propertyTypeLabels).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                    Категория
+                  </label>
+                  <select
+                    id="category"
+                    value={currentCategory || ''}
+                    onChange={(e) => handleFilterChange({ category: e.target.value as 'RENT' | 'SALE' | undefined })}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  >
+                    <option value="">Всички</option>
+                    {Object.entries(categoryLabels).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Тип локация
-                </label>
-                <select
-                  value={currentLocationType}
-                  onChange={(e) => handleFilterChange({ location_type: e.target.value })}
-                  disabled={isLoading}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <option value="">Всички локации</option>
-                  {Object.entries(locationTypeLabels).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div>
+                  <label htmlFor="location_type" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                    Локация
+                  </label>
+                  <select
+                    id="location_type"
+                    value={currentLocationType}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleFilterChange({ 
+                        location_type: value === '' ? undefined : value as 'CITY' | 'REGION'
+                      });
+                    }}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  >
+                    <option value="">Всички</option>
+                    {locationTypes.map(({ value, label }) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Район
-                </label>
-                <select
-                  value={currentRegion}
-                  onChange={(e) => handleFilterChange({ region: e.target.value })}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
-                >
-                  <option value="">Всички райони</option>
-                  {regions.map((region) => (
-                    <option key={region} value={region}>
-                      {region}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Минимална цена
-                </label>
-                <input
-                  type="number"
-                  value={currentMinPrice || ''}
-                  onChange={(e) => handleFilterChange({ minPrice: e.target.value ? Number(e.target.value) : undefined })}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
-                  placeholder="Минимална цена"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Максимална цена
-                </label>
-                <input
-                  type="number"
-                  value={currentMaxPrice || ''}
-                  onChange={(e) => handleFilterChange({ maxPrice: e.target.value ? Number(e.target.value) : undefined })}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
-                  placeholder="Максимална цена"
-                />
+                <div>
+                  <label htmlFor="minPrice" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                    Минимална цена
+                  </label>
+                  <input
+                    type="number"
+                    id="minPrice"
+                    value={currentMinPrice || ''}
+                    onChange={(e) => handleFilterChange({ minPrice: e.target.value ? Number(e.target.value) : undefined })}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="maxPrice" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                    Максимална цена
+                  </label>
+                  <input
+                    type="number"
+                    id="maxPrice"
+                    value={currentMaxPrice || ''}
+                    onChange={(e) => handleFilterChange({ maxPrice: e.target.value ? Number(e.target.value) : undefined })}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                  />
+                </div>
               </div>
             </div>
           </div>
-        )}
 
-        {/* Properties Grid */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <PropertyCardSkeleton key={index} />
-            ))}
-          </div>
-        ) : error ? (
-          <div className="text-center py-12">
-            <p className="text-red-600 dark:text-red-500 text-lg">{error}</p>
-          </div>
-        ) : properties.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400 text-lg">Няма намерени имоти</p>
-          </div>
-        ) : (
-          <TransitionGroup className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {properties.map((property) => (
-              <CSSTransition key={property.id} timeout={300} classNames="fade">
-                <PropertyCard {...property} />
-              </CSSTransition>
-            ))}
-          </TransitionGroup>
-        )}
+          {/* Properties Grid */}
+          <div className="w-full lg:w-4/5">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3">
+              {isLoading ? (
+                Array.from({ length: 6 }).map((_, index) => (
+                  <PropertyCardSkeleton key={index} />
+                ))
+              ) : properties?.length ? (
+                properties.map((property) => (
+                  <PropertyCard key={property.id} {...property} />
+                ))
+              ) : (
+                <div className="py-12 text-center col-span-full">
+                  <p className="text-lg text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                    Няма намерени имоти
+                  </p>
+                </div>
+              )}
+            </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-8 flex justify-center">
-            <nav className="flex items-center gap-2">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 disabled:opacity-50"
-              >
-                <ChevronLeftIcon className="h-5 w-5" />
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  className={`px-4 py-2 rounded-md ${
-                    currentPage === page
-                      ? 'bg-red-600 text-white'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500 disabled:opacity-50"
-              >
-                <ChevronRightIcon className="h-5 w-5" />
-              </button>
-            </nav>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex items-center justify-between border-t border-gray-200 dark:border-[rgb(var(--color-dark-border))] pt-4">
+                <div className="flex justify-between flex-1 sm:hidden">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="btn btn-secondary"
+                  >
+                    Предишна
+                  </button>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="btn btn-secondary"
+                  >
+                    Следваща
+                  </button>
+                </div>
+                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                      Страница <span className="font-medium">{currentPage}</span> от{' '}
+                      <span className="font-medium">{totalPages}</span>
+                    </p>
+                  </div>
+                  <div>
+                    <nav className="inline-flex -space-x-px rounded-md shadow-sm isolate" aria-label="Pagination">
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 dark:text-gray-500 ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))] focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                      >
+                        <span className="sr-only">Предишна</span>
+                        <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
+                      </button>
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 dark:text-gray-500 ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))] focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                      >
+                        <span className="sr-only">Следваща</span>
+                        <ChevronRightIcon className="w-5 h-5" aria-hidden="true" />
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -100,20 +100,20 @@ export default function Messages() {
       <div className="mt-8 flex flex-col">
         <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
-                <thead className="bg-gray-50 dark:bg-gray-800">
+            <div className="overflow-hidden shadow ring-1 ring-black/5 dark:ring-[rgb(var(--color-dark-border))] md:rounded-lg">
+              <table className="min-w-full divide-y divide-gray-300 dark:divide-[rgb(var(--color-dark-border))]">
+                <thead className="bg-gray-50 dark:bg-[rgb(var(--color-dark-bg-secondary))]">
                   <tr>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                       Име
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                       Имейл
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                       Съобщение
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                       Дата
                     </th>
                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -121,37 +121,37 @@ export default function Messages() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+                <tbody className="bg-white divide-y divide-gray-200 dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:divide-[rgb(var(--color-dark-border))]">
                   {data?.items.map((message: ContactMessage) => (
-                    <tr key={message.id} className={message.isRead ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-100">
+                    <tr key={message.id} className={message.isRead ? 'bg-gray-50 dark:bg-[rgb(var(--color-dark-bg))]' : 'bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))]'}>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                         {message.name}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600 dark:text-gray-300">
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                         {message.email}
                       </td>
-                      <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300">
+                      <td className="px-3 py-4 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                         {message.message}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600 dark:text-gray-300">
-                        {new Date(message.createdAt).toLocaleDateString('bg-BG')}
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                        {new Date(message.createdAt).toLocaleDateString('bg-BG', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        {!message.isRead && (
-                          <button
-                            onClick={() => handleMarkAsRead(message.id)}
-                            className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 mr-4"
-                          >
-                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                            <span className="sr-only">Маркирай като прочетено</span>
-                          </button>
-                        )}
                         <button
-                          onClick={() => handleDelete(message.id)}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                          onClick={() => handleMarkAsRead(message.id)}
+                          className={`${
+                            message.isRead 
+                              ? 'text-gray-400 dark:text-[rgb(var(--color-dark-text-secondary))]' 
+                              : 'text-primary-600 dark:text-primary-500 hover:text-primary-700 dark:hover:text-primary-400'
+                          }`}
                         >
-                          <TrashIcon className="h-5 w-5" aria-hidden="true" />
-                          <span className="sr-only">Изтрий</span>
+                          {message.isRead ? 'Прочетено' : 'Маркирай като прочетено'}
                         </button>
                       </td>
                     </tr>

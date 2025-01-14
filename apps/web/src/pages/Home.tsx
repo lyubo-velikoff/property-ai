@@ -87,18 +87,18 @@ export default function Home() {
         {/* Search Box Overlay */}
         <div className="absolute inset-x-0 bottom-0 z-10 transform translate-y-1/2">
           <div className="px-4 mx-auto max-w-4xl sm:px-6 lg:px-8">
-            <div className="bg-white rounded-lg shadow-xl dark:bg-gray-800/95 backdrop-blur-sm">
+            <div className="bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] rounded-lg shadow-xl backdrop-blur-sm">
               <div className="p-6">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div>
-                    <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text))]">
                       Тип имот
                     </label>
                     <select
                       id="type"
                       value={selectedType}
                       onChange={(e) => setSelectedType(e.target.value)}
-                      className="block py-2 pr-10 pl-3 mt-1 w-full text-base rounded-md border-gray-300 focus:border-red-500 focus:outline-none focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                      className="block py-2 pr-10 pl-3 mt-1 w-full text-base rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] sm:text-sm"
                     >
                       {propertyTypes.map((type) => (
                         <option key={type} value={type}>
@@ -108,14 +108,14 @@ export default function Home() {
                     </select>
                   </div>
                   <div>
-                    <label htmlFor="region" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    <label htmlFor="region" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text))]">
                       Район
                     </label>
                     <select
                       id="region"
                       value={selectedRegion}
                       onChange={(e) => setSelectedRegion(e.target.value)}
-                      className="block py-2 pr-10 pl-3 mt-1 w-full text-base rounded-md border-gray-300 focus:border-red-500 focus:outline-none focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                      className="block py-2 pr-10 pl-3 mt-1 w-full text-base rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] sm:text-sm"
                     >
                       {regions.map((region) => (
                         <option key={region} value={region}>
@@ -128,7 +128,7 @@ export default function Home() {
                 <div className="mt-6">
                   <button
                     onClick={handleSearch}
-                    className="px-4 py-3 w-full text-sm font-semibold text-white bg-red-600 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    className="px-4 py-3 w-full text-sm font-semibold text-white bg-primary-600 rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-[rgb(var(--color-dark-bg-secondary))]"
                   >
                     <div className="flex justify-center items-center">
                       <MagnifyingGlassIcon className="w-5 h-5" />
@@ -143,33 +143,33 @@ export default function Home() {
       </div>
 
       {/* Featured Properties Section */}
-      <div className="bg-gray-50 dark:bg-gray-900">
+      <div className="bg-gray-50 dark:bg-[rgb(var(--color-dark-bg))]">
         <div className="px-4 pt-32 pb-16 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">
+          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
             Топ Оферти
           </h2>
           <div className="grid gap-8 mt-12 sm:grid-cols-2 lg:grid-cols-3">
             {isLoading ? (
               // Loading skeletons
               [...Array(3)].map((_, index) => (
-                <div key={index} className="bg-white rounded-lg shadow-lg animate-pulse dark:bg-gray-800">
-                  <div className="bg-gray-200 aspect-w-16 aspect-h-9 dark:bg-gray-700" />
+                <div key={index} className="bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] rounded-lg shadow-lg animate-pulse">
+                  <div className="bg-gray-200 aspect-w-16 aspect-h-9 dark:bg-[rgb(var(--color-dark-border))]" />
                   <div className="p-4">
-                    <div className="w-3/4 h-4 bg-gray-200 rounded dark:bg-gray-700" />
-                    <div className="mt-4 w-1/2 h-4 bg-gray-200 rounded dark:bg-gray-700" />
+                    <div className="w-3/4 h-4 bg-gray-200 rounded dark:bg-[rgb(var(--color-dark-border))]" />
+                    <div className="mt-4 w-1/2 h-4 bg-gray-200 rounded dark:bg-[rgb(var(--color-dark-border))]" />
                   </div>
                 </div>
               ))
             ) : error ? (
-              <div className="col-span-full p-4 bg-red-50 rounded-lg dark:bg-red-900">
-                <p className="text-sm text-center text-red-700 dark:text-red-200">{error}</p>
+              <div className="col-span-full p-4 bg-red-50 dark:bg-red-900/30 rounded-lg">
+                <p className="text-sm text-center text-red-700 dark:text-red-300">{error}</p>
               </div>
             ) : featuredProperties.length > 0 ? (
               featuredProperties.map((property) => (
                 <PropertyCard key={property.id} {...property} />
               ))
             ) : (
-              <div className="col-span-full text-center text-gray-500 dark:text-gray-400">
+              <div className="col-span-full text-center text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Няма намерени оферти
               </div>
             )}
@@ -178,7 +178,7 @@ export default function Home() {
             <div className="mt-12 text-center">
               <Link
                 to="/properties"
-                className="inline-flex items-center px-6 py-3 text-base font-semibold text-white bg-red-600 rounded-md shadow-sm hover:bg-red-700"
+                className="inline-flex items-center px-6 py-3 text-base font-semibold text-white bg-primary-600 rounded-md shadow-sm hover:bg-primary-700"
               >
                 Разгледайте всички имоти
               </Link>

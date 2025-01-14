@@ -141,25 +141,25 @@ export default function PropertyDetails() {
   }
 
   return (
-    <div className="min-h-full bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-full bg-gray-50 dark:bg-[rgb(var(--color-dark-bg))]">
       <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
         {/* Back button */}
         <Link
           to="/properties"
-          className="inline-flex items-center mb-6 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-500"
+          className="inline-flex items-center mb-6 text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))] hover:text-primary-600 dark:hover:text-primary-500"
         >
           <ArrowLeftIcon className="mr-2 w-5 h-5" />
           Обратно към всички имоти
         </Link>
 
         {/* Property Title */}
-        <h1 className="mb-6 text-3xl font-bold text-gray-900 dark:text-white">
+        <h1 className="mb-6 text-3xl font-bold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
           {property.title}
         </h1>
 
         {/* Property Description */}
         <div className="mb-8">
-          <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
+          <p className="text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))] whitespace-pre-wrap">
             {property.description}
           </p>
         </div>
@@ -232,64 +232,64 @@ export default function PropertyDetails() {
             </div>
 
             {/* Property Details */}
-            <div className="mt-8 p-6 bg-white rounded-lg shadow dark:bg-gray-800">
-              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Детайли за имота</h2>
+            <div className="mt-8 p-6 bg-white rounded-lg shadow dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+              <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Детайли за имота</h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Тип имот</h3>
-                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Тип имот</h3>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                     {propertyTypeLabels[property.type] || property.type}
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Категория</h3>
-                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Категория</h3>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                     {categoryLabels[property.category] || property.category}
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Тип локация</h3>
-                  <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Тип локация</h3>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                     {locationTypeLabels[property.location_type] || property.location_type}
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Площ</h3>
-                  <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.area_sqm} м²</p>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Площ</h3>
+                  <p className="mt-1 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">{property.area_sqm} м²</p>
                 </div>
                 {property.land_area_sqm && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Площ на парцела</h3>
-                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.land_area_sqm} м²</p>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Площ на парцела</h3>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">{property.land_area_sqm} м²</p>
                   </div>
                 )}
                 {property.floor && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Етаж</h3>
-                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.floor} от {property.total_floors || '?'}</p>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Етаж</h3>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">{property.floor} от {property.total_floors || '?'}</p>
                   </div>
                 )}
                 {property.construction_type && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Строителство</h3>
-                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.construction_type}</p>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Строителство</h3>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">{property.construction_type}</p>
                   </div>
                 )}
                 {property.furnishing && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Обзавеждане</h3>
-                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.furnishing}</p>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Обзавеждане</h3>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">{property.furnishing}</p>
                   </div>
                 )}
                 {property.has_regulation !== undefined && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Регулация</h3>
-                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.has_regulation ? 'Да' : 'Не'}</p>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Регулация</h3>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">{property.has_regulation ? 'Да' : 'Не'}</p>
                   </div>
                 )}
                 {property.features && property.features.length > 0 && (
                   <div className="sm:col-span-2">
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Характеристики</h3>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">Характеристики</h3>
                     <div className="mt-1 flex flex-wrap gap-2">
                       {property.features.map((feature: Feature) => (
                         <span 
@@ -309,36 +309,36 @@ export default function PropertyDetails() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Price Card */}
-            <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-              <div className="mb-4 text-3xl font-bold text-red-600">
+            <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+              <div className="mb-4 text-3xl font-bold text-primary-600">
                 {formatPrice(property.price)}
                 <span className="ml-1 text-xl">{property.currency}</span>
               </div>
               <div className="space-y-4">
                 <button
                   onClick={() => setShowContactForm(true)}
-                  className="px-4 py-2 w-full text-white bg-red-600 rounded-md transition-colors hover:bg-red-700"
+                  className="px-4 py-2 w-full text-white bg-primary-600 rounded-md transition-colors hover:bg-primary-700"
                 >
                   Изпратете запитване
                 </button>
                 <div className="space-y-2">
                   <a
                     href="tel:082519851"
-                    className="flex gap-2 items-center text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500"
+                    className="flex gap-2 items-center text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))] hover:text-primary-600 dark:hover:text-primary-500"
                   >
                     <PhoneIcon className="w-5 h-5" />
                     082/51-98-51
                   </a>
                   <a
                     href="tel:0895606165"
-                    className="flex gap-2 items-center text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500"
+                    className="flex gap-2 items-center text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))] hover:text-primary-600 dark:hover:text-primary-500"
                   >
                     <PhoneIcon className="w-5 h-5" />
                     0895606165
                   </a>
                   <a
                     href="mailto:avalon_ds@abv.bg"
-                    className="flex gap-2 items-center text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-500"
+                    className="flex gap-2 items-center text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))] hover:text-primary-600 dark:hover:text-primary-500"
                   >
                     <EnvelopeIcon className="w-5 h-5" />
                     avalon_ds@abv.bg
@@ -348,14 +348,14 @@ export default function PropertyDetails() {
             </div>
 
             {/* Location Map */}
-            <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-              <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                 Локация
               </h3>
-              <div className="h-[300px] bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+              <div className="h-[300px] bg-gray-200 dark:bg-[rgb(var(--color-dark-border))] rounded-lg overflow-hidden">
                 <GoogleMap
                   center={{
-                    lat: 43.849699, // TODO: Get actual property coordinates
+                    lat: 43.849699,
                     lng: 25.954861,
                   }}
                 />
@@ -367,13 +367,13 @@ export default function PropertyDetails() {
         {/* Contact Form Modal */}
         {showContactForm && (
           <div className="flex fixed inset-0 z-50 justify-center items-center p-4 bg-black bg-opacity-50">
-            <div className="p-6 w-full max-w-md bg-white rounded-lg dark:bg-gray-800">
-              <h3 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="p-6 w-full max-w-md bg-white rounded-lg dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+              <h3 className="mb-4 text-xl font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                 Изпратете запитване
               </h3>
               <form onSubmit={handleContactSubmit} className="space-y-4">
                 <div>
-                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                     Име
                   </label>
                   <input
@@ -381,11 +381,11 @@ export default function PropertyDetails() {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] sm:text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                     Имейл
                   </label>
                   <input
@@ -393,11 +393,11 @@ export default function PropertyDetails() {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] sm:text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                     Телефон
                   </label>
                   <input
@@ -405,11 +405,11 @@ export default function PropertyDetails() {
                     required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] sm:text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                  <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                     Съобщение
                   </label>
                   <textarea
@@ -417,20 +417,20 @@ export default function PropertyDetails() {
                     rows={4}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                    className="block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] sm:text-sm"
                   />
                 </div>
                 <div className="flex gap-4 justify-end">
                   <button
                     type="button"
                     onClick={() => setShowContactForm(false)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-red-600 dark:hover:text-red-500"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))] hover:text-primary-600 dark:hover:text-primary-500"
                   >
                     Отказ
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                    className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700"
                   >
                     Изпрати
                   </button>

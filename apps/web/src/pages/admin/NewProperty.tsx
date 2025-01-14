@@ -55,7 +55,7 @@ export default function NewProperty() {
 
       <div className="mt-8">
         <div>
-          <div className="bg-white dark:bg-gray-800 shadow sm:rounded-md">
+          <div className="bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] shadow sm:rounded-md">
             <div className="px-4 py-5 sm:p-6">
               {error && (
                 <div className="mb-4 p-4 rounded-md bg-red-50 dark:bg-red-900/50">
@@ -64,10 +64,10 @@ export default function NewProperty() {
                       <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
                     </div>
                     <div className="ml-3">
-                      <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                      <h3 className="text-sm font-medium text-red-800 dark:text-[rgb(var(--color-dark-text))]">
                         Възникна грешка при създаването на имота
                       </h3>
-                      <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                      <div className="mt-2 text-sm text-red-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                         {error instanceof Error ? error.message : 'Unknown error'}
                       </div>
                     </div>

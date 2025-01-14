@@ -1,12 +1,18 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PencilIcon, TrashIcon, PlusIcon, ArrowLeftIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, TrashIcon, PlusIcon, ArrowLeftIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { getProperties, deleteProperty, type Property, type PropertyFilters } from '../../services/propertyService';
 import { event } from '../../lib/analytics';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../../constants/property';
+import { propertyTypeLabels, locationTypeLabels, categoryLabels, currencyLabels } from '../../constants/property';
 import { useDebounce } from '../../hooks/useDebounce';
+
+function formatPrice(price: number) {
+  return new Intl.NumberFormat('bg-BG', {
+    maximumFractionDigits: 0,
+  }).format(price);
+}
 
 export default function Properties() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,34 +53,29 @@ export default function Properties() {
   return (
     <div className="py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Имоти</h1>
-          </div>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Имоти</h1>
           <Link
             to="/admin/properties/new"
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700"
           >
-            <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-            Нов имот
+            <PlusIcon className="w-5 h-5 mr-2" />
+            Добави имот
           </Link>
         </div>
 
-        <div className="mt-4">
+        <div className="mb-6">
           <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-            </div>
             <input
               type="text"
-              placeholder="Търсене на имот..."
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="block w-full rounded-md border-0 py-2 pl-10 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 dark:bg-gray-800 sm:text-sm sm:leading-6"
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Търси по заглавие..."
+              className="block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] sm:text-sm"
             />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+              <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
+            </div>
           </div>
         </div>
 
@@ -106,142 +107,131 @@ export default function Properties() {
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col mt-8">
-            <div className="overflow-x-auto -mx-4 -my-2 sm:-mx-6 lg:-mx-8">
-              <div className="inline-block py-2 min-w-full align-middle md:px-6 lg:px-8">
-                <div className="overflow-hidden ring-1 ring-black ring-opacity-5 shadow md:rounded-lg">
-                  <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
-                    <thead className="bg-gray-50 dark:bg-gray-800">
-                      <tr>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          Изображение
-                        </th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          Заглавие
-                        </th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          Тип
-                        </th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          Локация
-                        </th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                          Цена
-                        </th>
-                        <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                          <span className="sr-only">Действия</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-                      {properties.map((property) => (
-                        <tr key={property.id}>
-                          <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                            {property.images && property.images[0] && (
-                              <img 
-                                src={property.images[0].url || '/images/property-placeholder.webp'} 
-                                alt={property.title}
-                                className="w-16 h-16 object-cover rounded"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.onerror = null;
-                                  target.src = '/images/property-placeholder.webp';
-                                }}
-                              />
-                            )}
-                          </td>
-                          <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
-                            <Link
-                              to={`/admin/properties/${property.id}/edit`}
-                              className="hover:text-primary-600 dark:hover:text-primary-400"
-                            >
-                              {property.title}
-                            </Link>
-                          </td>
-                          <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                            {propertyTypeLabels[property.type] || property.type}
-                          </td>
-                          <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                            {locationTypeLabels[property.location_type] || property.location_type}
-                          </td>
-                          <td className="px-3 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                            {new Intl.NumberFormat('bg-BG', {
-                              style: 'currency',
-                              currency: property.currency || 'BGN'
-                            }).format(property.price)}
-                          </td>
-                          <td className="relative py-4 pr-4 pl-3 text-sm font-medium text-right whitespace-nowrap sm:pr-6">
-                            <div className="flex gap-2 justify-end items-center">
-                              <Link
-                                to={`/admin/properties/${property.id}/edit`}
-                                className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
-                              >
-                                <PencilIcon className="w-5 h-5" aria-hidden="true" />
-                              </Link>
-                              <button
-                                onClick={() => handleDelete(property.id)}
-                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                              >
-                                <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          <div className="overflow-hidden bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] shadow-sm sm:rounded-lg">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-[rgb(var(--color-dark-border))]">
+                <thead className="bg-gray-50 dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+                  <tr>
+                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
+                      Снимка
+                    </th>
+                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
+                      Заглавие
+                    </th>
+                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
+                      Тип
+                    </th>
+                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
+                      Локация
+                    </th>
+                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
+                      Цена
+                    </th>
+                    <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                      <span className="sr-only">Действия</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-[rgb(var(--color-dark-border))] bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))]">
+                  {properties.map((property) => (
+                    <tr key={property.id}>
+                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                        <div className="h-10 w-10 flex-shrink-0">
+                          <img
+                            src={property.images?.[0]?.url || '/images/property-placeholder.webp'}
+                            alt=""
+                            className="h-10 w-10 rounded-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.onerror = null;
+                              target.src = '/images/property-placeholder.webp';
+                            }}
+                          />
+                        </div>
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                        <Link
+                          to={`/admin/properties/${property.id}/edit`}
+                          className="hover:text-primary-600 dark:hover:text-primary-500"
+                        >
+                          {property.title}
+                        </Link>
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                        {propertyTypeLabels[property.type]}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                        {property.region?.name || property.neighborhood?.name}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                        {formatPrice(property.price)} {currencyLabels[property.currency]}
+                      </td>
+                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            to={`/admin/properties/${property.id}/edit`}
+                            className="text-primary-600 hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-400"
+                          >
+                            <PencilIcon className="h-5 w-5" aria-hidden="true" />
+                          </Link>
+                          <button
+                            onClick={() => handleDelete(property.id)}
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                          >
+                            <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
         {totalPages > 1 && (
-          <div className="flex justify-between items-center px-4 py-3 mt-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 sm:px-6">
+          <div className="mt-4 flex items-center justify-between border-t border-gray-200 dark:border-[rgb(var(--color-dark-border))] pt-4">
             <div className="flex flex-1 justify-between sm:hidden">
               <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="inline-flex relative items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+                className="relative inline-flex items-center rounded-md border border-gray-300 dark:border-[rgb(var(--color-dark-border))] bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] px-4 py-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))]"
               >
                 Предишна
               </button>
               <button
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="inline-flex relative items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+                className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-[rgb(var(--color-dark-border))] bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] px-4 py-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))]"
               >
                 Следваща
               </button>
             </div>
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  Страница <span className="font-medium">{currentPage}</span> от{' '}
+                <p className="text-sm text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                  Показване на страница <span className="font-medium">{currentPage}</span> от{' '}
                   <span className="font-medium">{totalPages}</span>
                 </p>
               </div>
               <div>
-                <nav className="inline-flex isolate -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                   <button
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="inline-flex relative items-center px-2 py-2 text-gray-400 dark:text-gray-500 rounded-l-md ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                    className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 dark:text-[rgb(var(--color-dark-text-secondary))] ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))] focus:z-20 focus:outline-offset-0"
                   >
                     <span className="sr-only">Предишна</span>
-                    <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
-                    </svg>
+                    <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
                   </button>
                   <button
-                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="inline-flex relative items-center px-2 py-2 text-gray-400 dark:text-gray-500 rounded-r-md ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+                    className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 dark:text-[rgb(var(--color-dark-text-secondary))] ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))] focus:z-20 focus:outline-offset-0"
                   >
                     <span className="sr-only">Следваща</span>
-                    <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                    </svg>
+                    <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </nav>
               </div>

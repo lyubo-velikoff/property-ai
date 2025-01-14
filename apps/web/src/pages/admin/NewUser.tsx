@@ -36,9 +36,9 @@ function UserForm({ onSubmit, isSubmitting, submitLabel, onCancel }: UserFormPro
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form className="space-y-6" onSubmit={handleSubmit}>
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
           Име
         </label>
         <input
@@ -47,13 +47,13 @@ function UserForm({ onSubmit, isSubmitting, submitLabel, onCancel }: UserFormPro
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
           required
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
           Имейл
         </label>
         <input
@@ -62,13 +62,13 @@ function UserForm({ onSubmit, isSubmitting, submitLabel, onCancel }: UserFormPro
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
           required
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
           Парола
         </label>
         <input
@@ -77,13 +77,13 @@ function UserForm({ onSubmit, isSubmitting, submitLabel, onCancel }: UserFormPro
           name="password"
           value={formData.password}
           onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
           required
         />
       </div>
 
       <div>
-        <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
           Роля
         </label>
         <select
@@ -91,7 +91,7 @@ function UserForm({ onSubmit, isSubmitting, submitLabel, onCancel }: UserFormPro
           name="role"
           value={formData.role}
           onChange={handleChange}
-          className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300 dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
           required
         >
           <option value="USER">Потребител</option>
@@ -103,7 +103,7 @@ function UserForm({ onSubmit, isSubmitting, submitLabel, onCancel }: UserFormPro
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+          className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text))] bg-white dark:bg-[rgb(var(--color-dark-bg))] border border-gray-300 dark:border-[rgb(var(--color-dark-border))] rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-[rgb(var(--color-dark-bg-secondary))]"
         >
           Отказ
         </button>
@@ -170,7 +170,7 @@ export default function NewUser() {
             </div>
           </div>
           <div className="mt-5 md:col-span-2 md:mt-0">
-            <div className="bg-white dark:bg-gray-800 shadow sm:rounded-md">
+            <div className="bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] shadow sm:rounded-md">
               <div className="px-4 py-5 sm:p-6">
                 {error && (
                   <div className="mb-4 p-4 rounded-md bg-red-50 dark:bg-red-900/50">
