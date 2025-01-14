@@ -19,14 +19,9 @@ export default function Dashboard() {
     queryKey: ['admin', 'stats'],
     queryFn: async () => {
       const response = await api.get<Stats>('/admin/stats');
-      console.log('Full API Response:', response);
-      console.log('Response data:', response.data);
-      
-      if (!response.data) {
-        throw new Error('Invalid response structure');
-      }
+      console.log('Stats:', response.data);
       return response.data;
-    },
+    }
   });
 
   const cards = [
