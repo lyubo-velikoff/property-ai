@@ -588,6 +588,11 @@ export default function PropertyForm({
                       src={image.url}
                       alt={initialData.title}
                       className="object-cover w-full h-32 rounded-lg"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = '/images/property-placeholder.webp';
+                      }}
                     />
                   </div>
                 ))}

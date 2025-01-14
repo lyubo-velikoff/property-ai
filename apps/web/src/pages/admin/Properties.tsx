@@ -136,9 +136,14 @@ export default function Properties() {
                       <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
                         {property.images && property.images[0] && (
                           <img 
-                            src={property.images[0].url} 
+                            src={property.images[0].url || '/images/property-placeholder.webp'} 
                             alt={property.title}
                             className="w-16 h-16 object-cover rounded"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.onerror = null;
+                              target.src = '/images/property-placeholder.webp';
+                            }}
                           />
                         )}
                       </td>

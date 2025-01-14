@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { propertyTypeLabels, locationTypeLabels } from '../../constants/property';
+import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../../constants/property';
 
 export interface PropertyCardProps {
   id: string;
@@ -9,8 +9,16 @@ export interface PropertyCardProps {
   currency: string;
   area_sqm: number;
   type: string;
+  category: string;
   location_type: 'CITY' | 'REGION';
   images?: Array<{ url: string }>;
+  features?: Array<{ featureId: number; name: string }>;
+  floor?: number;
+  total_floors?: number;
+  construction_type?: string;
+  furnishing?: string;
+  has_regulation?: boolean;
+  land_area_sqm?: number;
 }
 
 export default function PropertyCard({
@@ -21,6 +29,7 @@ export default function PropertyCard({
   currency,
   area_sqm,
   type,
+  category,
   location_type,
   images,
 }: PropertyCardProps) {
@@ -37,19 +46,26 @@ export default function PropertyCard({
     >
       <div className="relative flex-shrink-0 h-48">
         <img
-          src={images?.[0]?.url || '/placeholder-property.jpg'}
+          src={images?.[0]?.url || '/images/property-placeholder.webp'}
           alt={title}
           className="object-cover w-full h-full"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.onerror = null; // Prevent infinite loop
+            target.src = '/images/property-placeholder.webp';
+          }}
         />
+        <div className="absolute -bottom-3 right-4">
+          <span className="inline-flex px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md shadow-sm">
+            {categoryLabels[category] || category}
+          </span>
+        </div>
       </div>
       <div className="flex flex-col flex-1 p-4">
         <div className="flex-1">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
             {title}
           </h3>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
-            {description}
-          </p>
         </div>
         <div className="mt-4">
           <div className="flex items-center justify-between">

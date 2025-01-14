@@ -54,43 +54,33 @@ export default function NewProperty() {
       </div>
 
       <div className="mt-8">
-        <div className="md:grid md:grid-cols-3 md:gap-6">
-          <div className="md:col-span-1">
-            <div className="px-4 sm:px-0">
-              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Информация за имота</h3>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                Попълнете информацията за имота. Всички полета са задължителни.
-              </p>
-            </div>
-          </div>
-          <div className="mt-5 md:col-span-2 md:mt-0">
-            <div className="bg-white dark:bg-gray-800 shadow sm:rounded-md">
-              <div className="px-4 py-5 sm:p-6">
-                {error && (
-                  <div className="mb-4 p-4 rounded-md bg-red-50 dark:bg-red-900/50">
-                    <div className="flex">
-                      <div className="flex-shrink-0">
-                        <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
-                      </div>
-                      <div className="ml-3">
-                        <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
-                          Възникна грешка при създаването на имота
-                        </h3>
-                        <div className="mt-2 text-sm text-red-700 dark:text-red-300">
-                          {error instanceof Error ? error.message : 'Unknown error'}
-                        </div>
+        <div>
+          <div className="bg-white dark:bg-gray-800 shadow sm:rounded-md">
+            <div className="px-4 py-5 sm:p-6">
+              {error && (
+                <div className="mb-4 p-4 rounded-md bg-red-50 dark:bg-red-900/50">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                        Възникна грешка при създаването на имота
+                      </h3>
+                      <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                        {error instanceof Error ? error.message : 'Unknown error'}
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
+              )}
 
-                <PropertyForm
-                  onSubmit={handleSubmit}
-                  isSubmitting={isPending}
-                  submitLabel="Създай"
-                  onCancel={() => navigate('/admin/properties')}
-                />
-              </div>
+              <PropertyForm
+                onSubmit={handleSubmit}
+                isSubmitting={isPending}
+                submitLabel="Създай"
+                onCancel={() => navigate('/admin/properties')}
+              />
             </div>
           </div>
         </div>

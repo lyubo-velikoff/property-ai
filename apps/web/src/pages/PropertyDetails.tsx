@@ -21,6 +21,22 @@ interface PropertyImage {
   url: string;
 }
 
+interface Feature {
+  featureId: number;
+  name: string;
+}
+
+interface Property extends PropertyCardProps {
+  images?: PropertyImage[];
+  features?: Feature[];
+  floor?: number;
+  total_floors?: number;
+  construction_type?: string;
+  furnishing?: string;
+  has_regulation?: boolean;
+  land_area_sqm?: number;
+}
+
 function formatPrice(price: number) {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
@@ -141,22 +157,34 @@ export default function PropertyDetails() {
           {property.title}
         </h1>
 
+        {/* Property Description */}
+        <div className="mb-8">
+          <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
+            {property.description}
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
             {/* Image Gallery */}
             <div className="space-y-4">
             <div className="overflow-hidden relative w-full rounded-lg" onClick={() => setShowFullscreen(true)}>
                 <img
-                  src={property.images[activeImage]?.url || '/images/property-placeholder.webp'}
+                  src={property.images?.[activeImage]?.url || '/images/property-placeholder.webp'}
                   alt={property.title}
-                  className="object-cover w-full h-auto rounded-lg"
+                  className="object-cover w-full h-auto rounded-lg cursor-pointer"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = '/images/property-placeholder.webp';
+                  }}
                 />
                 {property.images && property.images.length > 1 && (
                   <>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setActiveImage((prev) => (prev === 0 ? property.images.length - 1 : prev - 1));
+                        setActiveImage((prev) => (prev === 0 ? (property.images?.length || 1) - 1 : prev - 1));
                       }}
                       className="absolute left-2 top-1/2 p-2 text-white rounded-full transition-colors -translate-y-1/2 bg-black/50 hover:bg-black/75"
                     >
@@ -165,7 +193,7 @@ export default function PropertyDetails() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setActiveImage((prev) => (prev === property.images.length - 1 ? 0 : prev + 1));
+                        setActiveImage((prev) => (prev === (property.images?.length || 1) - 1 ? 0 : prev + 1));
                       }}
                       className="absolute right-2 top-1/2 p-2 text-white rounded-full transition-colors -translate-y-1/2 bg-black/50 hover:bg-black/75"
                     >
@@ -191,6 +219,11 @@ export default function PropertyDetails() {
                         src={img.url}
                         alt={`Property view ${index + 1}`}
                         className="object-cover w-full h-full"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = '/images/property-placeholder.webp';
+                        }}
                       />
                     </button>
                   ))}
@@ -199,7 +232,7 @@ export default function PropertyDetails() {
             </div>
 
             {/* Property Details */}
-            <div className="p-6 bg-white rounded-lg shadow dark:bg-gray-800">
+            <div className="mt-8 p-6 bg-white rounded-lg shadow dark:bg-gray-800">
               <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Детайли за имота</h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
@@ -224,10 +257,16 @@ export default function PropertyDetails() {
                   <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Площ</h3>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.area_sqm} м²</p>
                 </div>
+                {property.land_area_sqm && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Площ на парцела</h3>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.land_area_sqm} м²</p>
+                  </div>
+                )}
                 {property.floor && (
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Етаж</h3>
-                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.floor}</p>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.floor} от {property.total_floors || '?'}</p>
                   </div>
                 )}
                 {property.construction_type && (
@@ -240,6 +279,27 @@ export default function PropertyDetails() {
                   <div>
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Обзавеждане</h3>
                     <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.furnishing}</p>
+                  </div>
+                )}
+                {property.has_regulation !== undefined && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Регулация</h3>
+                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{property.has_regulation ? 'Да' : 'Не'}</p>
+                  </div>
+                )}
+                {property.features && property.features.length > 0 && (
+                  <div className="sm:col-span-2">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Характеристики</h3>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {property.features.map((feature: Feature) => (
+                        <span 
+                          key={feature.featureId} 
+                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                        >
+                          {feature.name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -381,7 +441,7 @@ export default function PropertyDetails() {
         )}
 
         {/* Fullscreen Image Modal */}
-        {showFullscreen && (
+        {showFullscreen && property.images && (
           <div 
             className="flex fixed inset-0 z-50 justify-center items-center bg-black/90"
             onClick={handleFullscreenClose}
@@ -398,18 +458,23 @@ export default function PropertyDetails() {
               {/* Main Image */}
               <div className="flex relative justify-center items-center p-4 w-full h-full">
                 <img
-                  src={property.images[activeImage]?.url}
+                  src={property.images[activeImage]?.url || '/images/property-placeholder.webp'}
                   alt={`Property view ${activeImage + 1}`}
                   className="object-contain max-w-full max-h-full"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = '/images/property-placeholder.webp';
+                  }}
                 />
 
-                {property.images && property.images.length > 1 && (
+                {property.images.length > 1 && (
                   <>
                     {/* Previous Button */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setActiveImage((prev) => (prev === 0 ? property.images.length - 1 : prev - 1));
+                        setActiveImage((prev) => (prev === 0 ? property.images!.length - 1 : prev - 1));
                       }}
                       className="absolute left-4 p-2 text-white rounded-full transition-colors bg-black/50 hover:bg-black/75"
                     >
@@ -420,7 +485,7 @@ export default function PropertyDetails() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setActiveImage((prev) => (prev === property.images.length - 1 ? 0 : prev + 1));
+                        setActiveImage((prev) => (prev === property.images!.length - 1 ? 0 : prev + 1));
                       }}
                       className="absolute right-4 p-2 text-white rounded-full transition-colors bg-black/50 hover:bg-black/75"
                     >
@@ -453,6 +518,11 @@ export default function PropertyDetails() {
                         src={img.url}
                         alt={`Thumbnail ${index + 1}`}
                         className="object-cover w-full h-full"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = '/images/property-placeholder.webp';
+                        }}
                       />
                     </button>
                   ))}
