@@ -2,8 +2,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import AppRoutes from './AppRoutes';
-import { UserProvider } from './contexts/UserContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/auth';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,9 +19,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <ThemeProvider>
-          <UserProvider>
+          <AuthProvider>
             <AppRoutes />
-          </UserProvider>
+          </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>
       <ReactQueryDevtools />

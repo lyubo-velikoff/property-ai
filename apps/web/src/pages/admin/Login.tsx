@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { z } from 'zod';
 import api from '../../lib/api';
-import { useUser } from '../../contexts/UserContext';
+import { useAuth } from '../../contexts/auth';
 
 const loginSchema = z.object({
   email: z.string().email('Невалиден имейл адрес'),
@@ -11,6 +11,11 @@ const loginSchema = z.object({
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
+
+interface ApiResponse<T> {
+  status: string;
+  data: T;
+}
 
 interface User {
   id: string;
@@ -29,7 +34,7 @@ interface LoginResponse {
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { setUser } = useUser();
+  const { login, setUser } = useAuth();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/admin';
 
   const [formData, setFormData] = useState<LoginForm>({
@@ -41,16 +46,16 @@ export default function Login() {
 
   const { mutate, isPending } = useMutation<LoginResponse, Error, LoginForm>({
     mutationFn: async (data: LoginForm) => {
-      const response = await api.post<LoginResponse>('/auth/login', data);
-      console.log('API Response:', response.data);
-      return response.data;
+      const response = await api.post<{ status: string; data: LoginResponse }>('/auth/login', data);
+      return response.data.data;
     },
     onSuccess: (response) => {
-      console.log('Success Response:', response);
       localStorage.setItem('token', response.token);
-      setUser(response.user);
-      // Force navigation to admin dashboard
-      window.location.href = '/admin';
+      setUser({
+        ...response.user,
+        role: response.user.role.toUpperCase() as 'ADMIN' | 'USER'
+      });
+      navigate(from);
     },
     onError: (error) => {
       console.error('Login error:', error);
@@ -143,9 +148,9 @@ export default function Login() {
             <button
               type="submit"
               disabled={isPending}
-              className="relative flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md group hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative flex w-full justify-center rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:opacity-50"
             >
-              {isPending ? 'Влизане...' : 'Влез'}
+              {isPending ? 'Влизане...' : 'Вход'}
             </button>
           </div>
         </form>

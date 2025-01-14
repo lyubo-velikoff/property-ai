@@ -13,7 +13,7 @@ export interface RegisterData {
 }
 
 export const login = async (data: LoginData): Promise<AuthResponse> => {
-  const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', data);
+  const response = await api.post<{ status: string; data: AuthResponse }>('/auth/login', data);
   const { token, user } = response.data.data;
   localStorage.setItem('token', token);
   return { token, user };
