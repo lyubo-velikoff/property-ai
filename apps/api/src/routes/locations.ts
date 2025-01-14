@@ -1,45 +1,128 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
 import { protect, restrictTo } from '../middleware/auth';
 import { AppError } from '../middleware/error';
+import { 
+  ApiSuccessResponse, 
+  ApiErrorResponse,
+  ApiErrorCode,
+  CreateLocationInput,
+  CreateFeatureInput,
+  RegionResponse,
+  RegionsResponse,
+  NeighborhoodResponse,
+  NeighborhoodsResponse,
+  FeatureResponse,
+  FeaturesResponse,
+  FeatureType,
+  UserRole,
+  Feature,
+  Region,
+  Neighborhood
+} from '@avalon/shared-types';
 
 const router = Router();
 
+const locationSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+}) satisfies z.ZodType<CreateLocationInput>;
+
+const featureSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  type: z.nativeEnum(FeatureType),
+}) satisfies z.ZodType<CreateFeatureInput>;
+
+const handleError = (error: unknown, res: Response) => {
+  if (error instanceof z.ZodError) {
+    const response: ApiErrorResponse = {
+      status: 'error',
+      message: 'Invalid input data',
+      code: ApiErrorCode.VALIDATION_ERROR,
+      errors: error.errors.reduce((acc, err) => {
+        const path = err.path.join('.');
+        acc[path] = [err.message];
+        return acc;
+      }, {} as Record<string, string[]>)
+    };
+    res.status(400).json(response);
+  } else if (error instanceof AppError) {
+    const response: ApiErrorResponse = {
+      status: 'error',
+      message: error.message,
+      code: error.statusCode === 404 ? ApiErrorCode.NOT_FOUND : ApiErrorCode.INTERNAL_ERROR
+    };
+    res.status(error.statusCode).json(response);
+  } else {
+    console.error(error);
+    const response: ApiErrorResponse = {
+      status: 'error',
+      message: 'Internal server error',
+      code: ApiErrorCode.INTERNAL_ERROR
+    };
+    res.status(500).json(response);
+  }
+};
+
+const mapDatesToISOString = <T extends { createdAt: Date; updatedAt: Date }>(
+  item: T
+): Omit<T, 'createdAt' | 'updatedAt'> & { createdAt: string; updatedAt: string } => ({
+  ...item,
+  createdAt: item.createdAt.toISOString(),
+  updatedAt: item.updatedAt.toISOString()
+});
+
+const mapRegion = (region: { id: number; name: string; createdAt: Date; updatedAt: Date }): Region => ({
+  ...mapDatesToISOString(region)
+});
+
+const mapNeighborhood = (neighborhood: { id: number; name: string; createdAt: Date; updatedAt: Date }): Neighborhood => ({
+  ...mapDatesToISOString(neighborhood)
+});
+
+const mapFeature = (feature: { id: number; name: string; type: string; createdAt: Date; updatedAt: Date }): Feature => ({
+  ...mapDatesToISOString(feature),
+  type: feature.type as FeatureType
+});
+
 // Get all regions
-router.get('/regions', protect, async (req, res, next) => {
+router.get('/regions', protect, async (req, res: Response, next) => {
   try {
     const regions = await prisma.region.findMany({
       orderBy: { name: 'asc' },
     });
 
-    res.json({
+    const response: ApiSuccessResponse<RegionsResponse> = {
       status: 'success',
-      data: { regions },
-    });
+      data: { regions: regions.map(mapRegion) }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Get all neighborhoods
-router.get('/neighborhoods', protect, async (req, res, next) => {
+router.get('/neighborhoods', protect, async (req, res: Response, next) => {
   try {
     const neighborhoods = await prisma.neighborhood.findMany({
       orderBy: { name: 'asc' },
     });
 
-    res.json({
+    const response: ApiSuccessResponse<NeighborhoodsResponse> = {
       status: 'success',
-      data: { neighborhoods },
-    });
+      data: { neighborhoods: neighborhoods.map(mapNeighborhood) }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Get all features
-router.get('/features', protect, async (req, res, next) => {
+router.get('/features', protect, async (req, res: Response, next) => {
   try {
     const features = await prisma.feature.findMany({
       orderBy: [
@@ -48,156 +131,148 @@ router.get('/features', protect, async (req, res, next) => {
       ],
     });
 
-    res.json({
+    const response: ApiSuccessResponse<FeaturesResponse> = {
       status: 'success',
-      data: { features },
-    });
+      data: { features: features.map(mapFeature) }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Create region (admin only)
-router.post('/regions', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.post('/regions', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
   try {
-    const schema = z.object({
-      id: z.number(),
-      name: z.string().min(2, 'Name must be at least 2 characters'),
-    });
-
-    const data = schema.parse(req.body);
+    const { name } = locationSchema.parse(req.body);
 
     const region = await prisma.region.create({
-      data,
+      data: { name },
     });
 
-    res.status(201).json({
+    const response: ApiSuccessResponse<RegionResponse> = {
       status: 'success',
-      data: { region },
-    });
+      data: { region: mapRegion(region) }
+    };
+
+    res.status(201).json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Create neighborhood (admin only)
-router.post('/neighborhoods', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.post('/neighborhoods', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
   try {
-    const schema = z.object({
-      id: z.number(),
-      name: z.string().min(2, 'Name must be at least 2 characters'),
-    });
-
-    const data = schema.parse(req.body);
+    const { name } = locationSchema.parse(req.body);
 
     const neighborhood = await prisma.neighborhood.create({
-      data,
+      data: { name },
     });
 
-    res.status(201).json({
+    const response: ApiSuccessResponse<NeighborhoodResponse> = {
       status: 'success',
-      data: { neighborhood },
-    });
+      data: { neighborhood: mapNeighborhood(neighborhood) }
+    };
+
+    res.status(201).json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Create feature (admin only)
-router.post('/features', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.post('/features', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
   try {
-    const schema = z.object({
-      name: z.string().min(2, 'Name must be at least 2 characters'),
-      type: z.enum(['INFRASTRUCTURE', 'BUILDING']),
-    });
-
-    const data = schema.parse(req.body);
+    const { name, type } = featureSchema.parse(req.body);
 
     const feature = await prisma.feature.create({
-      data,
+      data: { 
+        name,
+        type: type as string // Cast to string for Prisma
+      },
     });
 
-    res.status(201).json({
+    const response: ApiSuccessResponse<FeatureResponse> = {
       status: 'success',
-      data: { feature },
-    });
+      data: { feature: mapFeature(feature) }
+    };
+
+    res.status(201).json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Update region (admin only)
-router.patch('/regions/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.patch('/regions/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
   try {
-    const schema = z.object({
-      name: z.string().min(2, 'Name must be at least 2 characters'),
-    });
-
-    const data = schema.parse(req.body);
+    const data = locationSchema.partial().parse(req.body);
 
     const region = await prisma.region.update({
       where: { id: parseInt(req.params.id) },
       data,
     });
 
-    res.json({
+    const response: ApiSuccessResponse<RegionResponse> = {
       status: 'success',
-      data: { region },
-    });
+      data: { region: mapRegion(region) }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Update neighborhood (admin only)
-router.patch('/neighborhoods/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.patch('/neighborhoods/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
   try {
-    const schema = z.object({
-      name: z.string().min(2, 'Name must be at least 2 characters'),
-    });
-
-    const data = schema.parse(req.body);
+    const data = locationSchema.partial().parse(req.body);
 
     const neighborhood = await prisma.neighborhood.update({
       where: { id: parseInt(req.params.id) },
       data,
     });
 
-    res.json({
+    const response: ApiSuccessResponse<NeighborhoodResponse> = {
       status: 'success',
-      data: { neighborhood },
-    });
+      data: { neighborhood: mapNeighborhood(neighborhood) }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Update feature (admin only)
-router.patch('/features/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.patch('/features/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
   try {
-    const schema = z.object({
-      name: z.string().min(2, 'Name must be at least 2 characters'),
-      type: z.enum(['INFRASTRUCTURE', 'BUILDING']),
-    });
-
-    const data = schema.parse(req.body);
+    const data = featureSchema.partial().parse(req.body);
 
     const feature = await prisma.feature.update({
       where: { id: parseInt(req.params.id) },
-      data,
+      data: {
+        name: data.name,
+        type: data.type as string | undefined
+      },
     });
 
-    res.json({
+    const response: ApiSuccessResponse<FeatureResponse> = {
       status: 'success',
-      data: { feature },
-    });
+      data: { feature: mapFeature(feature) }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Delete region (admin only)
-router.delete('/regions/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.delete('/regions/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
   try {
     await prisma.region.delete({
       where: { id: parseInt(req.params.id) },
@@ -208,12 +283,12 @@ router.delete('/regions/:id', protect, restrictTo('ADMIN'), async (req, res, nex
       data: null,
     });
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Delete neighborhood (admin only)
-router.delete('/neighborhoods/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.delete('/neighborhoods/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
   try {
     await prisma.neighborhood.delete({
       where: { id: parseInt(req.params.id) },
@@ -224,12 +299,12 @@ router.delete('/neighborhoods/:id', protect, restrictTo('ADMIN'), async (req, re
       data: null,
     });
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Delete feature (admin only)
-router.delete('/features/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.delete('/features/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
   try {
     await prisma.feature.delete({
       where: { id: parseInt(req.params.id) },
@@ -240,8 +315,8 @@ router.delete('/features/:id', protect, restrictTo('ADMIN'), async (req, res, ne
       data: null,
     });
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
-export { router as locationRoutes }; 
+export const locationRoutes = router; 

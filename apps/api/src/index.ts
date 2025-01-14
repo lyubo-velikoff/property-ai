@@ -4,7 +4,7 @@ import { errorHandler } from './middleware/error';
 import { authRoutes } from './routes/auth';
 import { propertyRoutes } from './routes/properties';
 import contactRoutes from './routes/contact';
-import adminRoutes from './routes/admin';
+import { adminRoutes } from './routes/admin';
 import { locationRoutes } from './routes/locations';
 import path from 'path';
 

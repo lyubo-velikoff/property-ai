@@ -1,10 +1,25 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
 import { protect, restrictTo } from '../middleware/auth';
 import { AppError } from '../middleware/error';
 import { upload } from '../config/multer';
 import { propertySchema } from './properties';
+import { 
+  ApiSuccessResponse, 
+  ApiErrorResponse,
+  ApiErrorCode,
+  UserRole,
+  User,
+  Property,
+  AdminStatsResponse,
+  PropertiesResponse,
+  PropertyResponse,
+  CreateUserInput,
+  UpdateUserInput,
+  UsersResponse,
+  UserResponse
+} from '@avalon/shared-types';
 
 const router = Router();
 
@@ -13,11 +28,64 @@ const userSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['USER', 'ADMIN']).default('USER'),
+  role: z.nativeEnum(UserRole).default(UserRole.USER),
+}) satisfies z.ZodType<CreateUserInput>;
+
+const handleError = (error: unknown, res: Response) => {
+  if (error instanceof z.ZodError) {
+    const response: ApiErrorResponse = {
+      status: 'error',
+      message: 'Invalid input data',
+      code: ApiErrorCode.VALIDATION_ERROR,
+      errors: error.errors.reduce((acc, err) => {
+        const path = err.path.join('.');
+        acc[path] = [err.message];
+        return acc;
+      }, {} as Record<string, string[]>)
+    };
+    res.status(400).json(response);
+  } else if (error instanceof AppError) {
+    const response: ApiErrorResponse = {
+      status: 'error',
+      message: error.message,
+      code: error.statusCode === 404 ? ApiErrorCode.NOT_FOUND : ApiErrorCode.INTERNAL_ERROR
+    };
+    res.status(error.statusCode).json(response);
+  } else {
+    console.error(error);
+    const response: ApiErrorResponse = {
+      status: 'error',
+      message: 'Internal server error',
+      code: ApiErrorCode.INTERNAL_ERROR
+    };
+    res.status(500).json(response);
+  }
+};
+
+const mapUser = (user: { id: string; name: string; email: string; role: string; createdAt: Date }): User => ({
+  ...user,
+  role: user.role as UserRole,
+  createdAt: user.createdAt.toISOString()
+});
+
+const mapProperty = (property: any): Property => ({
+  ...property,
+  createdAt: property.createdAt.toISOString(),
+  updatedAt: property.updatedAt.toISOString(),
+  images: property.images?.map((image: any) => ({
+    ...image,
+    createdAt: image.createdAt.toISOString(),
+    updatedAt: image.updatedAt.toISOString()
+  })),
+  contact_info: property.contact_info ? {
+    ...property.contact_info,
+    createdAt: property.contact_info.createdAt.toISOString(),
+    updatedAt: property.contact_info.updatedAt.toISOString()
+  } : undefined
 });
 
 // Get admin dashboard stats
-router.get('/stats', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.get('/stats', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
   try {
     const [properties, messages, users] = await Promise.all([
       prisma.property.count(),
@@ -25,21 +93,23 @@ router.get('/stats', protect, restrictTo('ADMIN'), async (req, res, next) => {
       prisma.user.count(),
     ]);
 
-    res.json({
+    const response: ApiSuccessResponse<AdminStatsResponse> = {
       status: 'success',
       data: {
         properties,
         messages,
         users,
       },
-    });
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Get all properties (admin)
-router.get('/properties', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.get('/properties', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -50,26 +120,37 @@ router.get('/properties', protect, restrictTo('ADMIN'), async (req, res, next) =
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
+        include: {
+          images: true,
+          contact_info: true,
+        },
       }),
       prisma.property.count(),
     ]);
 
-    res.json({
+    const response: ApiSuccessResponse<PropertiesResponse> = {
       status: 'success',
       data: {
-        properties,
-        total,
-        page,
-        pages: Math.ceil(total / limit),
-      },
-    });
+        data: properties.map(mapProperty),
+        meta: {
+          total,
+          page,
+          pageSize: limit,
+          totalPages: Math.ceil(total / limit),
+          hasNextPage: skip + limit < total,
+          hasPreviousPage: page > 1
+        }
+      }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Get single property (admin)
-router.get('/properties/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.get('/properties/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
   try {
     const property = await prisma.property.findUnique({
       where: { id: req.params.id },
@@ -83,12 +164,14 @@ router.get('/properties/:id', protect, restrictTo('ADMIN'), async (req, res, nex
       throw new AppError(404, 'Property not found');
     }
 
-    res.json({
+    const response: ApiSuccessResponse<PropertyResponse> = {
       status: 'success',
-      data: { property },
-    });
+      data: { property: mapProperty(property) }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
@@ -96,9 +179,9 @@ router.get('/properties/:id', protect, restrictTo('ADMIN'), async (req, res, nex
 router.patch(
   '/properties/:id',
   protect,
-  restrictTo('ADMIN'),
+  restrictTo(UserRole.ADMIN),
   upload.array('image', 20),
-  async (req, res, next) => {
+  async (req, res: Response) => {
     try {
       const data = propertySchema.parse({
         ...req.body,
@@ -156,18 +239,20 @@ router.patch(
         },
       });
 
-      res.json({
+      const response: ApiSuccessResponse<PropertyResponse> = {
         status: 'success',
-        data: { property },
-      });
+        data: { property: mapProperty(property) }
+      };
+
+      res.json(response);
     } catch (error) {
-      next(error);
+      handleError(error, res);
     }
   }
 );
 
 // Get all users (admin)
-router.get('/users', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.get('/users', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -189,22 +274,29 @@ router.get('/users', protect, restrictTo('ADMIN'), async (req, res, next) => {
       prisma.user.count(),
     ]);
 
-    res.json({
+    const response: ApiSuccessResponse<UsersResponse> = {
       status: 'success',
       data: {
-        users,
-        total,
-        page,
-        pages: Math.ceil(total / limit),
-      },
-    });
+        users: users.map(mapUser),
+        meta: {
+          total,
+          page,
+          pageSize: limit,
+          totalPages: Math.ceil(total / limit),
+          hasNextPage: skip + limit < total,
+          hasPreviousPage: page > 1
+        }
+      }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Get single user (admin)
-router.get('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.get('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: String(req.params.id) },
@@ -221,17 +313,19 @@ router.get('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next) =>
       throw new AppError(404, 'User not found');
     }
 
-    res.json({
+    const response: ApiSuccessResponse<UserResponse> = {
       status: 'success',
-      data: { user },
-    });
+      data: { user: mapUser(user) }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Create user (admin)
-router.post('/users', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.post('/users', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
   try {
     const data = userSchema.parse(req.body);
 
@@ -255,19 +349,21 @@ router.post('/users', protect, restrictTo('ADMIN'), async (req, res, next) => {
       },
     });
 
-    res.status(201).json({
+    const response: ApiSuccessResponse<UserResponse> = {
       status: 'success',
-      data: { user },
-    });
+      data: { user: mapUser(user) }
+    };
+
+    res.status(201).json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Update user (admin)
-router.patch('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.patch('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
   try {
-    const data = userSchema.partial().parse(req.body);
+    const data = userSchema.partial().parse(req.body) as UpdateUserInput;
 
     // If email is being updated, check if it's already taken
     if (data.email) {
@@ -295,28 +391,32 @@ router.patch('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next) 
       },
     });
 
-    res.json({
+    const response: ApiSuccessResponse<UserResponse> = {
       status: 'success',
-      data: { user },
-    });
+      data: { user: mapUser(user) }
+    };
+
+    res.json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
 // Delete user (admin)
-router.delete('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next) => {
+router.delete('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
   try {
     await prisma.user.delete({
       where: { id: String(req.params.id) },
     });
 
-    res.json({
+    const response: ApiSuccessResponse<null> = {
       status: 'success',
-      data: null,
-    });
+      data: null
+    };
+
+    res.status(204).json(response);
   } catch (error) {
-    next(error);
+    handleError(error, res);
   }
 });
 
@@ -324,9 +424,9 @@ router.delete('/users/:id', protect, restrictTo('ADMIN'), async (req, res, next)
 router.post(
   '/properties',
   protect,
-  restrictTo('ADMIN'),
+  restrictTo(UserRole.ADMIN),
   upload.array('image', 20),
-  async (req, res, next) => {
+  async (req, res: Response) => {
     try {
       const data = propertySchema.parse(req.body);
       const files = req.files as Express.Multer.File[];
@@ -366,14 +466,16 @@ router.post(
         },
       });
 
-      res.status(201).json({
+      const response: ApiSuccessResponse<PropertyResponse> = {
         status: 'success',
-        data: { property },
-      });
+        data: { property: mapProperty(property) }
+      };
+
+      res.status(201).json(response);
     } catch (error) {
-      next(error);
+      handleError(error, res);
     }
   }
 );
 
-export default router; 
+export const adminRoutes = router; 

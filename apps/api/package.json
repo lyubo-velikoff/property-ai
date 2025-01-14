@@ -16,6 +16,7 @@
     "test": "cross-env NODE_ENV=test jest"
   },
   "dependencies": {
+    "@avalon/shared-types": "workspace:*",
     "@prisma/client": "^5.22.0",
     "@types/nodemailer": "^6.4.17",
     "bcryptjs": "^2.4.3",

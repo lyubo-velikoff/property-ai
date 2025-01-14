@@ -2,10 +2,34 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma';
 import { AppError } from './error';
+import { User, UserRole } from '@avalon/shared-types';
+
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
+}
 
 interface JwtPayload {
   id: string;
 }
+
+const mapUserToResponse = (user: { 
+  id: string; 
+  name: string; 
+  email: string; 
+  role: string;
+  createdAt: Date;
+}): User => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  role: user.role as UserRole,
+  createdAt: user.createdAt.toISOString()
+});
 
 // Protect routes
 export const protect = async (req: Request, res: Response, next: NextFunction) => {
@@ -28,6 +52,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
         name: true,
         email: true,
         role: true,
+        createdAt: true
       },
     });
 
@@ -36,7 +61,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
     }
 
     // Add user to request
-    req.user = user;
+    req.user = mapUserToResponse(user);
     next();
   } catch (error) {
     next(error);
@@ -44,7 +69,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
 };
 
 // Restrict to certain roles
-export const restrictTo = (role: string) => {
+export const restrictTo = (role: UserRole) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (req.user?.role !== role) {
       throw new AppError(403, 'You do not have permission to perform this action');

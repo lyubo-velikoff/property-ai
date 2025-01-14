@@ -32,6 +32,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@avalon/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       '@prisma/client':
         specifier: ^5.22.0
         version: 5.22.0(prisma@5.22.0)
@@ -235,6 +238,15 @@ importers:
       vitest:
         specifier: ^1.0.4
         version: 1.6.0(@types/node@20.17.12)(happy-dom@12.10.3)
+
+  packages/shared-types:
+    devDependencies:
+      tsup:
+        specifier: ^8.0.0
+        version: 8.3.5(@swc/core@1.10.7)(jiti@1.21.7)(postcss@8.4.49)(tsx@4.19.2)(typescript@5.7.3)(yaml@2.7.0)
+      typescript:
+        specifier: ^5.4.2
+        version: 5.7.3
 
 packages:
 

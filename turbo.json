@@ -10,7 +10,7 @@
       "outputs": []
     },
     "dev": {
-      "dependsOn": ["prisma:generate"],
+      "dependsOn": ["^build", "prisma:generate"],
       "cache": false,
       "persistent": true,
       "dotEnv": [
