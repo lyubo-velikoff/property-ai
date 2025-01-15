@@ -2,14 +2,13 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ChevronLeftIcon, ChevronRightIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import PropertyCard, { PropertyCardProps } from '../components/properties/PropertyCard';
+import PropertyCard from '../components/properties/PropertyCard';
 import PropertyCardSkeleton from '../components/properties/PropertyCardSkeleton';
-import { getProperties, PropertyFilters } from '../services/propertyService';
+import { getProperties } from '../services/propertyService';
+import type { Property, PropertyFilters, LocationType } from '@avalon/shared-types';
 import { propertyTypeLabels, locationTypeLabels, categoryLabels, locationTypes } from '../constants/property';
 
 declare module 'react-transition-group';
-
-type LocationType = 'CITY' | 'REGION';
 
 const regions = [
   'Всички райони',

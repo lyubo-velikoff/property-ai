@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import type { ContactMessage } from '@prisma/client';
+import type { ContactMessage } from '@avalon/shared-types';
 
 interface MessagesResponse {
   success: boolean;

@@ -1,25 +1,25 @@
 import { Link } from 'react-router-dom';
 import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../../constants/property';
+import type { Property, PropertyType, PropertyCategory, LocationType, Currency, ConstructionType, FurnishingType } from '@avalon/shared-types';
 
-export interface PropertyCardProps {
+export type PropertyCardProps = {
   id: string;
   title: string;
   description: string;
   price: number;
-  currency: string;
+  currency: Currency;
   area_sqm: number;
-  type: string;
-  category: string;
-  location_type: 'CITY' | 'REGION';
-  images?: Array<{ url: string }>;
-  features?: Array<{ featureId: number; name: string }>;
+  type: PropertyType;
+  category: PropertyCategory;
+  location_type: LocationType;
+  images?: { url: string }[];
   floor?: number;
   total_floors?: number;
-  construction_type?: string;
-  furnishing?: string;
+  construction_type?: ConstructionType;
+  furnishing?: FurnishingType;
   has_regulation?: boolean;
   land_area_sqm?: number;
-}
+};
 
 export default function PropertyCard({
   id,

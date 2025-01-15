@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { getMessages, markMessageAsRead, deleteMessage } from '../../services/messages';
 import { event } from '../../lib/analytics';
-import type { ContactMessage } from '@prisma/client';
+import type { ContactMessage } from '@avalon/shared-types';
 
 export default function Messages() {
   const [page, setPage] = useState(1);

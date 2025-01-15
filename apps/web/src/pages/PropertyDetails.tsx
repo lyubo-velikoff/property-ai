@@ -12,30 +12,10 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { getPropertyById } from '../services/propertyService';
-import { PropertyCardProps } from '../components/properties/PropertyCard';
+import type { Property } from '@avalon/shared-types';
 import GoogleMap from '../components/maps/GoogleMap';
 import { useQuery } from '@tanstack/react-query';
 import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../constants/property';
-
-interface PropertyImage {
-  url: string;
-}
-
-interface Feature {
-  featureId: number;
-  name: string;
-}
-
-interface Property extends PropertyCardProps {
-  images?: PropertyImage[];
-  features?: Feature[];
-  floor?: number;
-  total_floors?: number;
-  construction_type?: string;
-  furnishing?: string;
-  has_regulation?: boolean;
-  land_area_sqm?: number;
-}
 
 function formatPrice(price: number) {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');

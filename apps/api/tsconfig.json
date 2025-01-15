@@ -10,9 +10,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "baseUrl": ".",
-    "allowImportingTsExtensions": true,
     "declaration": true,
-    "emitDeclarationOnly": true,
     "paths": {
       "@/*": ["src/*"]
     }

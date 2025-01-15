@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import type { User } from '@prisma/client';
+import type { User } from '@avalon/shared-types';
 
 // The shape of data returned by the API
 interface UsersResponse {
@@ -20,17 +20,17 @@ export async function getUsers(page: number, limit: number) {
 
 export async function getUser(id: string): Promise<User> {
   const response = await api.get<UserResponse>(`/admin/users/${id}`);
-  return response.user;
+  return response.data.user;
 }
 
 export async function createUser(data: Omit<User, 'id' | 'createdAt'>): Promise<User> {
   const response = await api.post<UserResponse>('/admin/users', data);
-  return response.user;
+  return response.data.user;
 }
 
 export async function updateUser(id: string, data: Partial<Omit<User, 'id' | 'createdAt'>>): Promise<User> {
   const response = await api.patch<UserResponse>(`/admin/users/${id}`, data);
-  return response.user;
+  return response.data.user;
 }
 
 export async function deleteUser(id: string): Promise<void> {

@@ -4,7 +4,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { getUsers, deleteUser } from '../../services/users';
 import { event } from '../../lib/analytics';
-import type { User } from '@prisma/client';
+import type { User } from '@avalon/shared-types';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export default function Users() {

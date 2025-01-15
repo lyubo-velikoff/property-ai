@@ -164,14 +164,14 @@ export default function PropertyForm({
         <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
           <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Основна информация</h3>
           <div className="grid grid-cols-1 gap-6">
-            <div>
+          <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
-                Заглавие
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
+              Заглавие
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
                 value={data.title}
                 onChange={handleChange}
                 className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
@@ -191,7 +191,7 @@ export default function PropertyForm({
                 id="description"
                 name="description"
                 value={data.description}
-                onChange={handleChange}
+              onChange={handleChange}
                 rows={4}
                 className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                   errors.description 
@@ -256,18 +256,18 @@ export default function PropertyForm({
                 } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
               />
               {errors.area_sqm && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.area_sqm}</p>}
-            </div>
+          </div>
 
-            <div>
+          <div>
               <label htmlFor="land_area_sqm" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Площ на парцела (кв.м)
-              </label>
-              <input
+            </label>
+            <input
                 type="number"
                 id="land_area_sqm"
                 name="land_area_sqm"
                 value={data.land_area_sqm || ''}
-                onChange={handleChange}
+              onChange={handleChange}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               />
             </div>
@@ -319,9 +319,9 @@ export default function PropertyForm({
                   <option key={region.id} value={region.id}>{region.name}</option>
                 ))}
               </select>
-            </div>
+          </div>
 
-            <div>
+          <div>
               <label htmlFor="neighborhoodId" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Квартал
               </label>
@@ -350,60 +350,60 @@ export default function PropertyForm({
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
-                Тип имот
-              </label>
-              <select
-                id="type"
-                name="type"
+              Тип имот
+            </label>
+            <select
+              id="type"
+              name="type"
                 value={data.type}
-                onChange={handleChange}
+              onChange={handleChange}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
                 {propertyTypes.map(type => (
                   <option key={type.value} value={type.value}>{type.label}</option>
-                ))}
-              </select>
-            </div>
+              ))}
+            </select>
+          </div>
 
-            <div>
+          <div>
               <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
-                Категория
-              </label>
-              <select
-                id="category"
-                name="category"
+              Категория
+            </label>
+            <select
+              id="category"
+              name="category"
                 value={data.category}
-                onChange={handleChange}
+              onChange={handleChange}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-              >
+            >
                 {categories.map(category => (
                   <option key={category.value} value={category.value}>{category.label}</option>
                 ))}
-              </select>
-            </div>
+            </select>
+          </div>
 
-            <div>
+          <div>
               <label htmlFor="construction_type" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Вид строителство
-              </label>
-              <select
+            </label>
+            <select
                 id="construction_type"
                 name="construction_type"
                 value={data.construction_type || ''}
-                onChange={handleChange}
+              onChange={handleChange}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               >
                 <option value="">Изберете</option>
                 {constructionTypes.map(type => (
                   <option key={type.value} value={type.value}>{type.label}</option>
                 ))}
-              </select>
-            </div>
+            </select>
+          </div>
 
-            <div>
+          <div>
               <label htmlFor="furnishing" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Обзавеждане
-              </label>
+            </label>
               <select
                 id="furnishing"
                 name="furnishing"
@@ -418,45 +418,45 @@ export default function PropertyForm({
               </select>
             </div>
           </div>
-        </div>
+          </div>
 
         {/* Floor Info & Additional Info */}
         <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
           <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Етажност и допълнителна информация</h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
-            <div>
+          <div>
               <label htmlFor="floor" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
-                Етаж
-              </label>
-              <input
-                type="number"
-                id="floor"
-                name="floor"
+              Етаж
+            </label>
+            <input
+              type="number"
+              id="floor"
+              name="floor"
                 value={data.floor || ''}
                 onChange={handleChange}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-              />
-            </div>
+            />
+          </div>
 
-            <div>
+          <div>
               <label htmlFor="total_floors" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Общо етажи
-              </label>
+            </label>
               <input
                 type="number"
                 id="total_floors"
                 name="total_floors"
                 value={data.total_floors || ''}
-                onChange={handleChange}
+              onChange={handleChange}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               />
-            </div>
+          </div>
 
-            <div>
+          <div>
               <label htmlFor="has_regulation" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Има регулация
-              </label>
-              <select
+            </label>
+            <select
                 id="has_regulation"
                 name="has_regulation"
                 value={data.has_regulation ? 'yes' : 'no'}
@@ -470,7 +470,7 @@ export default function PropertyForm({
               >
                 <option value="yes">Да</option>
                 <option value="no">Не</option>
-              </select>
+            </select>
             </div>
 
             <div className="flex items-center pt-6">
@@ -491,47 +491,47 @@ export default function PropertyForm({
         {/* Contact Info */}
         <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
           <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Контактна информация</h3>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
               <label htmlFor="contact_info.phone" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
-                Телефон за контакт
-              </label>
-              <input
-                type="tel"
-                id="contact_info.phone"
-                name="contact_info.phone"
+              Телефон за контакт
+            </label>
+            <input
+              type="tel"
+              id="contact_info.phone"
+              name="contact_info.phone"
                 value={data.contact_info.phone}
-                onChange={handleChange}
+              onChange={handleChange}
                 className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                   errors['contact_info.phone'] 
                     ? 'border-red-500 dark:border-red-500' 
                     : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
                 } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
-              />
-              {errors['contact_info.phone'] && (
+            />
+            {errors['contact_info.phone'] && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.phone']}</p>
-              )}
-            </div>
+            )}
+          </div>
 
-            <div>
+          <div>
               <label htmlFor="contact_info.email" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
-                Имейл за контакт
-              </label>
-              <input
-                type="email"
-                id="contact_info.email"
-                name="contact_info.email"
+              Имейл за контакт
+            </label>
+            <input
+              type="email"
+              id="contact_info.email"
+              name="contact_info.email"
                 value={data.contact_info.email}
-                onChange={handleChange}
+              onChange={handleChange}
                 className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
                   errors['contact_info.email'] 
                     ? 'border-red-500 dark:border-red-500' 
                     : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
                 } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
-              />
-              {errors['contact_info.email'] && (
+            />
+            {errors['contact_info.email'] && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.email']}</p>
-              )}
+            )}
             </div>
           </div>
         </div>
@@ -605,10 +605,10 @@ export default function PropertyForm({
             <label className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
               {initialData?.images?.length ? 'Добави нови изображения' : 'Изображения'}
             </label>
-            <div className="flex justify-center px-6 pt-5 pb-6 mt-1 border-2 border-gray-300 border-dashed rounded-md dark:border-gray-600">
-              <div className="space-y-1 text-center">
+            <div className="flex justify-center px-6 pt-5 pb-6 mt-1 rounded-md border-2 border-gray-300 border-dashed dark:border-gray-600">
+            <div className="space-y-1 text-center">
                 <svg
-                  className="w-12 h-12 mx-auto text-gray-400"
+                  className="mx-auto w-12 h-12 text-gray-400"
                   stroke="currentColor"
                   fill="none"
                   viewBox="0 0 48 48"
@@ -627,17 +627,17 @@ export default function PropertyForm({
                     className="relative font-medium rounded-md cursor-pointer text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500"
                   >
                     <span>Качи файлове</span>
-                    <input
+                  <input
                       id="images"
                       name="images"
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageChange}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageChange}
                       className="sr-only"
-                    />
-                  </label>
-                  <p className="pl-1">или ги провлачете тук</p>
+                  />
+                </label>
+                <p className="pl-1">или ги провлачете тук</p>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   PNG, JPG, WEBP до 10MB
@@ -649,37 +649,37 @@ export default function PropertyForm({
                 <h4 className="text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">Избрани файлове:</h4>
                 <ul className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
                   {Array.from(images).map((file, index) => (
-                    <li key={index} className="flex items-center justify-between py-2">
+                    <li key={index} className="flex justify-between items-center py-2">
                       <span className="text-sm text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">{file.name}</span>
-                      <button
-                        type="button"
+                  <button
+                    type="button"
                         onClick={() => setImages(images.filter((_, i) => i !== index))}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                      >
+                  >
                         <XMarkIcon className="w-5 h-5" />
-                      </button>
+                  </button>
                     </li>
-                  ))}
+              ))}
                 </ul>
-              </div>
-            )}
+            </div>
+          )}
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 sm:col-span-2">
+        <div className="flex gap-3 justify-end sm:col-span-2">
           {onCancel && (
-            <button
-              type="button"
+          <button
+            type="button"
               onClick={onCancel}
               className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text))] bg-white dark:bg-[rgb(var(--color-dark-bg))] border border-gray-300 dark:border-[rgb(var(--color-dark-border))] rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-[rgb(var(--color-dark-bg-secondary))]"
-            >
-              Отказ
-            </button>
+          >
+            Отказ
+          </button>
           )}
           <button
             type="submit"
             disabled={isSubmitting || regionsLoading || neighborhoodsLoading || featuresLoading}
-            className="px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md shadow-sm bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-white rounded-md border border-transparent shadow-sm bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Запазване...' : submitLabel}
           </button>

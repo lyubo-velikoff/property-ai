@@ -1,132 +1,16 @@
-export interface ApiResponse<T> {
-  status: 'success' | 'error';
-  data: T;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'ADMIN' | 'USER';
-  createdAt: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
-
-export interface Property {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  currency: 'BGN' | 'EUR' | 'USD';
-  area_sqm: number;
-  land_area_sqm?: number;
-  floor?: number;
-  total_floors?: number;
-  construction_type?: string;
-  furnishing?: string;
-  location_type: 'CITY' | 'REGION';
-  regionId?: number;
-  neighborhoodId?: number;
-  has_regulation?: boolean;
-  category: 'SALE' | 'RENT';
-  type: 'APARTMENT' | 'HOUSE' | 'PLOT' | 'COMMERCIAL' | 'INDUSTRIAL';
-  featured?: boolean;
-  features: { featureId: number }[];
-  images: Image[];
-  contact_info: ContactInfo;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreatePropertyData {
-  title: string;
-  description: string;
-  price: number;
-  currency: 'BGN' | 'EUR' | 'USD';
-  area_sqm: number;
-  land_area_sqm?: number;
-  floor?: number;
-  total_floors?: number;
-  construction_type?: string;
-  furnishing?: string;
-  location_type: 'CITY' | 'REGION';
-  regionId?: number;
-  neighborhoodId?: number;
-  has_regulation?: boolean;
-  category: 'SALE' | 'RENT';
-  type: 'APARTMENT' | 'HOUSE' | 'PLOT' | 'COMMERCIAL' | 'INDUSTRIAL';
-  featured?: boolean;
-  features?: number[];
-  contact_info: {
-    phone: string;
-    email: string;
-  };
-}
-
-export interface Image {
-  id: string;
-  url: string;
-  propertyId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ContactInfo {
-  id: string;
-  phone: string;
-  email: string;
-  propertyId: string;
-}
-
-export interface ContactMessage {
-  id: string;
-  name: string;
-  email: string;
-  message: string;
-  isRead: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface PaginatedResponse<T> {
-  properties: T[];
-  total: number;
-  page: number;
-  pages: number;
-}
-
-export interface ContactFormData {
-  name: string;
-  email: string;
-  message: string;
-}
-
-export interface CreateUserData {
-  name: string;
-  email: string;
-  password: string;
-  role: 'ADMIN' | 'USER';
-}
-
-export interface PropertyFormData {
-  title: string;
-  description: string;
-  price: number;
-  currency: 'BGN' | 'EUR' | 'USD';
-  area_sqm: number;
-  floor?: number;
-  construction_type?: string;
-  furnishing?: string;
-  location_type: 'CITY' | 'REGION';
-  category: 'SALE' | 'RENT';
-  type: 'APARTMENT' | 'HOUSE' | 'PLOT' | 'COMMERCIAL' | 'INDUSTRIAL';
-  contact_info: {
-    phone: string;
-    email: string;
-  };
-  images?: File[];
-} 
+export {
+  type ApiResponse,
+  type ApiSuccessResponse,
+  type ApiErrorResponse,
+  type User,
+  type AuthResponse,
+  type Property,
+  type CreatePropertyInput as CreatePropertyData,
+  type Image,
+  type ContactInfo,
+  type ContactMessage,
+  type PaginatedResponse,
+  type CreateContactMessageInput as ContactFormData,
+  type CreateUserInput as CreateUserData,
+  type CreatePropertyInput as PropertyFormData
+} from '@avalon/shared-types'; 

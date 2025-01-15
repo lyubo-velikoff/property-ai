@@ -1,79 +1,47 @@
-import { PropertyCardProps } from '../components/properties/PropertyCard';
+import type {
+  Property,
+  PropertyResponse,
+  PropertiesResponse,
+  GetPropertiesParams,
+  PropertyType,
+  PropertyCategory,
+  LocationType,
+  Currency
+} from '@avalon/shared-types';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+export type { Property, PropertyResponse, PropertiesResponse, GetPropertiesParams, PropertyType, PropertyCategory, LocationType, Currency };
+
 export interface PropertyFilters {
-  type?: string;
-  location_type?: 'CITY' | 'REGION';
+  type?: PropertyType;
   region?: string;
   minPrice?: number;
   maxPrice?: number;
-  category?: 'RENT' | 'SALE';
+  category?: PropertyCategory;
+  location_type?: LocationType;
   search?: string;
-}
-
-export interface PropertyResponse {
-  properties: Property[];
-  total: number;
-  page: number;
-  pages: number;
-  pageSize: number;
-}
-
-interface PropertyImage {
-  url: string;
-}
-
-export interface Property {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  currency: 'BGN' | 'EUR' | 'USD';
-  area_sqm: number;
-  floor?: number;
-  construction_type?: string;
-  furnishing?: string;
-  location_type: 'CITY' | 'REGION';
-  category: 'SALE' | 'RENT';
-  type: 'APARTMENT' | 'HOUSE' | 'PLOT' | 'COMMERCIAL' | 'INDUSTRIAL';
-  images?: Array<{ id: string; url: string }>;
-  contact_info: {
-    id: string;
-    phone: string;
-    email: string;
-  };
-  region?: {
-    id: number;
-    name: string;
-  };
-  neighborhood?: {
-    id: number;
-    name: string;
-  };
-  createdAt: string;
-  updatedAt: string;
 }
 
 export async function getProperties(
   filters: PropertyFilters = {},
   page = 1,
   pageSize = 9
-): Promise<PropertyResponse> {
+): Promise<PropertiesResponse> {
   const params = new URLSearchParams();
   
   // Add filters to query params
   if (filters.type) params.append('type', filters.type);
   if (filters.region) params.append('region', filters.region);
-  if (filters.minPrice) params.append('minPrice', filters.minPrice.toString());
-  if (filters.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
+  if (filters.minPrice) params.append('min_price', filters.minPrice.toString());
+  if (filters.maxPrice) params.append('max_price', filters.maxPrice.toString());
   if (filters.category) params.append('category', filters.category);
   if (filters.location_type) params.append('location_type', filters.location_type);
   if (filters.search) params.append('search', filters.search);
   
   // Add pagination params
   params.append('page', page.toString());
-  params.append('pageSize', pageSize.toString());
+  params.append('limit', pageSize.toString());
 
   try {
     const response = await fetch(`${API_URL}/properties?${params.toString()}`);
@@ -81,20 +49,14 @@ export async function getProperties(
       throw new Error('Failed to fetch properties');
     }
     const data = await response.json();
-    return {
-      properties: data.data?.properties || [],
-      total: data.data?.total || 0,
-      page: data.data?.page || 1,
-      pages: data.data?.pages || 1,
-      pageSize: data.data?.pageSize || pageSize
-    };
+    return data.data;
   } catch (error) {
     console.error('Error fetching properties:', error);
     throw error;
   }
 }
 
-export async function getFeaturedProperties(): Promise<PropertyCardProps[]> {
+export async function getFeaturedProperties(): Promise<Property[]> {
   try {
     const response = await fetch(`${API_URL}/properties/featured`);
     if (!response.ok) {

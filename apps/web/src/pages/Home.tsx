@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { getFeaturedProperties } from '../services/propertyService';
-import PropertyCard, { PropertyCardProps } from '../components/properties/PropertyCard';
+import type { Property } from '@avalon/shared-types';
+import PropertyCard from '../components/properties/PropertyCard';
 
 const propertyTypes = [
   'Всички типове',
@@ -29,8 +30,8 @@ const regions = [
 export default function Home() {
   const [selectedType, setSelectedType] = useState('Всички типове');
   const [selectedRegion, setSelectedRegion] = useState('Всички райони');
-  const [featuredProperties, setFeaturedProperties] = useState<PropertyCardProps[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export default function Home() {
         setError('Failed to load featured properties');
         console.error(err);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
@@ -149,7 +150,7 @@ export default function Home() {
             Топ Оферти
           </h2>
           <div className="grid gap-8 mt-12 sm:grid-cols-2 lg:grid-cols-3">
-            {isLoading ? (
+            {loading ? (
               // Loading skeletons
               [...Array(3)].map((_, index) => (
                 <div key={index} className="bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] rounded-lg shadow-lg animate-pulse">
