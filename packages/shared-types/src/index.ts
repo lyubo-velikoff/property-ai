@@ -2,21 +2,41 @@
 export * from './common/api';
 export * from './common/pagination';
 
+// Location exports
+export type {
+  Region,
+  Neighborhood,
+  Location,
+  Feature,
+  CreateLocationInput,
+  CreateFeatureInput,
+  RegionResponse,
+  RegionsResponse,
+  NeighborhoodResponse,
+  NeighborhoodsResponse,
+  FeatureResponse,
+  FeaturesResponse
+} from './location';
+export { FeatureType } from './location';
+
 // Property exports
 export * from './property/enums';
-export * from './property/base';
-export * from './property/requests';
-export * from './property/responses';
+export type {
+  ContactInfo,
+  Image,
+  Property,
+  CreatePropertyInput,
+  UpdatePropertyInput
+} from './property/base';
+export type { GetPropertiesParams } from './property/requests';
+export type { PropertyResponse, PropertiesResponse } from './property/responses';
 
 // Contact exports
 export * from './contact';
 
-// Location exports
-export * from './location';
-
 // User exports
-export {
-  UserRole,
+export { UserRole } from './user';
+export type {
   User,
   CreateUserInput,
   UpdateUserInput,
@@ -28,7 +48,7 @@ export {
 export * from './admin';
 
 // Auth exports
-export {
+export type {
   RegisterInput,
   LoginInput,
   AuthResponse,

@@ -6,6 +6,7 @@ import {
   ConstructionType, 
   FurnishingType 
 } from './enums';
+import type { Location } from '../location';
 
 export interface ContactInfo {
   id: string;
@@ -38,6 +39,8 @@ export interface Property {
   featured?: boolean;
   contact_info?: ContactInfo;
   images?: Image[];
+  region_id?: number;
+  neighborhood_id?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -59,6 +62,8 @@ export interface CreatePropertyInput {
     phone: string;
     email: string;
   };
+  region_id?: number;
+  neighborhood_id?: number;
 }
 
 export interface UpdatePropertyInput extends Partial<CreatePropertyInput> {} 
