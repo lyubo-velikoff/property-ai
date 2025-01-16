@@ -240,69 +240,108 @@ async function main() {
       ]);
     }
 
-    // Create sample property
-    console.log('Creating sample property...');
-    const propertyId = await prisma.$transaction(async (tx) => {
-      // Create property
-      const result = await tx.$queryRaw<{ id: string }[]>`
-        INSERT INTO Property (
-          id, title, description, price, currency, area_sqm, floor,
-          total_floors, construction_type, furnishing, location_type,
-          neighborhoodId, category, type, featured, has_regulation,
-          createdAt, updatedAt
-        ) VALUES (
-          ${randomUUID()},
-          'Магазин, кв. Възраждане, 267000 Е',
-          'Агенция за недвижими имоти АВАЛОН Ви представя, МАГАЗИН с голяма витрина и лице към улица 15 метра...',
-          267000,
-          ${CURRENCY_MAP.euro},
-          149,
-          0,
-          1,
-          ${CONSTRUCTION_TYPE_MAP.brick},
-          ${FURNISHING_MAP.unfurnished},
-          'CITY',
-          4,
-          'SALE',
-          ${PROPERTY_TYPE_MAP.commercial},
-          false,
-          false,
-          datetime('now'),
-          datetime('now')
-        ) RETURNING id;
-      `;
+    // Create sample properties
+    console.log('Creating sample properties...');
+    const sampleProperties = [
+      {
+        title: 'Магазин, кв. Възраждане, 267000 €',
+        description: 'Агенция за недвижими имоти АВАЛОН Ви представя магазин в кв. Възраждане. Имотът е с площ от 149 кв.м. и се намира на партерен етаж в тухлена сграда. Подходящ за всякакъв вид търговска дейност.',
+        price: 267000,
+        currency: 'EUR',
+        area_sqm: 149,
+        floor: 0,
+        total_floors: 1,
+        construction_type: 'BRICK',
+        furnishing: 'UNFURNISHED',
+        location_type: 'CITY',
+        neighborhoodId: 4,
+        has_regulation: false,
+        category: 'SALE',
+        type: 'COMMERCIAL',
+        featured: false,
+        contact_info: {
+          phone: '+359888123456',
+          email: 'office@avalon.bg'
+        }
+      },
+      {
+        title: 'Тристаен апартамент, кв. Дружба 3, 95000 €',
+        description: 'Просторен тристаен апартамент в кв. Дружба 3. Имотът е с площ от 85 кв.м. и се намира на 4-ти етаж в панелна сграда. Състои се от хол, две спални, кухня, баня с тоалетна и две тераси.',
+        price: 95000,
+        currency: 'EUR',
+        area_sqm: 85,
+        floor: 4,
+        total_floors: 8,
+        construction_type: 'PANEL',
+        furnishing: 'PARTIALLY_FURNISHED',
+        location_type: 'CITY',
+        neighborhoodId: 8,
+        has_regulation: false,
+        category: 'SALE',
+        type: 'APARTMENT',
+        featured: true,
+        contact_info: {
+          phone: '+359888123456',
+          email: 'office@avalon.bg'
+        }
+      },
+      {
+        title: 'Къща, с. Николово, 120000 €',
+        description: 'Двуетажна къща в с. Николово. Имотът е с площ от 180 кв.м. РЗП и двор от 1000 кв.м. Състои се от първи етаж с хол, кухня, баня с тоалетна и втори етаж с три спални и баня.',
+        price: 120000,
+        currency: 'EUR',
+        area_sqm: 180,
+        land_area_sqm: 1000,
+        floor: 2,
+        total_floors: 2,
+        construction_type: 'BRICK',
+        furnishing: 'FURNISHED',
+        location_type: 'REGION',
+        regionId: 48,
+        has_regulation: true,
+        category: 'SALE',
+        type: 'HOUSE',
+        featured: true,
+        contact_info: {
+          phone: '+359888123456',
+          email: 'office@avalon.bg'
+        }
+      },
+      {
+        title: 'Парцел, с. Басарбово, 25000 €',
+        description: 'Парцел в с. Басарбово с площ от 2000 кв.м. Имотът е с лице на главен път и е подходящ за жилищно строителство.',
+        price: 25000,
+        currency: 'EUR',
+        area_sqm: 2000,
+        location_type: 'REGION',
+        regionId: 12,
+        has_regulation: true,
+        category: 'SALE',
+        type: 'LAND',
+        featured: false,
+        contact_info: {
+          phone: '+359888123456',
+          email: 'office@avalon.bg'
+        }
+      }
+    ];
 
-      const id = result[0].id;
+    for (const propertyData of sampleProperties) {
+      const property = await prisma.property.create({
+        data: {
+          ...propertyData,
+          contact_info: {
+            create: propertyData.contact_info
+          }
+        }
+      });
+      console.log('Created property:', property.title);
+    }
 
-      // Create features
-      await tx.$executeRaw`
-        INSERT INTO PropertyFeature (propertyId, featureId, createdAt, updatedAt)
-        VALUES 
-          (${id}, 1, datetime('now'), datetime('now')),
-          (${id}, 2, datetime('now'), datetime('now')),
-          (${id}, 4, datetime('now'), datetime('now'));
-      `;
-
-      // Create image
-      await tx.$executeRaw`
-        INSERT INTO Image (id, url, propertyId, createdAt, updatedAt)
-        VALUES (${randomUUID()}, '/uploads/properties/2803.jpg', ${id}, datetime('now'), datetime('now'));
-      `;
-
-      // Create contact info
-      await tx.$executeRaw`
-        INSERT INTO ContactInfo (id, phone, email, propertyId, createdAt, updatedAt)
-        VALUES (${randomUUID()}, '0895 606 165', 'agent@avalon.bg', ${id}, datetime('now'), datetime('now'));
-      `;
-
-      return id;
-    });
-
-    console.log('Created sample property:', propertyId);
-
-  } catch (e) {
-    console.error(e);
-    throw e;
+    console.log('Seeding completed successfully');
+  } catch (error) {
+    console.error('Error seeding database:', error);
+    throw error;
   } finally {
     await prisma.$disconnect();
   }

@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { z } from 'zod';
-import { login as loginApi } from '../../services/auth';
 import { useAuth } from '../../contexts/auth';
-import type { AuthResponse } from '../../types/api';
+import type { LoginData } from '../../services/auth';
 
 const loginSchema = z.object({
   email: z.string().email('Невалиден имейл адрес'),
@@ -16,7 +15,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { setUser } = useAuth();
+  const { login } = useAuth();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/admin';
 
   const [formData, setFormData] = useState<LoginForm>({
@@ -26,15 +25,9 @@ export default function Login() {
 
   const [errors, setErrors] = useState<Partial<LoginForm>>({});
 
-  const { mutate, isPending } = useMutation<AuthResponse, Error, LoginForm>({
-    mutationFn: loginApi,
-    onSuccess: (data) => {
-      console.log('Mutation success response:', data);
-      localStorage.setItem('token', data.token);
-      setUser({
-        ...data.user,
-        role: data.user.role.toUpperCase() as 'ADMIN' | 'USER'
-      });
+  const { mutate, isPending } = useMutation<void, Error, LoginData>({
+    mutationFn: login,
+    onSuccess: () => {
       navigate(from);
     },
     onError: (error) => {

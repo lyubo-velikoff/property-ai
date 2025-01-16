@@ -21,12 +21,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authVerified, setAuthVerified] = useState(false);
 
   // Initial auth check
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       setIsLoading(false);
+      setAuthVerified(true);
       return;
     }
 
@@ -36,26 +38,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const userData = await getCurrentUser();
         console.log('User data received:', userData);
         setUser(userData);
-        // If we're on the login page and verification succeeds, redirect to admin
-        if (window.location.pathname === '/admin/login') {
+        
+        // Only redirect if we haven't verified auth yet
+        if (!authVerified && window.location.pathname === '/admin/login') {
           navigate('/admin');
         }
       } catch (error) {
         console.error('Auth verification failed:', error);
-        // Clear both token and user on auth error
         localStorage.removeItem('token');
         setUser(null);
-        // Redirect to login if we're on an admin page
-        if (window.location.pathname.startsWith('/admin')) {
+        
+        // Only redirect if we haven't verified auth yet
+        if (!authVerified && window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
           navigate('/admin/login');
         }
       } finally {
         setIsLoading(false);
+        setAuthVerified(true);
       }
     };
 
     verifyAuth();
-  }, [navigate]);
+  }, [navigate, authVerified]);
 
   const login = async (data: LoginData) => {
     try {
@@ -67,10 +71,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('token', response.token);
       // Then update user state
       setUser(response.user);
+      // Reset auth verification flag
+      setAuthVerified(false);
       navigate('/admin');
     } catch (error) {
       console.error('Login failed:', error);
-      // Clear any existing token on login failure
       localStorage.removeItem('token');
       setUser(null);
       throw error;
@@ -82,14 +87,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log('Registering...');
       const response = await registerApi(data);
       console.log('Registration successful:', response);
-      // Set token first
       localStorage.setItem('token', response.token);
-      // Then update user state
       setUser(response.user);
+      // Reset auth verification flag
+      setAuthVerified(false);
       navigate('/');
     } catch (error) {
       console.error('Registration failed:', error);
-      // Clear any existing token on registration failure
       localStorage.removeItem('token');
       setUser(null);
       throw error;
@@ -99,9 +103,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     console.log('Logging out...');
     logoutApi();
-    // Clear both token and user
     localStorage.removeItem('token');
     setUser(null);
+    // Reset auth verification flag
+    setAuthVerified(false);
     navigate('/admin/login');
   };
 

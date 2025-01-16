@@ -27,14 +27,8 @@ api.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
-      // Clear token and redirect to login
+      // Clear token but don't redirect - let the auth context handle navigation
       localStorage.removeItem('token');
-      
-      // Only redirect to login if we're on an admin page
-      if (window.location.pathname.startsWith('/admin')) {
-        window.location.href = '/admin/login';
-      }
-      
       return Promise.reject(new Error('Unauthorized - Please log in'));
     }
     

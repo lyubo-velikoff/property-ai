@@ -1,4 +1,4 @@
-import express, { Response } from 'express';
+import { Router, Response, Request } from 'express';
 import { z } from 'zod';
 import { PrismaClient, Prisma } from '@prisma/client';
 import multer from 'multer';
@@ -24,9 +24,8 @@ import {
   Property,
   UserRole
 } from '@avalon/shared-types';
-import { Router } from 'express';
 
-const router = express.Router();
+const router: Router = Router();
 
 export const propertySchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters'),
@@ -60,6 +59,8 @@ const propertyInclude = {
 } as const;
 
 const handleError = (error: unknown, res: Response) => {
+  console.error('Properties route error:', error);
+
   if (error instanceof z.ZodError) {
     const response: ApiErrorResponse = {
       status: 'error',
@@ -79,8 +80,20 @@ const handleError = (error: unknown, res: Response) => {
       code: error.statusCode === 404 ? ApiErrorCode.NOT_FOUND : ApiErrorCode.INTERNAL_ERROR
     };
     res.status(error.statusCode).json(response);
+  } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    console.error('Prisma error:', {
+      code: error.code,
+      meta: error.meta,
+      message: error.message
+    });
+    const response: ApiErrorResponse = {
+      status: 'error',
+      message: 'Database error',
+      code: ApiErrorCode.INTERNAL_ERROR
+    };
+    res.status(500).json(response);
   } else {
-    console.error(error);
+    console.error('Unhandled error:', error);
     const response: ApiErrorResponse = {
       status: 'error',
       message: 'Internal server error',
@@ -107,7 +120,7 @@ const mapProperty = (property: any): Property => ({
 });
 
 // Get all properties with filtering
-router.get('/', async (req, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const {
       page = '1',
@@ -157,6 +170,13 @@ router.get('/', async (req, res: Response) => {
       if (max_area) where.area_sqm = { lte: parseInt(max_area) };
     }
 
+    console.log('Querying properties with:', {
+      where,
+      skip,
+      take: parseInt(limit),
+      include: propertyInclude
+    });
+
     const [properties, total] = await Promise.all([
       prisma.property.findMany({
         where,
@@ -166,7 +186,15 @@ router.get('/', async (req, res: Response) => {
         orderBy: { createdAt: 'desc' },
       }),
       prisma.property.count({ where }),
-    ]);
+    ]).catch(error => {
+      console.error('Database query error:', error);
+      throw error;
+    });
+
+    console.log('Found properties:', {
+      count: properties.length,
+      total
+    });
 
     const response: ApiSuccessResponse<PropertiesResponse> = {
       status: 'success',
@@ -223,7 +251,7 @@ router.get('/featured', async (req, res: Response) => {
 });
 
 // Get single property
-router.get('/:id', async (req, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
   try {
     const property = await prisma.property.findUnique({
       where: { id: req.params.id },
@@ -231,7 +259,7 @@ router.get('/:id', async (req, res: Response) => {
     });
 
     if (!property) {
-      throw new AppError(404, 'Property not found');
+      throw new AppError('Property not found', '404');
     }
 
     const response: ApiSuccessResponse<PropertyResponse> = {
@@ -329,7 +357,7 @@ router.patch(
       });
 
       if (!existingProperty) {
-        throw new AppError(404, 'Property not found');
+        throw new AppError('Property not found', '404');
       }
 
       // Update the property with the correct contact info reference
@@ -387,10 +415,10 @@ router.delete('/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Resp
 
     const response: ApiSuccessResponse<null> = {
       status: 'success',
-      data: null
+      data: null,
     };
 
-    res.status(204).json(response);
+    res.json(response);
   } catch (error) {
     handleError(error, res);
   }

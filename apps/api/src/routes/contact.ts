@@ -1,4 +1,4 @@
-import { Router, Response } from 'express';
+import { Router, Response, Request } from 'express';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
 import { protect, restrictTo } from '../middleware/auth';
@@ -7,37 +7,28 @@ import {
   ApiSuccessResponse, 
   ApiErrorResponse,
   ApiErrorCode,
-  CreateContactMessageInput,
-  ContactMessageResponse,
+  ContactMessage, 
+  ContactMessageResponse, 
   ContactMessagesResponse,
-  UserRole,
-  ContactMessage
+  UserRole
 } from '@avalon/shared-types';
 
-const router = Router();
+const router: Router = Router();
 
-const contactSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
-}) satisfies z.ZodType<CreateContactMessageInput>;
+const createMessageSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  message: z.string().min(1),
+});
 
-const mapContactMessage = (message: {
-  id: string;
-  name: string;
-  email: string;
-  message: string;
-  isRead: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}): ContactMessage => ({
+const mapContactMessage = (message: any): ContactMessage => ({
   id: message.id,
   name: message.name,
   email: message.email,
   message: message.message,
   isRead: message.isRead,
   createdAt: message.createdAt.toISOString(),
-  updatedAt: message.updatedAt.toISOString()
+  updatedAt: message.updatedAt.toISOString(),
 });
 
 const handleError = (error: unknown, res: Response) => {
@@ -72,9 +63,9 @@ const handleError = (error: unknown, res: Response) => {
 };
 
 // Create contact message
-router.post('/', async (req, res: Response, next) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
-    const data = contactSchema.parse(req.body);
+    const data = createMessageSchema.parse(req.body);
 
     const message = await prisma.contactMessage.create({
       data
@@ -92,10 +83,10 @@ router.post('/', async (req, res: Response, next) => {
 });
 
 // Get all messages (admin only)
-router.get('/messages', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.get('/messages', protect, restrictTo(UserRole.ADMIN), async (req: Request, res: Response) => {
   try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
     const [messages, total] = await Promise.all([
@@ -107,6 +98,9 @@ router.get('/messages', protect, restrictTo(UserRole.ADMIN), async (req, res: Re
       prisma.contactMessage.count(),
     ]);
 
+    const totalPages = Math.ceil(total / limit);
+    const hasNextPage = page < totalPages;
+
     const response: ApiSuccessResponse<ContactMessagesResponse> = {
       status: 'success',
       data: {
@@ -115,10 +109,10 @@ router.get('/messages', protect, restrictTo(UserRole.ADMIN), async (req, res: Re
           total,
           page,
           pageSize: limit,
-          totalPages: Math.ceil(total / limit),
-          hasNextPage: skip + limit < total,
-          hasPreviousPage: page > 1
-        }
+          totalPages,
+          hasNextPage,
+          hasPreviousPage: page > 1,
+        },
       }
     };
 
@@ -129,14 +123,18 @@ router.get('/messages', protect, restrictTo(UserRole.ADMIN), async (req, res: Re
 });
 
 // Mark message as read (admin only)
-router.patch('/messages/:id/read', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.patch('/messages/:id/read', protect, restrictTo(UserRole.ADMIN), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
     const message = await prisma.contactMessage.update({
-      where: { id },
+      where: { id: String(id) },
       data: { isRead: true },
     });
+
+    if (!message) {
+      throw new AppError('Message not found', 404);
+    }
 
     const response: ApiSuccessResponse<ContactMessageResponse> = {
       status: 'success',
@@ -150,17 +148,17 @@ router.patch('/messages/:id/read', protect, restrictTo(UserRole.ADMIN), async (r
 });
 
 // Delete message (admin only)
-router.delete('/messages/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.delete('/messages/:id', protect, restrictTo(UserRole.ADMIN), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
     await prisma.contactMessage.delete({
-      where: { id },
+      where: { id: String(id) },
     });
 
     const response: ApiSuccessResponse<null> = {
       status: 'success',
-      data: null
+      data: null,
     };
 
     res.json(response);
@@ -169,4 +167,4 @@ router.delete('/messages/:id', protect, restrictTo(UserRole.ADMIN), async (req, 
   }
 });
 
-export const contactRoutes: Router = router; 
+export const contactRoutes = router; 

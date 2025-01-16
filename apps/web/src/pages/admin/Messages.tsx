@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { getMessages, markMessageAsRead, deleteMessage } from '../../services/messages';
-import { event } from '../../lib/analytics';
 import type { ContactMessage } from '@avalon/shared-types';
 
 export default function Messages() {
@@ -20,21 +18,6 @@ export default function Messages() {
     mutationFn: markMessageAsRead,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
-      
-      // Track successful message mark as read
-      event({
-        action: 'message_mark_read',
-        category: 'Admin',
-        label: 'Success'
-      });
-    },
-    onError: (error: any) => {
-      // Track message mark as read error
-      event({
-        action: 'message_mark_read_error',
-        category: 'Admin',
-        label: error.response?.data?.message || 'Unknown error'
-      });
     }
   });
 
@@ -42,21 +25,6 @@ export default function Messages() {
     mutationFn: deleteMessage,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
-      
-      // Track successful message deletion
-      event({
-        action: 'message_delete',
-        category: 'Admin',
-        label: 'Success'
-      });
-    },
-    onError: (error: any) => {
-      // Track message deletion error
-      event({
-        action: 'message_delete_error',
-        category: 'Admin',
-        label: error.response?.data?.message || 'Unknown error'
-      });
     }
   });
 
@@ -85,6 +53,9 @@ export default function Messages() {
       </div>
     );
   }
+
+  const messages = data?.data?.data?.data || [];
+  const { total, hasNextPage, hasPreviousPage } = data?.data?.data?.meta || { total: 0, hasNextPage: false, hasPreviousPage: false };
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -122,7 +93,7 @@ export default function Messages() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-[rgb(var(--color-dark-bg-secondary))] dark:divide-[rgb(var(--color-dark-border))]">
-                  {data?.items.map((message: ContactMessage) => (
+                  {messages.map((message: ContactMessage) => (
                     <tr key={message.id} className={message.isRead ? 'bg-gray-50 dark:bg-[rgb(var(--color-dark-bg))]' : 'bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))]'}>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
                         {message.name}
@@ -143,16 +114,24 @@ export default function Messages() {
                         })}
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <button
-                          onClick={() => handleMarkAsRead(message.id)}
-                          className={`${
-                            message.isRead 
-                              ? 'text-gray-400 dark:text-[rgb(var(--color-dark-text-secondary))]' 
-                              : 'text-primary-600 dark:text-primary-500 hover:text-primary-700 dark:hover:text-primary-400'
-                          }`}
-                        >
-                          {message.isRead ? 'Прочетено' : 'Маркирай като прочетено'}
-                        </button>
+                        <div className="flex justify-end space-x-4">
+                          <button
+                            onClick={() => handleMarkAsRead(message.id)}
+                            className={`${
+                              message.isRead 
+                                ? 'text-gray-400 dark:text-[rgb(var(--color-dark-text-secondary))]' 
+                                : 'text-primary-600 dark:text-primary-500 hover:text-primary-700 dark:hover:text-primary-400'
+                            }`}
+                          >
+                            {message.isRead ? 'Прочетено' : 'Маркирай като прочетено'}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(message.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            Изтрий
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -167,14 +146,14 @@ export default function Messages() {
         <div className="flex flex-1 justify-between sm:hidden">
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
+            disabled={!hasPreviousPage}
             className="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
           >
             Предишна
           </button>
           <button
             onClick={() => setPage(p => p + 1)}
-            disabled={!data?.hasNextPage}
+            disabled={!hasNextPage}
             className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
           >
             Следваща
@@ -185,16 +164,16 @@ export default function Messages() {
             <p className="text-sm text-gray-700 dark:text-gray-300">
               Показване на <span className="font-medium">{((page - 1) * limit) + 1}</span> до{' '}
               <span className="font-medium">
-                {Math.min(page * limit, data?.total || 0)}
+                {Math.min(page * limit, total)}
               </span>{' '}
-              от <span className="font-medium">{data?.total}</span> резултата
+              от <span className="font-medium">{total}</span> резултата
             </p>
           </div>
           <div>
             <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
+                disabled={!hasPreviousPage}
                 className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 dark:text-gray-500 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
               >
                 <span className="sr-only">Предишна</span>
@@ -204,7 +183,7 @@ export default function Messages() {
               </button>
               <button
                 onClick={() => setPage(p => p + 1)}
-                disabled={!data?.hasNextPage}
+                disabled={!hasNextPage}
                 className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 dark:text-gray-500 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
               >
                 <span className="sr-only">Следваща</span>

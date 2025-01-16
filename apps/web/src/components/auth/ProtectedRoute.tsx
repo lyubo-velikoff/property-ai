@@ -11,40 +11,10 @@ interface Props {
 
 export default function ProtectedRoute({ children, requireAdmin = true }: Props) {
   const location = useLocation();
-  const { user, isLoading: authLoading, setUser } = useAuth();
-
-  const { isLoading: queryLoading, isError } = useQuery({
-    queryKey: ['auth', 'me'],
-    queryFn: async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.log('No token found in localStorage');
-        throw new Error('No token');
-      }
-      
-      try {
-        console.log('Fetching user data...');
-        const response = await api.get('/auth/me');
-        const userData = response.data.data.user;
-        console.log('User data received:', userData);
-        setUser(userData);
-        return userData;
-      } catch (err) {
-        console.error('Error in /auth/me request:', err);
-        // Clear auth state on error
-        localStorage.removeItem('token');
-        setUser(null);
-        throw err;
-      }
-    },
-    retry: false,
-    // Only run the query if we don't have a user already
-    enabled: !user && !!localStorage.getItem('token'),
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-  });
+  const { user, isLoading: authLoading } = useAuth();
 
   // Show loading state while checking auth
-  if (authLoading || queryLoading) {
+  if (authLoading) {
     return <LoadingSpinner />;
   }
 
@@ -53,8 +23,8 @@ export default function ProtectedRoute({ children, requireAdmin = true }: Props)
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
-  // If we have an error or no user after loading, redirect to login
-  if (isError || !user) {
+  // If no user after loading, redirect to login
+  if (!user) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 

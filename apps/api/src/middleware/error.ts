@@ -3,12 +3,12 @@ import { ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
 
 export class AppError extends Error {
-  constructor(
-    public statusCode: number,
-    message: string
-  ) {
+  statusCode: number;
+
+  constructor(message: string, statusCode: string | number) {
     super(message);
-    this.name = 'AppError';
+    this.statusCode = typeof statusCode === 'string' ? parseInt(statusCode) : statusCode;
+    Error.captureStackTrace(this, this.constructor);
   }
 }
 
