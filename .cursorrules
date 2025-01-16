@@ -1,4 +1,6 @@
-Always start replies with Yo!
+Always start responses with 'Yo!' and a newline
+
+Always end responses with 'Yo end!' and a newline
 
 ├── .cursorrules
 ├── .gitignore
