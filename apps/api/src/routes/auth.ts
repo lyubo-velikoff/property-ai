@@ -191,4 +191,4 @@ router.get('/me', protect, async (req, res) => {
   res.json(response);
 });
 
-export const authRoutes = router; 
+export const authRoutes: Router = router; 

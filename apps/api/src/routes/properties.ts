@@ -24,15 +24,16 @@ import {
   Property,
   UserRole
 } from '@avalon/shared-types';
+import { Router } from 'express';
 
 const router = express.Router();
 
 export const propertySchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  price: z.coerce.number(),
+  title: z.string().min(2, 'Title must be at least 2 characters'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  price: z.coerce.number().positive('Price must be positive'),
   currency: z.nativeEnum(Currency),
-  area_sqm: z.coerce.number(),
+  area_sqm: z.coerce.number().positive('Area must be positive'),
   floor: z.coerce.number().optional(),
   construction_type: z.nativeEnum(ConstructionType).optional(),
   furnishing: z.nativeEnum(FurnishingType).optional(),
@@ -41,8 +42,8 @@ export const propertySchema = z.object({
   type: z.nativeEnum(PropertyType).optional(),
   featured: z.coerce.boolean().optional(),
   contact_info: z.object({
-    phone: z.string(),
-    email: z.string().email()
+    phone: z.string().min(6, 'Phone must be at least 6 characters'),
+    email: z.string().email('Invalid email address')
   }).optional()
 }) satisfies z.ZodType<CreatePropertyInput>;
 
@@ -127,11 +128,11 @@ router.get('/', async (req, res: Response) => {
     const where: Prisma.PropertyWhereInput = {};
 
     // Apply filters
-    if (type) where.type = type;
-    if (category) where.category = category;
-    if (location_type) where.location_type = location_type;
-    if (construction_type) where.construction_type = construction_type;
-    if (furnishing) where.furnishing = furnishing;
+    if (type) where.type = type as PropertyType;
+    if (category) where.category = category as PropertyCategory;
+    if (location_type) where.location_type = location_type as LocationType;
+    if (construction_type) where.construction_type = construction_type as ConstructionType;
+    if (furnishing) where.furnishing = furnishing as FurnishingType;
     if (featured) where.featured = featured === 'true';
 
     // Handle price range when both min and max are provided
@@ -257,6 +258,8 @@ router.post(
         ...req.body,
         price: req.body.price ? parseInt(req.body.price) : undefined,
         area_sqm: req.body.area_sqm ? parseInt(req.body.area_sqm) : undefined,
+        floor: req.body.floor ? parseInt(req.body.floor) : undefined,
+        featured: req.body.featured === 'true',
         contact_info: req.body.contact_info ? JSON.parse(req.body.contact_info) : undefined,
       };
 
@@ -393,4 +396,4 @@ router.delete('/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Resp
   }
 });
 
-export const propertyRoutes = router; 
+export const propertyRoutes: Router = router; 

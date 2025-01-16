@@ -6,6 +6,8 @@ export {
   type AuthResponse,
   type Property,
   type CreatePropertyInput as CreatePropertyData,
+  type PropertyResponse,
+  type PropertiesResponse,
   type Image,
   type ContactInfo,
   type ContactMessage,

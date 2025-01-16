@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PencilIcon, TrashIcon, PlusIcon, ArrowLeftIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { getProperties, deleteProperty } from '../../services/propertyService';
-import type { Property, PropertyFilters } from '@avalon/shared-types';
+import type { GetPropertiesParams } from '@avalon/shared-types';
 import { event } from '../../lib/analytics';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { propertyTypeLabels, locationTypeLabels, categoryLabels, currencyLabels } from '../../constants/property';
@@ -21,17 +21,15 @@ export default function Properties() {
   const debouncedSearch = useDebounce(searchQuery, 300);
   const queryClient = useQueryClient();
 
-  const filters = useMemo(() => ({
-    search: debouncedSearch,
-  }), [debouncedSearch]);
+  const filters = useMemo<GetPropertiesParams>(() => ({}), []);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['properties', currentPage, debouncedSearch],
+    queryKey: ['properties', currentPage],
     queryFn: () => getProperties(filters, currentPage),
   });
 
-  const properties = data?.properties || [];
-  const totalPages = data?.pages || 1;
+  const properties = data?.data || [];
+  const totalPages = data?.meta.totalPages || 1;
 
   const deleteMutation = useMutation({
     mutationFn: deleteProperty,

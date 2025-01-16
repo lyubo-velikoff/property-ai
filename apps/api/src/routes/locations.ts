@@ -319,4 +319,4 @@ router.delete('/features/:id', protect, restrictTo(UserRole.ADMIN), async (req, 
   }
 });
 
-export const locationRoutes = router; 
+export const locationRoutes: Router = router; 

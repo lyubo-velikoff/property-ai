@@ -478,4 +478,4 @@ router.post(
   }
 );
 
-export const adminRoutes = router; 
+export const adminRoutes: Router = router; 

@@ -13,18 +13,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export type { Property, PropertyResponse, PropertiesResponse, GetPropertiesParams, PropertyType, PropertyCategory, LocationType, Currency };
 
-export interface PropertyFilters {
-  type?: PropertyType;
-  region?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  category?: PropertyCategory;
-  location_type?: LocationType;
-  search?: string;
-}
-
 export async function getProperties(
-  filters: PropertyFilters = {},
+  filters: GetPropertiesParams = {},
   page = 1,
   pageSize = 9
 ): Promise<PropertiesResponse> {
@@ -32,12 +22,15 @@ export async function getProperties(
   
   // Add filters to query params
   if (filters.type) params.append('type', filters.type);
-  if (filters.region) params.append('region', filters.region);
-  if (filters.minPrice) params.append('min_price', filters.minPrice.toString());
-  if (filters.maxPrice) params.append('max_price', filters.maxPrice.toString());
+  if (filters.min_price) params.append('min_price', filters.min_price);
+  if (filters.max_price) params.append('max_price', filters.max_price);
+  if (filters.min_area) params.append('min_area', filters.min_area);
+  if (filters.max_area) params.append('max_area', filters.max_area);
   if (filters.category) params.append('category', filters.category);
   if (filters.location_type) params.append('location_type', filters.location_type);
-  if (filters.search) params.append('search', filters.search);
+  if (filters.construction_type) params.append('construction_type', filters.construction_type);
+  if (filters.furnishing) params.append('furnishing', filters.furnishing);
+  if (filters.featured) params.append('featured', filters.featured.toString());
   
   // Add pagination params
   params.append('page', page.toString());
@@ -63,7 +56,7 @@ export async function getFeaturedProperties(): Promise<Property[]> {
       throw new Error('Failed to fetch featured properties');
     }
     const data = await response.json();
-    return data.data.properties;
+    return data.data.data;
   } catch (error) {
     console.error('Error fetching featured properties:', error);
     throw error;

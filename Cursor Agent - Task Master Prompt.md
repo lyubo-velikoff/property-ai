@@ -1,5 +1,5 @@
 # User Input:
-[TASK]: Recently, I have updated the @avalon/api to use shared types and have not configured the @avalon/web to use the new types. I want to analyse the codebase and find the places where I need to update the @avalon/web to use the new types.You can carry on updating the @avalon/web to use the new types.
+[TASK]: Now that we have updated the shared types in the web, I want to make sure that the web app is working as expected. Could you perform a full test of the web app and make sure that it is working as expected. Additionally, I want to make sure that the admin page is working as expected. I want you to also periodically check if you can compile the web and server apps and read the logs to make sure that everything is working as expected and you can resolve any issues.
 [PROJECT OVERVIEW]: .cursorrules
 [MAIN BRANCH]: master
 [YOLO MODE]: on
