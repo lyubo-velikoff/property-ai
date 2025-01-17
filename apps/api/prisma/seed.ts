@@ -1,6 +1,29 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import bcryptjs from 'bcryptjs';
 import { randomUUID } from 'crypto';
+
+type GeneratedProperty = {
+  title: string;
+  description: string;
+  price: number;
+  currency: string;
+  area_sqm: number;
+  floor?: number;
+  total_floors?: number;
+  construction_type?: string;
+  furnishing?: string;
+  location_type: string;
+  neighborhoodId?: number;
+  regionId?: number;
+  has_regulation?: boolean;
+  category: string;
+  type: string;
+  featured: boolean;
+  contact_info: {
+    phone: string;
+    email: string;
+  };
+};
 
 const prisma = new PrismaClient();
 
@@ -31,6 +54,63 @@ const PROPERTY_TYPE_MAP = {
   commercial: 'COMMERCIAL',
   industrial: 'INDUSTRIAL',
 } as const;
+
+type PropertyType = 'APARTMENT' | 'HOUSE' | 'LAND' | 'COMMERCIAL' | 'INDUSTRIAL';
+type ConstructionType = 'BRICK' | 'EPK' | 'PK' | 'PANEL' | 'WOOD_FLOOR';
+type FurnishingType = 'FURNISHED' | 'PARTIALLY_FURNISHED' | 'UNFURNISHED';
+type LocationType = 'CITY' | 'REGION';
+
+// Helper function to generate random properties
+function generateRandomProperties(count: number): GeneratedProperty[] {
+  const properties: GeneratedProperty[] = [];
+  const propertyTypes = ['APARTMENT', 'HOUSE', 'LAND', 'COMMERCIAL', 'INDUSTRIAL'] as const;
+  const constructionTypes = ['BRICK', 'EPK', 'PK', 'PANEL', 'WOOD_FLOOR'] as const;
+  const furnishingTypes = ['FURNISHED', 'PARTIALLY_FURNISHED', 'UNFURNISHED'] as const;
+  const locationTypes = ['CITY', 'REGION'] as const;
+
+  for (let i = 0; i < count; i++) {
+    const type = propertyTypes[Math.floor(Math.random() * propertyTypes.length)];
+    const isCity = Math.random() > 0.5;
+    const price = Math.floor(Math.random() * 300000) + 50000;
+    const area = Math.floor(Math.random() * 200) + 50;
+
+    const property: GeneratedProperty = {
+      title: `${type === 'APARTMENT' ? 'Апартамент' : 
+              type === 'HOUSE' ? 'Къща' :
+              type === 'LAND' ? 'Парцел' :
+              type === 'COMMERCIAL' ? 'Магазин' : 'Промишлено помещение'}, ${
+              isCity ? 'кв. ' + neighborhoods[Math.floor(Math.random() * neighborhoods.length)].name :
+                      'с. ' + regions[Math.floor(Math.random() * regions.length)].name
+            }, ${price} €`,
+      description: `${type === 'APARTMENT' ? 'Просторен апартамент' :
+                    type === 'HOUSE' ? 'Двуетажна къща' :
+                    type === 'LAND' ? 'Парцел' :
+                    type === 'COMMERCIAL' ? 'Търговско помещение' : 'Промишлено помещение'} с площ от ${area} кв.м.`,
+      price,
+      currency: 'EUR',
+      area_sqm: area,
+      floor: type === 'APARTMENT' ? Math.floor(Math.random() * 8) + 1 : undefined,
+      total_floors: type === 'APARTMENT' ? 8 : type === 'HOUSE' ? 2 : undefined,
+      construction_type: type !== 'LAND' ? constructionTypes[Math.floor(Math.random() * constructionTypes.length)] : undefined,
+      furnishing: type !== 'LAND' ? furnishingTypes[Math.floor(Math.random() * furnishingTypes.length)] : undefined,
+      location_type: isCity ? 'CITY' : 'REGION',
+      neighborhoodId: isCity ? neighborhoods[Math.floor(Math.random() * neighborhoods.length)].id : undefined,
+      regionId: !isCity ? regions[Math.floor(Math.random() * regions.length)].id : undefined,
+      has_regulation: type === 'LAND' ? Math.random() > 0.5 : undefined,
+      category: Math.random() > 0.3 ? 'SALE' : 'RENT',
+      type,
+      featured: Math.random() > 0.8,
+      contact_info: {
+        phone: '+359888123456',
+        email: 'office@avalon.bg'
+      }
+    };
+
+    properties.push(property);
+  }
+
+  return properties;
+}
 
 const regions = [
   { id: 1, name: "главен път Е85" },
@@ -172,28 +252,28 @@ const neighborhoods = [
 ];
 
 const infrastructureFeatures = [
-  { name: "Ток", type: "INFRASTRUCTURE" },
-  { name: "Вода", type: "INFRASTRUCTURE" },
-  { name: "Ограда", type: "INFRASTRUCTURE" },
-  { name: "Асвалтов път", type: "INFRASTRUCTURE" },
-  { name: "Черен път", type: "INFRASTRUCTURE" }
+  { id: 1, name: "Ток", type: "INFRASTRUCTURE" },
+  { id: 2, name: "Вода", type: "INFRASTRUCTURE" },
+  { id: 3, name: "Ограда", type: "INFRASTRUCTURE" },
+  { id: 4, name: "Асвалтов път", type: "INFRASTRUCTURE" },
+  { id: 5, name: "Черен път", type: "INFRASTRUCTURE" }
 ];
 
 const buildingFeatures = [
-  { name: "ТЕЦ", type: "BUILDING" },
-  { name: "Газ", type: "BUILDING" },
-  { name: "Климатик", type: "BUILDING" },
-  { name: "Локално парно", type: "BUILDING" },
-  { name: "В строеж", type: "BUILDING" },
-  { name: "С преход", type: "BUILDING" },
-  { name: "Асансьор", type: "BUILDING" },
-  { name: "Гараж", type: "BUILDING" },
-  { name: "Паркинг", type: "BUILDING" },
-  { name: "С действащ бизнес", type: "BUILDING" },
-  { name: "Видео наблюдение", type: "BUILDING" },
-  { name: "Охрана", type: "BUILDING" },
-  { name: "Саниран", type: "BUILDING" },
-  { name: "Тераса", type: "BUILDING" }
+  { id: 6, name: "ТЕЦ", type: "BUILDING" },
+  { id: 7, name: "Газ", type: "BUILDING" },
+  { id: 8, name: "Климатик", type: "BUILDING" },
+  { id: 9, name: "Локално парно", type: "BUILDING" },
+  { id: 10, name: "В строеж", type: "BUILDING" },
+  { id: 11, name: "С преход", type: "BUILDING" },
+  { id: 12, name: "Асансьор", type: "BUILDING" },
+  { id: 13, name: "Гараж", type: "BUILDING" },
+  { id: 14, name: "Паркинг", type: "BUILDING" },
+  { id: 15, name: "С действащ бизнес", type: "BUILDING" },
+  { id: 16, name: "Видео наблюдение", type: "BUILDING" },
+  { id: 17, name: "Охрана", type: "BUILDING" },
+  { id: 18, name: "Саниран", type: "BUILDING" },
+  { id: 19, name: "Тераса", type: "BUILDING" }
 ];
 
 async function main() {
@@ -202,140 +282,78 @@ async function main() {
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash('admin123', salt);
 
-    const admin = await prisma.user.upsert({
+    await prisma.user.upsert({
       where: { email: 'admin@avalon.bg' },
       update: {},
       create: {
-        email: 'admin@avalon.bg',
+        id: randomUUID(),
         name: 'Admin',
+        email: 'admin@avalon.bg',
         password: hashedPassword,
         role: 'ADMIN',
       },
     });
 
-    console.log('Created admin user:', admin.email);
-
     // Seed regions
-    console.log('Seeding regions...');
     for (const region of regions) {
-      await prisma.$transaction([
-        prisma.$executeRaw`INSERT OR IGNORE INTO Region (id, name, createdAt, updatedAt) VALUES (${region.id}, ${region.name}, datetime('now'), datetime('now'))`
-      ]);
+      await prisma.region.upsert({
+        where: { id: region.id },
+        update: { name: region.name },
+        create: { id: region.id, name: region.name },
+      });
     }
 
     // Seed neighborhoods
-    console.log('Seeding neighborhoods...');
     for (const neighborhood of neighborhoods) {
-      await prisma.$transaction([
-        prisma.$executeRaw`INSERT OR IGNORE INTO Neighborhood (id, name, createdAt, updatedAt) VALUES (${neighborhood.id}, ${neighborhood.name}, datetime('now'), datetime('now'))`
-      ]);
+      await prisma.neighborhood.upsert({
+        where: { id: neighborhood.id },
+        update: { name: neighborhood.name },
+        create: { id: neighborhood.id, name: neighborhood.name },
+      });
     }
 
     // Seed features
-    console.log('Seeding features...');
-    const allFeatures = [...infrastructureFeatures, ...buildingFeatures];
-    for (const [index, feature] of allFeatures.entries()) {
-      await prisma.$transaction([
-        prisma.$executeRaw`INSERT OR IGNORE INTO Feature (id, name, type, createdAt, updatedAt) VALUES (${index + 1}, ${feature.name}, ${feature.type}, datetime('now'), datetime('now'))`
-      ]);
+    for (const feature of [...infrastructureFeatures, ...buildingFeatures]) {
+      await prisma.feature.upsert({
+        where: { id: feature.id },
+        update: { type: feature.type },
+        create: { id: feature.id, name: feature.name, type: feature.type },
+      });
     }
 
-    // Create sample properties
-    console.log('Creating sample properties...');
-    const sampleProperties = [
-      {
-        title: 'Магазин, кв. Възраждане, 267000 €',
-        description: 'Агенция за недвижими имоти АВАЛОН Ви представя магазин в кв. Възраждане. Имотът е с площ от 149 кв.м. и се намира на партерен етаж в тухлена сграда. Подходящ за всякакъв вид търговска дейност.',
-        price: 267000,
-        currency: 'EUR',
-        area_sqm: 149,
-        floor: 0,
-        total_floors: 1,
-        construction_type: 'BRICK',
-        furnishing: 'UNFURNISHED',
-        location_type: 'CITY',
-        neighborhoodId: 4,
-        has_regulation: false,
-        category: 'SALE',
-        type: 'COMMERCIAL',
-        featured: false,
+    // Generate and seed 100 random properties
+    const properties = generateRandomProperties(100);
+    for (const property of properties) {
+      const propertyData: Prisma.PropertyCreateInput = {
+        id: randomUUID(),
+        title: property.title,
+        description: property.description,
+        price: property.price,
+        currency: property.currency,
+        area_sqm: property.area_sqm,
+        floor: property.floor,
+        total_floors: property.total_floors,
+        construction_type: property.construction_type,
+        furnishing: property.furnishing,
+        location_type: property.location_type,
+        neighborhood: property.neighborhoodId ? { connect: { id: property.neighborhoodId } } : undefined,
+        region: property.regionId ? { connect: { id: property.regionId } } : undefined,
+        has_regulation: property.has_regulation,
+        category: property.category,
+        type: property.type,
+        featured: property.featured,
         contact_info: {
-          phone: '+359888123456',
-          email: 'office@avalon.bg'
-        }
-      },
-      {
-        title: 'Тристаен апартамент, кв. Дружба 3, 95000 €',
-        description: 'Просторен тристаен апартамент в кв. Дружба 3. Имотът е с площ от 85 кв.м. и се намира на 4-ти етаж в панелна сграда. Състои се от хол, две спални, кухня, баня с тоалетна и две тераси.',
-        price: 95000,
-        currency: 'EUR',
-        area_sqm: 85,
-        floor: 4,
-        total_floors: 8,
-        construction_type: 'PANEL',
-        furnishing: 'PARTIALLY_FURNISHED',
-        location_type: 'CITY',
-        neighborhoodId: 8,
-        has_regulation: false,
-        category: 'SALE',
-        type: 'APARTMENT',
-        featured: true,
-        contact_info: {
-          phone: '+359888123456',
-          email: 'office@avalon.bg'
-        }
-      },
-      {
-        title: 'Къща, с. Николово, 120000 €',
-        description: 'Двуетажна къща в с. Николово. Имотът е с площ от 180 кв.м. РЗП и двор от 1000 кв.м. Състои се от първи етаж с хол, кухня, баня с тоалетна и втори етаж с три спални и баня.',
-        price: 120000,
-        currency: 'EUR',
-        area_sqm: 180,
-        land_area_sqm: 1000,
-        floor: 2,
-        total_floors: 2,
-        construction_type: 'BRICK',
-        furnishing: 'FURNISHED',
-        location_type: 'REGION',
-        regionId: 48,
-        has_regulation: true,
-        category: 'SALE',
-        type: 'HOUSE',
-        featured: true,
-        contact_info: {
-          phone: '+359888123456',
-          email: 'office@avalon.bg'
-        }
-      },
-      {
-        title: 'Парцел, с. Басарбово, 25000 €',
-        description: 'Парцел в с. Басарбово с площ от 2000 кв.м. Имотът е с лице на главен път и е подходящ за жилищно строителство.',
-        price: 25000,
-        currency: 'EUR',
-        area_sqm: 2000,
-        location_type: 'REGION',
-        regionId: 12,
-        has_regulation: true,
-        category: 'SALE',
-        type: 'LAND',
-        featured: false,
-        contact_info: {
-          phone: '+359888123456',
-          email: 'office@avalon.bg'
-        }
-      }
-    ];
-
-    for (const propertyData of sampleProperties) {
-      const property = await prisma.property.create({
-        data: {
-          ...propertyData,
-          contact_info: {
-            create: propertyData.contact_info
+          create: {
+            id: randomUUID(),
+            phone: property.contact_info.phone,
+            email: property.contact_info.email
           }
         }
+      };
+
+      await prisma.property.create({
+        data: propertyData,
       });
-      console.log('Created property:', property.title);
     }
 
     console.log('Seeding completed successfully');
@@ -347,4 +365,11 @@ async function main() {
   }
 }
 
-main(); 
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  }); 
