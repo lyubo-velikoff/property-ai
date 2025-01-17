@@ -1,0 +1,21 @@
+- Improve pagination across the app. Have it as a shared component so might need to create a shared library package for it.
+
+
+- Edit property is not really working. Produces an error below. Can you investigate and fix it.
+
+{
+    "status": "error",
+    "message": "Invalid input data",
+    "code": "VALIDATION_ERROR",
+    "errors": {
+        "type": [
+            "Invalid enum value. Expected 'APARTMENT' | 'HOUSE' | 'VILLA' | 'OFFICE' | 'SHOP' | 'WAREHOUSE' | 'LAND', received 'COMMERCIAL'"
+        ],
+        "contact_info": [
+            "Expected object, received string"
+        ]
+    }
+}
+
+
+- So we have the CRUD operations in the admin panel. Would be nice whenever we do a create, edit, delete operation to have a toast message to inform the user of the operation status. Act as a designer and developer and produce a great toast notification. Alternatively you can install a third package library for that I don't mind it. The goal is to have the application look responsive and if there is a success, we want to see that message being displayed and whenever there is an error want to be notified about it.
