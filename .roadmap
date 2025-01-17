@@ -1,4 +1,4 @@
-- Improve pagination across the app. Have it as a shared component so might need to create a shared library package for it.
+- Improve pagination across the app. Have it as a shared component so might need to create a shared library package for it. Can you also make it so that whenever we go to the next page, the previous page is not being lost. Check if there are any broken unit tests after u come with a good pagination and if there is no tests, add some. We have existing unit tests across the aps/web.
 
 
 - Edit property is not really working. Produces an error below. Can you investigate and fix it.
