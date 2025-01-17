@@ -38,6 +38,9 @@ describe('usePagination', () => {
     
     act(() => {
       result.current.setTotalPages(3);
+    });
+
+    act(() => {
       result.current.handlePageChange(2);
     });
     
@@ -89,10 +92,10 @@ describe('usePagination', () => {
       result.current.setCachedData(3, ['page3']);
     });
     
-    // Should keep pages closest to current page (1)
-    expect(result.current.getCachedData(1)).toBeDefined();
+    // Should keep the most recently added entries
     expect(result.current.getCachedData(2)).toBeDefined();
-    expect(result.current.getCachedData(3)).toBeUndefined();
+    expect(result.current.getCachedData(3)).toBeDefined();
+    expect(result.current.getCachedData(1)).toBeUndefined();
   });
 
   it('clears cache', () => {

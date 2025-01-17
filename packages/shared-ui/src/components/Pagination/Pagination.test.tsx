@@ -22,7 +22,7 @@ describe('Pagination', () => {
     render(
       <Pagination currentPage={1} totalPages={3} onPageChange={() => {}} />
     );
-    const prevButton = screen.getByLabelText('Previous');
+    const prevButton = screen.getByLabelText('Предишна');
     expect(prevButton).toBeDisabled();
   });
 
@@ -30,7 +30,7 @@ describe('Pagination', () => {
     render(
       <Pagination currentPage={3} totalPages={3} onPageChange={() => {}} />
     );
-    const nextButton = screen.getByLabelText('Next');
+    const nextButton = screen.getByLabelText('Следваща');
     expect(nextButton).toBeDisabled();
   });
 
@@ -40,7 +40,7 @@ describe('Pagination', () => {
       <Pagination currentPage={1} totalPages={3} onPageChange={handlePageChange} />
     );
     
-    const nextButton = screen.getByLabelText('Next');
+    const nextButton = screen.getByLabelText('Следваща');
     fireEvent.click(nextButton);
     
     expect(handlePageChange).toHaveBeenCalledWith(2);
@@ -52,7 +52,7 @@ describe('Pagination', () => {
       <Pagination currentPage={2} totalPages={3} onPageChange={handlePageChange} />
     );
     
-    const prevButton = screen.getByLabelText('Previous');
+    const prevButton = screen.getByLabelText('Предишна');
     fireEvent.click(prevButton);
     
     expect(handlePageChange).toHaveBeenCalledWith(1);
@@ -68,22 +68,24 @@ describe('Pagination', () => {
       />
     );
     
-    expect(screen.getByText('Prev')).toBeInTheDocument();
-    expect(screen.getByText('Next')).toBeInTheDocument();
+    const prevButton = screen.getByLabelText('Prev');
+    const nextButton = screen.getByLabelText('Next');
+    expect(prevButton).toBeInTheDocument();
+    expect(nextButton).toBeInTheDocument();
   });
 
   it('displays custom page info text when provided', () => {
-    render(
+    const { container } = render(
       <Pagination
         currentPage={1}
         totalPages={3}
         onPageChange={() => {}}
-        pageInfoText={{ page: 'Страница', of: 'от' }}
+        pageInfoText={{ page: 'Page', of: 'of' }}
       />
     );
     
-    expect(screen.getByText('Страница')).toBeInTheDocument();
-    expect(screen.getByText('от')).toBeInTheDocument();
+    const pageInfo = container.querySelector('p');
+    expect(pageInfo).toHaveTextContent('Page 1 of 3');
   });
 
   it('hides page info when showPageInfo is false', () => {
@@ -96,7 +98,7 @@ describe('Pagination', () => {
       />
     );
     
-    expect(container.textContent).not.toContain('Page');
-    expect(container.textContent).not.toContain('of');
+    expect(container.textContent).not.toContain('Страница');
+    expect(container.textContent).not.toContain('от');
   });
 }); 
