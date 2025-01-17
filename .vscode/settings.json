@@ -18,5 +18,9 @@
     "titleBar.inactiveBackground": "#c58b2f99",
     "titleBar.inactiveForeground": "#15202b99"
   },
-  "peacock.color": "#c58b2f"
+  "peacock.color": "#c58b2f",
+  "apc.stylesheet": {
+    ".pane-body.aichat-pane": "background-color: #ff0000 !important",
+    "span": "font-family: Cascadia Code SemiBold; line-height: 3.5 !imporant;"
+  }
 }

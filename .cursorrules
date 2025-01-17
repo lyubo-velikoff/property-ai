@@ -2,6 +2,8 @@ Always start responses with 'Yo!' and a newline
 
 Always end responses with 'Yo end!' and a newline
 
+## Code file structure
+
 ├── .cursorrules
 ├── .gitignore
 ├── .nvmrc
