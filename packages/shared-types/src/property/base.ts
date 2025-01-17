@@ -41,6 +41,8 @@ export interface Property {
   images?: Image[];
   region_id?: number;
   neighborhood_id?: number;
+  region?: Location;
+  neighborhood?: Location;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ChevronLeftIcon, ChevronRightIcon, FunnelIcon } from '@heroicons/react/24/outline';
+import { FunnelIcon } from '@heroicons/react/24/outline';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { Pagination, usePagination } from '@avalon/shared-ui';
 import PropertyCard from '../components/properties/PropertyCard';
 import PropertyCardSkeleton from '../components/properties/PropertyCardSkeleton';
 import { getProperties } from '../services/propertyService';
-import type { Property, GetPropertiesParams, LocationType } from '@avalon/shared-types';
-import { propertyTypeLabels, locationTypeLabels, categoryLabels, locationTypes } from '../constants/property';
+import type { 
+  Property, 
+  GetPropertiesParams,
+  PropertyType,
+  PropertyCategory,
+  LocationType
+} from '@avalon/shared-types';
+import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../constants/property';
 
 declare module 'react-transition-group';
 
@@ -25,11 +32,38 @@ const regions = [
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+
+  const filters: GetPropertiesParams = {
+    type: (searchParams.get('type') as PropertyType) || undefined,
+    category: (searchParams.get('category') as PropertyCategory) || undefined,
+    location_type: (searchParams.get('location_type') as LocationType) || undefined,
+    min_price: searchParams.get('min_price') || undefined,
+    max_price: searchParams.get('max_price') || undefined
+  };
+
+  const {
+    data: properties,
+    currentPage,
+    totalPages,
+    isLoading,
+    error,
+    goToPage
+  } = usePagination<Property>({
+    pageSize: 9,
+    fetchData: async (page, pageSize) => {
+      const response = await getProperties(filters, page, pageSize);
+      return {
+        data: response.data,
+        totalPages: response.meta.totalPages
+      };
+    }
+  });
+
+  // Initial data fetch
+  useEffect(() => {
+    const page = Number(searchParams.get('page')) || 1;
+    goToPage(page);
+  }, [searchParams.toString()]);
 
   const handleFilterChange = (key: string, value: string | undefined) => {
     const newParams = new URLSearchParams(searchParams);
@@ -38,6 +72,7 @@ export default function Properties() {
     } else {
       newParams.delete(key);
     }
+    newParams.delete('page'); // Reset to first page when filters change
     setSearchParams(newParams);
   };
 
@@ -46,38 +81,6 @@ export default function Properties() {
     newParams.set('page', page.toString());
     setSearchParams(newParams);
   };
-
-  useEffect(() => {
-    const fetchProperties = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const filters: GetPropertiesParams = {};
-        const type = searchParams.get('type') || undefined;
-        const category = searchParams.get('category') || undefined;
-        const location_type = searchParams.get('location_type') || undefined;
-        const min_price = searchParams.get('min_price') || undefined;
-        const max_price = searchParams.get('max_price') || undefined;
-
-        if (type) filters.type = type as any;
-        if (category) filters.category = category as any;
-        if (location_type) filters.location_type = location_type as any;
-        if (min_price) filters.min_price = min_price;
-        if (max_price) filters.max_price = max_price;
-
-        const response = await getProperties(filters, currentPage);
-        setProperties(response.data);
-        setTotalPages(response.meta.totalPages);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to fetch properties');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProperties();
-  }, [searchParams, currentPage]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[rgb(var(--color-dark-bg))]">
@@ -180,9 +183,9 @@ export default function Properties() {
             </div>
           ) : error ? (
             <div className="text-center">
-              <p className="text-red-600 dark:text-red-400">{error}</p>
+              <p className="text-red-600 dark:text-red-400">{error.message}</p>
             </div>
-          ) : properties.length ? (
+          ) : properties?.length ? (
             <div>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <TransitionGroup component={null}>
@@ -195,50 +198,11 @@ export default function Properties() {
               </div>
 
               <div className="mt-8">
-                <div className="flex justify-between flex-1 sm:hidden">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="btn btn-secondary"
-                  >
-                    Предишна
-                  </button>
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="btn btn-secondary"
-                  >
-                    Следваща
-                  </button>
-                </div>
-                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700 dark:text-[rgb(var(--color-dark-text))]">
-                      Страница <span className="font-medium">{currentPage}</span> от{' '}
-                      <span className="font-medium">{totalPages}</span>
-                    </p>
-                  </div>
-                  <div>
-                    <nav className="inline-flex -space-x-px rounded-md shadow-sm isolate" aria-label="Pagination">
-                      <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 dark:text-gray-500 ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))] focus:z-20 focus:outline-offset-0 disabled:opacity-50"
-                      >
-                        <span className="sr-only">Предишна</span>
-                        <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
-                      </button>
-                      <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 dark:text-gray-500 ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))] focus:z-20 focus:outline-offset-0 disabled:opacity-50"
-                      >
-                        <span className="sr-only">Следваща</span>
-                        <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
-                      </button>
-                    </nav>
-                  </div>
-                </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               </div>
             </div>
           ) : (

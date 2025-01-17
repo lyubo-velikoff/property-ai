@@ -1,9 +1,10 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { PencilIcon, TrashIcon, PlusIcon, ArrowLeftIcon, MagnifyingGlassIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { PencilIcon, TrashIcon, PlusIcon, ArrowLeftIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { Pagination, usePagination } from '@avalon/shared-ui';
 import { getProperties, deleteProperty } from '../../services/propertyService';
-import type { GetPropertiesParams } from '@avalon/shared-types';
+import type { Property, GetPropertiesParams } from '@avalon/shared-types';
 import { event } from '../../lib/analytics';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { propertyTypeLabels, locationTypeLabels, categoryLabels, currencyLabels } from '../../constants/property';
@@ -16,20 +17,36 @@ function formatPrice(price: number) {
 }
 
 export default function Properties() {
-  const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 300);
   const queryClient = useQueryClient();
 
-  const filters = useMemo<GetPropertiesParams>(() => ({}), []);
+  const filters = useMemo<GetPropertiesParams>(() => ({
+    search: debouncedSearch || undefined
+  }), [debouncedSearch]);
 
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['properties', currentPage],
-    queryFn: () => getProperties(filters, currentPage),
+  const {
+    data: properties,
+    currentPage,
+    totalPages,
+    isLoading: paginationLoading,
+    error: paginationError,
+    goToPage
+  } = usePagination<Property>({
+    pageSize: 10,
+    fetchData: async (page, pageSize) => {
+      const response = await getProperties(filters, page);
+      return {
+        data: response.data,
+        totalPages: response.meta.totalPages
+      };
+    }
   });
 
-  const properties = data?.data || [];
-  const totalPages = data?.meta.totalPages || 1;
+  // Refetch when search changes
+  useEffect(() => {
+    goToPage(1);
+  }, [debouncedSearch]);
 
   const deleteMutation = useMutation({
     mutationFn: deleteProperty,
@@ -78,17 +95,17 @@ export default function Properties() {
           </div>
         </div>
 
-        {isLoading ? (
+        {paginationLoading ? (
           <div className="flex justify-center items-center min-h-[400px]">
             <LoadingSpinner />
           </div>
-        ) : error ? (
+        ) : paginationError ? (
           <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
             <p className="mb-4 text-center text-red-600">
-              {error instanceof Error ? error.message : 'Възникна грешка при зареждането на имотите'}
+              {paginationError instanceof Error ? paginationError.message : 'Възникна грешка при зареждането на имотите'}
             </p>
             <button
-              onClick={() => refetch()}
+              onClick={() => goToPage(currentPage)}
               className="px-4 py-2 text-white bg-red-600 rounded transition-colors hover:bg-red-700"
             >
               Опитайте отново
@@ -132,7 +149,7 @@ export default function Properties() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-[rgb(var(--color-dark-border))] bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))]">
-                  {properties.map((property) => (
+                  {properties.map((property: Property) => (
                     <tr key={property.id}>
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                         <div className="h-10 w-10 flex-shrink-0">
@@ -190,51 +207,12 @@ export default function Properties() {
         )}
 
         {totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-between border-t border-gray-200 dark:border-[rgb(var(--color-dark-border))] pt-4">
-            <div className="flex flex-1 justify-between sm:hidden">
-              <button
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="relative inline-flex items-center rounded-md border border-gray-300 dark:border-[rgb(var(--color-dark-border))] bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] px-4 py-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))]"
-              >
-                Предишна
-              </button>
-              <button
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-[rgb(var(--color-dark-border))] bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] px-4 py-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))]"
-              >
-                Следваща
-              </button>
-            </div>
-            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
-                  Показване на страница <span className="font-medium">{currentPage}</span> от{' '}
-                  <span className="font-medium">{totalPages}</span>
-                </p>
-              </div>
-              <div>
-                <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                  <button
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 dark:text-[rgb(var(--color-dark-text-secondary))] ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))] focus:z-20 focus:outline-offset-0"
-                  >
-                    <span className="sr-only">Предишна</span>
-                    <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
-                  </button>
-                  <button
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 dark:text-[rgb(var(--color-dark-text-secondary))] ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))] focus:z-20 focus:outline-offset-0"
-                  >
-                    <span className="sr-only">Следваща</span>
-                    <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
-                  </button>
-                </nav>
-              </div>
-            </div>
+          <div className="mt-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={goToPage}
+            />
           </div>
         )}
       </div>

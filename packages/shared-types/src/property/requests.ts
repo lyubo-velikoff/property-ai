@@ -19,4 +19,5 @@ export interface GetPropertiesParams {
   construction_type?: ConstructionType;
   furnishing?: FurnishingType;
   featured?: string;
+  search?: string;
 } 

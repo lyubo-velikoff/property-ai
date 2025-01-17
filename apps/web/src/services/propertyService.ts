@@ -31,6 +31,7 @@ export async function getProperties(
   if (filters.construction_type) params.append('construction_type', filters.construction_type);
   if (filters.furnishing) params.append('furnishing', filters.furnishing);
   if (filters.featured) params.append('featured', filters.featured.toString());
+  if (filters.search) params.append('search', filters.search);
   
   // Add pagination params
   params.append('page', page.toString());

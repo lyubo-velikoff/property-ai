@@ -1,17 +1,5 @@
 import api from '../lib/api';
-import type { User } from '@avalon/shared-types';
-
-// The shape of data returned by the API
-interface UsersResponse {
-  users: User[];
-  total: number;
-  page: number;
-  pages: number;
-}
-
-interface UserResponse {
-  user: User;
-}
+import type { User, UsersResponse, UserResponse } from '@avalon/shared-types';
 
 export async function getUsers(page: number, limit: number) {
   // The axios interceptor transforms response to be the data property from the API response
