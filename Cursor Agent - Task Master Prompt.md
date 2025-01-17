@@ -1,5 +1,5 @@
 # User Input:
-[TASK]: Now that we have updated the shared types in the web, I want to make sure that the web app is working as expected. Could you perform a full test of the web app and make sure that it is working as expected. Additionally, I want to make sure that the admin page is working as expected. I want you to also periodically check if you can compile the web and server apps and read the logs to make sure that everything is working as expected and you can resolve any issues.
+[TASK]: We need to fix the pagination component styling. I have attached a screenshot of the current state of the pagination component. Using the styles in index.css, fix the styling of the pagination component by updating the shared component to use the necessary css variables
 [PROJECT OVERVIEW]: .cursorrules
 [MAIN BRANCH]: master
 [YOLO MODE]: on

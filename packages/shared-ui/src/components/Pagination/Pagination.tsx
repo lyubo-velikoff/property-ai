@@ -8,7 +8,10 @@ function classNames(...classes: string[]) {
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,
   totalPages,
-  onPageChange
+  onPageChange,
+  buttonLabels = { previous: 'Предишна', next: 'Следваща' },
+  pageInfoText = { page: 'Страница', of: 'от' },
+  showPageInfo = true
 }) => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   let displayedPages = pages;
@@ -35,23 +38,31 @@ export const Pagination: React.FC<PaginationProps> = ({
     }
   }
 
+  if (totalPages <= 1) return null;
+
   return (
-    <nav className="flex justify-between items-center px-4 py-3 bg-white border-t border-gray-200 dark:border-gray-700 dark:bg-gray-800 sm:px-6" aria-label="Pagination">
-      <div className="hidden sm:block">
-        <p className="text-sm text-gray-700 dark:text-gray-300">
-          Showing page <span className="font-medium">{currentPage}</span> of{' '}
-          <span className="font-medium">{totalPages}</span>
-        </p>
-      </div>
-      <div className="flex flex-1 justify-between sm:justify-end">
+    <nav className="flex justify-between items-center px-4 py-3 bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] border-t border-gray-200 dark:border-[rgb(var(--color-dark-border))] sm:px-6" aria-label="Pagination">
+      {showPageInfo && (
+        <div className="hidden sm:block">
+          <p className="text-sm text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+            {pageInfoText.page} <span className="font-medium">{currentPage}</span> {pageInfoText.of}{' '}
+            <span className="font-medium">{totalPages}</span>
+          </p>
+        </div>
+      )}
+      <div className={classNames(
+        'flex flex-1 justify-between',
+        showPageInfo ? 'sm:justify-end' : 'sm:justify-center'
+      )}>
         <div className="flex items-center">
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="inline-flex relative items-center px-2 py-2 text-gray-400 rounded-l-md ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+            className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 dark:text-[rgb(var(--color-dark-text-secondary))] ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))] focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+            aria-label={buttonLabels.previous}
           >
-            <span className="sr-only">Previous</span>
-            <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
+            <span className="sr-only">{buttonLabels.previous}</span>
+            <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
           </button>
 
           <div className="hidden sm:flex">
@@ -60,7 +71,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                 return (
                   <span
                     key={`ellipsis-${index}`}
-                    className="inline-flex relative items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 dark:text-gray-300 dark:ring-gray-600 focus:outline-offset-0"
+                    className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))] ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] focus:outline-offset-0"
                   >
                     ...
                   </span>
@@ -74,8 +85,8 @@ export const Pagination: React.FC<PaginationProps> = ({
                   className={classNames(
                     'relative inline-flex items-center px-4 py-2 text-sm font-semibold focus:z-20 focus:outline-offset-0',
                     currentPage === page
-                      ? 'z-10 bg-primary-600 dark:bg-primary-500 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600'
-                      : 'text-gray-900 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-offset-0'
+                      ? 'z-10 bg-[rgb(var(--color-primary-600))] text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--color-primary-600))]'
+                      : 'text-gray-900 dark:text-[rgb(var(--color-dark-text))] ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))] focus:outline-offset-0'
                   )}
                 >
                   {page}
@@ -87,10 +98,11 @@ export const Pagination: React.FC<PaginationProps> = ({
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="inline-flex relative items-center px-2 py-2 text-gray-400 rounded-r-md ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+            className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 dark:text-[rgb(var(--color-dark-text-secondary))] ring-1 ring-inset ring-gray-300 dark:ring-[rgb(var(--color-dark-border))] hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-bg))] focus:z-20 focus:outline-offset-0 disabled:opacity-50"
+            aria-label={buttonLabels.next}
           >
-            <span className="sr-only">Next</span>
-            <ChevronRightIcon className="w-5 h-5" aria-hidden="true" />
+            <span className="sr-only">{buttonLabels.next}</span>
+            <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
       </div>
