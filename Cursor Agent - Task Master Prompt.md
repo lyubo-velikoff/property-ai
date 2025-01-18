@@ -250,7 +250,8 @@ Blockers: [Any issues encountered, if any]
 ---
 
 # User Input:
-[TASK]: Can you update turbo to latest stable version as well as prisma to latest stable version? Before you do that, can you evaluate if there are any breaking changes that we should be aware of?
+[TASK]: Filter functionality in the apps/web app does not seem to be working.
+http://localhost:5173/properties?type=INDUSTRIAL&category=RENT&location_type=VILLAGE this is an example parameters that get updated in the url. As a safety measure, can you double check the current api types we are using in the web project against the api project located in apps/api. They might be a bit out of date but make sure you don't update api types.
 [PROJECT OVERVIEW]: https://docs.google.com/document/d/1XyYaTE6ra2k4uzrQX62D8xqG1XZ8DMxW5ztA6AYTQ4M/edit?usp=sharing
 [MAIN BRANCH]: master
 [YOLO MODE]: on
