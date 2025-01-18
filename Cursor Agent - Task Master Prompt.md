@@ -250,8 +250,7 @@ Blockers: [Any issues encountered, if any]
 ---
 
 # User Input:
-[TASK]: Filter functionality in the apps/web app does not seem to be working.
-http://localhost:5173/properties?type=INDUSTRIAL&category=RENT&location_type=VILLAGE this is an example parameters that get updated in the url. As a safety measure, can you double check the current api types we are using in the web project against the api project located in apps/api. They might be a bit out of date but make sure you don't update api types.
+[TASK]: Can you provide an automated erd for the database schema?
 [PROJECT OVERVIEW]: https://docs.google.com/document/d/1XyYaTE6ra2k4uzrQX62D8xqG1XZ8DMxW5ztA6AYTQ4M/edit?usp=sharing
 [MAIN BRANCH]: master
 [YOLO MODE]: on
