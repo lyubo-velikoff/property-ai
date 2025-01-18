@@ -1,39 +1,21 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": ["**/.env"],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build", "prisma:generate"],
+      "dependsOn": ["^build"],
       "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
     },
     "lint": {
       "outputs": []
     },
     "dev": {
-      "dependsOn": ["^build", "prisma:generate"],
       "cache": false,
-      "persistent": true,
-      "dotEnv": [
-        ".env.local",
-        ".env.development.local",
-        ".env.development",
-        ".env"
-      ]
-    },
-    "clean": {
-      "cache": false
-    },
-    "prisma:generate": {
-      "cache": false
-    },
-    "prisma:migrate": {
-      "cache": false
-    },
-    "prisma:studio": {
-      "cache": false
-    },
-    "prisma:seed": {
-      "cache": false
+      "persistent": true
     }
   }
 }
