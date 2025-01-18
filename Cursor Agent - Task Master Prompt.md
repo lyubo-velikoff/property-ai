@@ -224,7 +224,7 @@ Blockers: [Any issues encountered, if any]
 
 # Placeholder Definitions:
 
-[ Explanation of the placeholders used thoughout the prompt ]
+[ Explanation of the placeholders used throughout the prompt ]
 
 - [TASK]: The specific task or issue being addressed (e.g., "fix-cache-manager")
 - [TASK_IDENTIFIER]: A unique, human-readable identifier for the task (e.g., "fix-cache-manager")
