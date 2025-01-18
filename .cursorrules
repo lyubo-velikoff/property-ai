@@ -9,6 +9,20 @@
    - `shared-ui/`: Reusable UI components (including the recently updated Pagination component)
    - `shared-types/`: Common TypeScript type definitions
 
+**Database Structure**:
+- ORM: Prisma with SQLite
+- ERD Location: `apps/api/prisma/ERD.svg`
+- Key Models:
+  1. User (auth & authorization)
+  2. Property (main listing entity)
+  3. Region/Neighborhood (location hierarchy)
+  4. Feature/PropertyFeature (amenities, m2m)
+  5. Image (property photos)
+  6. ContactInfo (property contact)
+  7. ContactMessage (inquiries)
+- Schema: `apps/api/prisma/schema.prisma`
+- ERD Generation: `npx prisma-uml ./prisma/schema.prisma --output svg --file ./prisma/ERD.svg`
+
 **Tech Stack**:
 - Frontend:
   - React + TypeScript

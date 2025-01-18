@@ -254,3 +254,22 @@ Blockers: [Any issues encountered, if any]
 [PROJECT OVERVIEW]: https://docs.google.com/document/d/1XyYaTE6ra2k4uzrQX62D8xqG1XZ8DMxW5ztA6AYTQ4M/edit?usp=sharing
 [MAIN BRANCH]: master
 [YOLO MODE]: on
+
+# Database Documentation
+The project uses Prisma ORM with SQLite. The database schema is documented with an ERD diagram:
+- Location: `apps/api/prisma/ERD.svg`
+- Format: SVG (viewable in any browser)
+- Generation: Run `npx prisma-uml ./prisma/schema.prisma --output svg --file ./prisma/ERD.svg`
+
+Key Database Models:
+1. User - Authentication and authorization
+2. Property - Main property listing entity
+3. Region/Neighborhood - Location grouping
+4. Feature/PropertyFeature - Property amenities (many-to-many)
+5. Image - Property images
+6. ContactInfo - Property contact details
+7. ContactMessage - User inquiries
+
+All models include standard fields:
+- ID (String @id @default(cuid()) or Int @id @autoincrement())
+- Timestamps (createdAt, updatedAt)
