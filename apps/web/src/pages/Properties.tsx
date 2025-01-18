@@ -34,9 +34,9 @@ export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filters: GetPropertiesParams = {
-    type: (searchParams.get('type') as PropertyType) || undefined,
-    category: (searchParams.get('category') as PropertyCategory) || undefined,
-    location_type: (searchParams.get('location_type') as LocationType) || undefined,
+    type: (searchParams.get('type')?.toUpperCase() as PropertyType) || undefined,
+    category: (searchParams.get('category')?.toUpperCase() as PropertyCategory) || undefined,
+    location_type: (searchParams.get('location_type')?.toUpperCase() as LocationType) || undefined,
     min_price: searchParams.get('min_price') || undefined,
     max_price: searchParams.get('max_price') || undefined
   };
@@ -68,12 +68,13 @@ export default function Properties() {
   const handleFilterChange = (key: string, value: string | undefined) => {
     const newParams = new URLSearchParams(searchParams);
     if (value) {
-      newParams.set(key, value);
+      newParams.set(key, value.toUpperCase());
     } else {
       newParams.delete(key);
     }
     newParams.delete('page'); // Reset to first page when filters change
     setSearchParams(newParams);
+    goToPage(1); // Force a refetch when filters change
   };
 
   const handlePageChange = (page: number) => {

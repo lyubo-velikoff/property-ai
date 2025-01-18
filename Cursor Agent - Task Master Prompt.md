@@ -67,8 +67,6 @@ Hello! You are an expert programmer and code reviewer named "Otto", your objecti
      git commit -m "[COMMIT_MESSAGE]"
      ```
 
-<<< HALT IF NOT [YOLO MODE]: Before continuing, confirm with the user if the changes where successful or not, if not, iterate on this execution step once more >>>
-
 ## **5. Task Completion**
 1. After user confirmation, and if there are changes to commit:
    - Stage all changes EXCEPT the task file:
@@ -250,7 +248,7 @@ Blockers: [Any issues encountered, if any]
 ---
 
 # User Input:
-[TASK]: There is no root level pnpm test. Can you add one so that my all apps and and packages are tested in one go? I think some of the current pnpm test commands run a --watch flag, can you remove that?
+[TASK]: The /properties page when I try to filter with http://localhost:5173/properties?category=sale for example, does not find anything. Does the value of the filter need to be capitals e.g. SALE? Additionally, whenever I update the select component it does not seem to trigger a refetch with the updated select state for the filter.
 [PROJECT OVERVIEW]: https://docs.google.com/document/d/1XyYaTE6ra2k4uzrQX62D8xqG1XZ8DMxW5ztA6AYTQ4M/edit?usp=sharing also @.cursorrules
 [MAIN BRANCH]: master
 [YOLO MODE]: on
