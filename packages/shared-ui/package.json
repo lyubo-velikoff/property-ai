@@ -9,7 +9,8 @@
     "build": "tsc && vite build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "clean": "rm -rf dist .turbo node_modules"
   },
   "dependencies": {
     "@heroicons/react": "^2.0.18",

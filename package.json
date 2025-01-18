@@ -7,7 +7,9 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "clean": "turbo run clean && rm -rf node_modules **/node_modules",
+    "clean:build": "pnpm clean && pnpm install && pnpm build"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.19.0",

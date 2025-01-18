@@ -7,13 +7,15 @@
     "dev": "tsup src/index.ts --watch --onSuccess \"node dist/index.js\"",
     "build": "tsup src/index.ts --minify",
     "start": "node dist/index.js",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist .turbo node_modules",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx prisma/seed.ts",
     "fix:categories": "tsx scripts/fix-property-categories.ts",
-    "test": "cross-env NODE_ENV=test jest"
+    "test": "cross-env NODE_ENV=test jest",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@avalon/shared-types": "workspace:*",
