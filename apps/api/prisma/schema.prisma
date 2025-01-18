@@ -2,10 +2,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator dbml {
-  provider = "prisma-dbml-generator"
-  output   = "./ERD"
-  outputName = "ERD"
+generator uml {
+  provider = "prisma-uml"
+  output   = "./ERD.svg"
+  theme    = "default"
+  format   = "svg"
 }
 
 datasource db {
