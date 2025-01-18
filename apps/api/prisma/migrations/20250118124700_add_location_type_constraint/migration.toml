@@ -1,0 +1,5 @@
+# Migration: Add location_type constraint
+# Description: Adds a check constraint to enforce valid location_type values
+
+migration_name = "20250118124700_add_location_type_constraint"
+checksum = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" 

@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import app from '../../server';
 import prisma from '../../lib/prisma';
 import jwt from 'jsonwebtoken';
-import { PropertyType, PropertyCategory, Currency, LocationType, type UserRole } from '@avalon/shared-types';
+import type { PropertyType, PropertyCategory, Currency, LocationType, UserRole, ConstructionType, FurnishingType } from '@avalon/shared-types';
 
 describe('Property Routes', () => {
   let adminToken: string;
@@ -69,11 +69,13 @@ describe('Property Routes', () => {
         title: 'Test Property',
         description: 'A test property description',
         price: 200000,
-        currency: Currency.USD,
+        currency: 'USD' as Currency,
         area_sqm: 120,
-        type: PropertyType.APARTMENT,
-        category: PropertyCategory.SALE,
-        location_type: LocationType.CITY,
+        type: 'APARTMENT' as PropertyType,
+        category: 'SALE' as PropertyCategory,
+        location_type: 'CITY' as LocationType,
+        construction_type: 'BRICK' as ConstructionType,
+        furnishing: 'UNFURNISHED' as FurnishingType,
         contact_info: {
           phone: '+1234567890',
           email: 'contact@test.com'
@@ -91,6 +93,8 @@ describe('Property Routes', () => {
         .field('type', propertyData.type)
         .field('category', propertyData.category)
         .field('location_type', propertyData.location_type)
+        .field('construction_type', propertyData.construction_type)
+        .field('furnishing', propertyData.furnishing)
         .field('contact_info', JSON.stringify(propertyData.contact_info))
         .expect(201);
 
@@ -105,11 +109,13 @@ describe('Property Routes', () => {
         title: 'Test Property',
         description: 'A test property description',
         price: 200000,
-        currency: Currency.USD,
+        currency: 'USD' as Currency,
         area_sqm: 120,
-        type: PropertyType.APARTMENT,
-        category: PropertyCategory.SALE,
-        location_type: LocationType.CITY,
+        type: 'APARTMENT' as PropertyType,
+        category: 'SALE' as PropertyCategory,
+        location_type: 'CITY' as LocationType,
+        construction_type: 'BRICK' as ConstructionType,
+        furnishing: 'UNFURNISHED' as FurnishingType,
         contact_info: {
           phone: '+1234567890',
           email: 'contact@test.com'
@@ -126,6 +132,8 @@ describe('Property Routes', () => {
         .field('type', propertyData.type)
         .field('category', propertyData.category)
         .field('location_type', propertyData.location_type)
+        .field('construction_type', propertyData.construction_type)
+        .field('furnishing', propertyData.furnishing)
         .field('contact_info', JSON.stringify(propertyData.contact_info))
         .expect(401);
     });

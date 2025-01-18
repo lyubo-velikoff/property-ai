@@ -54,6 +54,8 @@ model Property {
   total_floors     Int?
   construction_type String?
   furnishing       String?
+  /// Valid values: 'CITY', 'SUBURB', 'VILLAGE', 'SEASIDE', 'MOUNTAIN'
+  /// @see packages/shared-types/src/property/enums.ts
   location_type    String            @default("CITY")
   region           Region?           @relation(fields: [regionId], references: [id])
   regionId         Int?
