@@ -3,6 +3,7 @@ import { z } from 'zod';
 import prisma from '../lib/prisma';
 import { protect, restrictTo } from '../middleware/auth';
 import { AppError } from '../middleware/error';
+import { USER_ROLES } from '../constants/roles';
 import { 
   ApiSuccessResponse, 
   ApiErrorResponse,
@@ -30,7 +31,7 @@ const locationSchema = z.object({
 
 const featureSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  type: z.nativeEnum(FeatureType),
+  type: z.enum(['INFRASTRUCTURE', 'BUILDING'] as const),
 }) satisfies z.ZodType<CreateFeatureInput>;
 
 const handleError = (error: unknown, res: Response) => {
@@ -143,7 +144,7 @@ router.get('/features', protect, async (req, res: Response, next) => {
 });
 
 // Create region (admin only)
-router.post('/regions', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.post('/regions', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response, next) => {
   try {
     const { name } = locationSchema.parse(req.body);
 
@@ -163,7 +164,7 @@ router.post('/regions', protect, restrictTo(UserRole.ADMIN), async (req, res: Re
 });
 
 // Create neighborhood (admin only)
-router.post('/neighborhoods', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.post('/neighborhoods', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response, next) => {
   try {
     const { name } = locationSchema.parse(req.body);
 
@@ -183,7 +184,7 @@ router.post('/neighborhoods', protect, restrictTo(UserRole.ADMIN), async (req, r
 });
 
 // Create feature (admin only)
-router.post('/features', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.post('/features', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response, next) => {
   try {
     const { name, type } = featureSchema.parse(req.body);
 
@@ -206,7 +207,7 @@ router.post('/features', protect, restrictTo(UserRole.ADMIN), async (req, res: R
 });
 
 // Update region (admin only)
-router.patch('/regions/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.patch('/regions/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response, next) => {
   try {
     const data = locationSchema.partial().parse(req.body);
 
@@ -227,7 +228,7 @@ router.patch('/regions/:id', protect, restrictTo(UserRole.ADMIN), async (req, re
 });
 
 // Update neighborhood (admin only)
-router.patch('/neighborhoods/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.patch('/neighborhoods/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response, next) => {
   try {
     const data = locationSchema.partial().parse(req.body);
 
@@ -248,7 +249,7 @@ router.patch('/neighborhoods/:id', protect, restrictTo(UserRole.ADMIN), async (r
 });
 
 // Update feature (admin only)
-router.patch('/features/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.patch('/features/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response, next) => {
   try {
     const data = featureSchema.partial().parse(req.body);
 
@@ -272,7 +273,7 @@ router.patch('/features/:id', protect, restrictTo(UserRole.ADMIN), async (req, r
 });
 
 // Delete region (admin only)
-router.delete('/regions/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.delete('/regions/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response, next) => {
   try {
     await prisma.region.delete({
       where: { id: parseInt(req.params.id) },
@@ -288,7 +289,7 @@ router.delete('/regions/:id', protect, restrictTo(UserRole.ADMIN), async (req, r
 });
 
 // Delete neighborhood (admin only)
-router.delete('/neighborhoods/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.delete('/neighborhoods/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response, next) => {
   try {
     await prisma.neighborhood.delete({
       where: { id: parseInt(req.params.id) },
@@ -304,7 +305,7 @@ router.delete('/neighborhoods/:id', protect, restrictTo(UserRole.ADMIN), async (
 });
 
 // Delete feature (admin only)
-router.delete('/features/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response, next) => {
+router.delete('/features/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response, next) => {
   try {
     await prisma.feature.delete({
       where: { id: parseInt(req.params.id) },

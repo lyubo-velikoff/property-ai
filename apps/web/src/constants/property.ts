@@ -1,14 +1,15 @@
 export const constructionTypes = [
   { value: 'BRICK', label: 'Тухла' },
-  { value: 'EPK', label: 'ЕПК' },
-  { value: 'PK', label: 'ПК' },
   { value: 'PANEL', label: 'Панел' },
-  { value: 'WOOD_FLOOR', label: 'Дървен гредоред' },
+  { value: 'EPK', label: 'ЕПК' },
+  { value: 'CONCRETE', label: 'Бетон' },
+  { value: 'STEEL', label: 'Метал' },
+  { value: 'WOOD', label: 'Дървена' },
 ] as const;
 
 export const furnishingTypes = [
-  { value: 'FURNISHED', label: 'Обзаведен' },
-  { value: 'PARTIALLY_FURNISHED', label: 'Частично обзаведен' },
+  { value: 'FULLY_FURNISHED', label: 'Обзаведен' },
+  { value: 'SEMI_FURNISHED', label: 'Частично обзаведен' },
   { value: 'UNFURNISHED', label: 'Необзаведен' },
 ] as const;
 
@@ -16,13 +17,16 @@ export const propertyTypes = [
   { value: 'APARTMENT', label: 'Апартамент' },
   { value: 'HOUSE', label: 'Къща' },
   { value: 'PLOT', label: 'Парцел' },
-  { value: 'COMMERCIAL', label: 'Търговски имот' },
-  { value: 'INDUSTRIAL', label: 'Индустриален имот' },
+  { value: 'COMMERCIAL', label: 'Магазин' },
+  { value: 'INDUSTRIAL', label: 'Склад' },
 ] as const;
 
 export const locationTypes = [
   { value: 'CITY', label: 'Град' },
-  { value: 'REGION', label: 'Регион' },
+  { value: 'SUBURB', label: 'Квартал' },
+  { value: 'VILLAGE', label: 'Село' },
+  { value: 'SEASIDE', label: 'Море' },
+  { value: 'MOUNTAIN', label: 'Планина' },
 ] as const;
 
 export const categories = [
@@ -33,6 +37,7 @@ export const categories = [
 export const currencies = [
   { value: 'BGN', label: 'лв.' },
   { value: 'EUR', label: '€' },
+  { value: 'USD', label: '$' },
 ] as const;
 
 // Label mappings for direct access

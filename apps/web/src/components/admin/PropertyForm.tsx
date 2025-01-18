@@ -1,60 +1,95 @@
 import { useState, useEffect } from 'react';
-import type { CreatePropertyData, Property } from '../../types/api';
+import type { 
+  CreatePropertyInput, 
+  Property,
+  ConstructionType,
+  FurnishingType,
+  LocationType,
+  PropertyCategory,
+  PropertyType,
+  Currency
+} from '@avalon/shared-types';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useQuery } from '@tanstack/react-query';
 import { getRegions, getNeighborhoods, getFeatures } from '../../services/locationService';
-import { constructionTypes, furnishingTypes, propertyTypes, locationTypes, categories, currencies } from '../../constants/property';
+import { 
+  constructionTypes, 
+  furnishingTypes, 
+  propertyTypes, 
+  locationTypes, 
+  categories, 
+  currencies 
+} from '../../constants/property';
+
+interface PropertyFeature {
+  featureId: number;
+}
+
+interface PropertyWithFeatures extends Property {
+  features?: PropertyFeature[];
+}
 
 interface PropertyFormProps {
-  initialData?: Property;
-  onSubmit: (data: CreatePropertyData, images: File[]) => Promise<void>;
+  initialData?: PropertyWithFeatures;
+  onSubmit: (data: CreatePropertyInput & { features?: number[] }, images: File[]) => Promise<void>;
   isSubmitting?: boolean;
   onCancel?: () => void;
   submitLabel?: string;
 }
 
-export default function PropertyForm({
-  initialData,
-  onSubmit,
-  isSubmitting = false,
-  onCancel,
-  submitLabel = 'Запази'
-}: PropertyFormProps) {
-  // Prepare initial data by converting Property type to CreatePropertyData type
-  const prepareInitialData = (data?: Property): Partial<CreatePropertyData> => {
-    if (!data) return {};
-    const { id, createdAt, updatedAt, features, ...rest } = data;
-    return {
-      ...rest,
-      features: features?.map(f => f.featureId),
+export default function PropertyForm({ initialData, onSubmit, isSubmitting, onCancel, submitLabel }: PropertyFormProps) {
+  const prepareInitialData = (data?: PropertyWithFeatures): CreatePropertyInput => {
+    if (!data) {
+      return {
+        title: '',
+        description: '',
+        price: 0,
+        currency: 'BGN' as Currency,
+        area_sqm: 0,
+        location_type: 'CITY' as LocationType,
+        category: 'SALE' as PropertyCategory,
+        type: 'APARTMENT' as PropertyType,
+        contact_info: {
+          phone: '',
+          email: ''
+        }
+      };
+    }
+
+    const { id, createdAt, updatedAt, features, region, neighborhood, images, contact_info, ...rest } = data;
+
+    // Map old enum values to new ones
+    const mappedData: CreatePropertyInput = {
+      title: rest.title,
+      description: rest.description,
+      price: rest.price,
+      currency: rest.currency as Currency,
+      area_sqm: rest.area_sqm,
+      floor: rest.floor,
+      region_id: region?.id,
+      neighborhood_id: neighborhood?.id,
+      construction_type: (rest.construction_type as string) === 'WOOD_FLOOR' ? 'WOOD' as ConstructionType : 
+                       rest.construction_type as ConstructionType | undefined,
+      furnishing: (rest.furnishing as string) === 'FURNISHED' ? 'FULLY_FURNISHED' as FurnishingType : 
+                 (rest.furnishing as string) === 'PARTIALLY_FURNISHED' ? 'SEMI_FURNISHED' as FurnishingType : 
+                 rest.furnishing as FurnishingType | undefined,
+      type: (rest.type as string) === 'SHOP' ? 'COMMERCIAL' as PropertyType :
+            (rest.type as string) === 'WAREHOUSE' ? 'INDUSTRIAL' as PropertyType :
+            (rest.type as string) === 'LAND' ? 'PLOT' as PropertyType :
+            rest.type as PropertyType,
+      location_type: rest.location_type as LocationType,
+      category: rest.category as PropertyCategory,
+      featured: rest.featured,
+      contact_info: {
+        phone: contact_info?.phone || '',
+        email: contact_info?.email || ''
+      }
     };
+
+    return mappedData;
   };
 
-  const [data, setData] = useState<CreatePropertyData>({
-    title: '',
-    description: '',
-    price: 0,
-    currency: 'BGN',
-    area_sqm: 0,
-    land_area_sqm: undefined,
-    floor: undefined,
-    total_floors: undefined,
-    construction_type: undefined,
-    furnishing: undefined,
-    location_type: 'CITY',
-    regionId: undefined,
-    neighborhoodId: undefined,
-    has_regulation: false,
-    category: 'SALE',
-    type: 'APARTMENT',
-    featured: false,
-    contact_info: {
-      phone: '',
-      email: '',
-    },
-    ...prepareInitialData(initialData),
-  });
-
+  const [data, setData] = useState<CreatePropertyInput>(() => prepareInitialData(initialData));
   const [images, setImages] = useState<File[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedFeatures, setSelectedFeatures] = useState<number[]>(
@@ -102,16 +137,33 @@ export default function PropertyForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
+    if (isSubmitting) return;
 
     try {
-      await onSubmit({ ...data, features: selectedFeatures }, images);
-    } catch (error: any) {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        setErrors({ general: error.response?.data?.message || 'Възникна грешка при запазването на имота' });
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          if (key === 'contact_info') {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, value.toString());
+          }
+        }
+      });
+
+      // Add images
+      images.forEach((image) => {
+        formData.append('image', image);
+      });
+
+      // Add features
+      if (selectedFeatures.length > 0) {
+        formData.append('features', selectedFeatures.join(','));
       }
+
+      await onSubmit(data, images);
+    } catch (error) {
+      console.error('Error submitting form:', error);
     }
   };
 
@@ -122,12 +174,29 @@ export default function PropertyForm({
       setData(prev => ({
         ...prev,
         contact_info: {
-          ...prev.contact_info,
+          phone: prev.contact_info?.phone || '',
+          email: prev.contact_info?.email || '',
           [field]: value,
         },
       }));
-    } else if (name === 'has_regulation' || name === 'featured') {
+    } else if (name === 'featured' || name === 'has_regulation') {
       setData(prev => ({ ...prev, [name]: (e.target as HTMLInputElement).checked }));
+    } else if (name === 'regionId') {
+      setData(prev => ({ ...prev, region_id: value ? Number(value) : undefined }));
+    } else if (name === 'neighborhoodId') {
+      setData(prev => ({ ...prev, neighborhood_id: value ? Number(value) : undefined }));
+    } else if (name === 'land_area_sqm' || name === 'total_floors') {
+      setData(prev => ({ ...prev, [name]: value ? Number(value) : undefined }));
+    } else if (name === 'type') {
+      // Map old type values to new ones
+      const mappedValue = value === 'SHOP' ? ('COMMERCIAL' as PropertyType) :
+                         value === 'WAREHOUSE' ? ('INDUSTRIAL' as PropertyType) :
+                         value === 'LAND' ? ('PLOT' as PropertyType) :
+                         (value as PropertyType);
+      setData(prev => ({
+        ...prev,
+        [name]: mappedValue,
+      }));
     } else {
       setData(prev => ({
         ...prev,
@@ -256,18 +325,18 @@ export default function PropertyForm({
                 } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
               />
               {errors.area_sqm && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.area_sqm}</p>}
-          </div>
+            </div>
 
-          <div>
+            <div>
               <label htmlFor="land_area_sqm" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Площ на парцела (кв.м)
-            </label>
-            <input
+              </label>
+              <input
                 type="number"
                 id="land_area_sqm"
                 name="land_area_sqm"
                 value={data.land_area_sqm || ''}
-              onChange={handleChange}
+                onChange={handleChange}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               />
             </div>
@@ -301,13 +370,13 @@ export default function PropertyForm({
             </div>
 
             <div>
-              <label htmlFor="regionId" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+              <label htmlFor="region_id" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Регион
               </label>
               <select
-                id="regionId"
+                id="region_id"
                 name="regionId"
-                value={data.regionId || ''}
+                value={data.region_id || ''}
                 onChange={handleChange}
                 disabled={regionsLoading}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
@@ -319,16 +388,16 @@ export default function PropertyForm({
                   <option key={region.id} value={region.id}>{region.name}</option>
                 ))}
               </select>
-          </div>
+            </div>
 
-          <div>
-              <label htmlFor="neighborhoodId" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+            <div>
+              <label htmlFor="neighborhood_id" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Квартал
               </label>
               <select
-                id="neighborhoodId"
+                id="neighborhood_id"
                 name="neighborhoodId"
-                value={data.neighborhoodId || ''}
+                value={data.neighborhood_id || ''}
                 onChange={handleChange}
                 disabled={neighborhoodsLoading}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
@@ -424,53 +493,51 @@ export default function PropertyForm({
         <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
           <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Етажност и допълнителна информация</h3>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
-          <div>
+            <div>
               <label htmlFor="floor" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
-              Етаж
-            </label>
-            <input
-              type="number"
-              id="floor"
-              name="floor"
+                Етаж
+              </label>
+              <input
+                type="number"
+                id="floor"
+                name="floor"
                 value={data.floor || ''}
                 onChange={handleChange}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-            />
-          </div>
+              />
+            </div>
 
-          <div>
+            <div>
               <label htmlFor="total_floors" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Общо етажи
-            </label>
+              </label>
               <input
                 type="number"
                 id="total_floors"
                 name="total_floors"
                 value={data.total_floors || ''}
-              onChange={handleChange}
+                onChange={handleChange}
                 className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               />
-          </div>
+            </div>
 
-          <div>
+            <div>
               <label htmlFor="has_regulation" className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
                 Има регулация
-            </label>
-            <select
-                id="has_regulation"
-                name="has_regulation"
-                value={data.has_regulation ? 'yes' : 'no'}
-                onChange={(e) => {
-                  setData(prev => ({
-                    ...prev,
-                    has_regulation: e.target.value === 'yes'
-                  }));
-                }}
-                className="block w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-[rgb(var(--color-dark-border))] dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-              >
-                <option value="yes">Да</option>
-                <option value="no">Не</option>
-            </select>
+              </label>
+              <div className="mt-1">
+                <label className="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    id="has_regulation"
+                    name="has_regulation"
+                    checked={data.has_regulation || false}
+                    onChange={handleChange}
+                    className="w-4 h-4 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:border-[rgb(var(--color-dark-border))]"
+                  />
+                  <span className="ml-2 text-sm text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">Да</span>
+                </label>
+              </div>
             </div>
 
             <div className="flex items-center pt-6">
@@ -500,16 +567,16 @@ export default function PropertyForm({
               type="tel"
               id="contact_info.phone"
               name="contact_info.phone"
-                value={data.contact_info.phone}
+              value={data.contact_info?.phone || ''}
               onChange={handleChange}
-                className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
-                  errors['contact_info.phone'] 
-                    ? 'border-red-500 dark:border-red-500' 
-                    : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
-                } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
+              className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
+                errors['contact_info.phone'] 
+                  ? 'border-red-500 dark:border-red-500' 
+                  : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
+              } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
             />
             {errors['contact_info.phone'] && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.phone']}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.phone']}</p>
             )}
           </div>
 
@@ -521,16 +588,16 @@ export default function PropertyForm({
               type="email"
               id="contact_info.email"
               name="contact_info.email"
-                value={data.contact_info.email}
+              value={data.contact_info?.email || ''}
               onChange={handleChange}
-                className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
-                  errors['contact_info.email'] 
-                    ? 'border-red-500 dark:border-red-500' 
-                    : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
-                } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
+              className={`mt-1 block w-full rounded-md shadow-sm sm:text-sm ${
+                errors['contact_info.email'] 
+                  ? 'border-red-500 dark:border-red-500' 
+                  : 'border-gray-300 dark:border-[rgb(var(--color-dark-border))]'
+              } dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] focus:border-primary-500 focus:ring-primary-500`}
             />
             {errors['contact_info.email'] && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.email']}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors['contact_info.email']}</p>
             )}
             </div>
           </div>
@@ -605,10 +672,10 @@ export default function PropertyForm({
             <label className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
               {initialData?.images?.length ? 'Добави нови изображения' : 'Изображения'}
             </label>
-            <div className="flex justify-center px-6 pt-5 pb-6 mt-1 rounded-md border-2 border-gray-300 border-dashed dark:border-gray-600">
+            <div className="flex justify-center px-6 pt-5 pb-6 mt-1 border-2 border-gray-300 border-dashed rounded-md dark:border-gray-600">
             <div className="space-y-1 text-center">
                 <svg
-                  className="mx-auto w-12 h-12 text-gray-400"
+                  className="w-12 h-12 mx-auto text-gray-400"
                   stroke="currentColor"
                   fill="none"
                   viewBox="0 0 48 48"
@@ -649,7 +716,7 @@ export default function PropertyForm({
                 <h4 className="text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">Избрани файлове:</h4>
                 <ul className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
                   {Array.from(images).map((file, index) => (
-                    <li key={index} className="flex justify-between items-center py-2">
+                    <li key={index} className="flex items-center justify-between py-2">
                       <span className="text-sm text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">{file.name}</span>
                   <button
                     type="button"
@@ -666,22 +733,22 @@ export default function PropertyForm({
           </div>
         </div>
 
-        <div className="flex gap-3 justify-end sm:col-span-2">
+        <div className="flex justify-end gap-4">
           {onCancel && (
-          <button
-            type="button"
+            <button
+              type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text))] bg-white dark:bg-[rgb(var(--color-dark-bg))] border border-gray-300 dark:border-[rgb(var(--color-dark-border))] rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-[rgb(var(--color-dark-border))] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-[rgb(var(--color-dark-bg-secondary))]"
-          >
-            Отказ
-          </button>
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 dark:bg-[rgb(var(--color-dark-bg))] dark:text-[rgb(var(--color-dark-text))] dark:border-[rgb(var(--color-dark-border))] dark:hover:bg-[rgb(var(--color-dark-bg-hover))]"
+            >
+              Отказ
+            </button>
           )}
           <button
             type="submit"
-            disabled={isSubmitting || regionsLoading || neighborhoodsLoading || featuresLoading}
-            className="px-4 py-2 text-sm font-medium text-white rounded-md border border-transparent shadow-sm bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isSubmitting}
+            className="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-[rgb(var(--color-dark-bg))]"
           >
-            {isSubmitting ? 'Запазване...' : submitLabel}
+            {isSubmitting ? 'Запазване...' : submitLabel || 'Запази'}
           </button>
         </div>
       </div>

@@ -13,9 +13,17 @@ export default function NewProperty() {
   const { mutate, isPending, error } = useMutation({
     mutationFn: async ({ data, images }: { data: CreatePropertyData; images: File[] }) => {
       const formData = new FormData();
-      formData.append('data', JSON.stringify(data));
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          if (key === 'contact_info') {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, value.toString());
+          }
+        }
+      });
       images.forEach((image) => {
-        formData.append('images', image);
+        formData.append('image', image);
       });
       return createProperty(formData);
     },

@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client';
 export class AppError extends Error {
   statusCode: number;
 
-  constructor(message: string, statusCode: string | number) {
+  constructor(statusCode: string | number, message: string) {
     super(message);
     this.statusCode = typeof statusCode === 'string' ? parseInt(statusCode) : statusCode;
     Error.captureStackTrace(this, this.constructor);

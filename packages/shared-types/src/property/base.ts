@@ -28,14 +28,16 @@ export interface Property {
   title: string;
   description: string;
   price: number;
-  currency: Currency;
+  currency: 'BGN' | 'EUR' | 'USD';
   area_sqm: number;
+  land_area_sqm?: number;
   floor?: number;
-  construction_type?: ConstructionType;
-  furnishing?: FurnishingType;
-  location_type: LocationType;
-  category: PropertyCategory;
-  type: PropertyType;
+  total_floors?: number;
+  construction_type?: 'BRICK' | 'PANEL' | 'EPK' | 'CONCRETE' | 'STEEL' | 'WOOD';
+  furnishing?: 'UNFURNISHED' | 'SEMI_FURNISHED' | 'FULLY_FURNISHED';
+  location_type: 'CITY' | 'SUBURB' | 'VILLAGE' | 'SEASIDE' | 'MOUNTAIN';
+  category: 'SALE' | 'RENT';
+  type: 'APARTMENT' | 'HOUSE' | 'PLOT' | 'COMMERCIAL' | 'INDUSTRIAL';
   featured?: boolean;
   contact_info?: ContactInfo;
   images?: Image[];
@@ -43,6 +45,7 @@ export interface Property {
   neighborhood_id?: number;
   region?: Location;
   neighborhood?: Location;
+  has_regulation?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -51,14 +54,16 @@ export interface CreatePropertyInput {
   title: string;
   description: string;
   price: number;
-  currency: Currency;
+  currency: 'BGN' | 'EUR' | 'USD';
   area_sqm: number;
+  land_area_sqm?: number;
   floor?: number;
-  construction_type?: ConstructionType;
-  furnishing?: FurnishingType;
-  location_type?: LocationType;
-  category?: PropertyCategory;
-  type?: PropertyType;
+  total_floors?: number;
+  construction_type?: 'BRICK' | 'PANEL' | 'EPK' | 'CONCRETE' | 'STEEL' | 'WOOD';
+  furnishing?: 'UNFURNISHED' | 'SEMI_FURNISHED' | 'FULLY_FURNISHED';
+  location_type?: 'CITY' | 'SUBURB' | 'VILLAGE' | 'SEASIDE' | 'MOUNTAIN';
+  category?: 'SALE' | 'RENT';
+  type?: 'APARTMENT' | 'HOUSE' | 'PLOT' | 'COMMERCIAL' | 'INDUSTRIAL';
   featured?: boolean;
   contact_info?: {
     phone: string;
@@ -66,6 +71,7 @@ export interface CreatePropertyInput {
   };
   region_id?: number;
   neighborhood_id?: number;
+  has_regulation?: boolean;
 }
 
 export interface UpdatePropertyInput extends Partial<CreatePropertyInput> {} 

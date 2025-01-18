@@ -1,12 +1,6 @@
 import { PaginatedResponse } from '../common/pagination';
 
-/**
- * Feature type
- */
-export enum FeatureType {
-  INFRASTRUCTURE = 'INFRASTRUCTURE',
-  BUILDING = 'BUILDING'
-}
+export type FeatureType = 'INFRASTRUCTURE' | 'BUILDING';
 
 /**
  * Base location interface

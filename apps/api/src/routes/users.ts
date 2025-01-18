@@ -1,28 +1,35 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
+import bcrypt from 'bcryptjs';
 import prisma from '../lib/prisma';
 import { protect, restrictTo } from '../middleware/auth';
 import { AppError } from '../middleware/error';
 import { 
   ApiSuccessResponse, 
   ApiErrorResponse,
-  ApiErrorCode,
-  UserRole,
-  User,
-  UsersResponse,
-  UserResponse,
-  CreateUserInput,
-  UpdateUserInput
+  type UserRole,
+  type User,
+  type UsersResponse,
+  type UserResponse,
+  ApiErrorCode 
 } from '@avalon/shared-types';
+import { USER_ROLES } from '../constants/roles';
 
 const router = Router();
 
-const userSchema = z.object({
+const createUserSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.nativeEnum(UserRole).default(UserRole.USER),
-}) satisfies z.ZodType<CreateUserInput>;
+  role: z.enum(['ADMIN', 'USER'] as const).default('USER'),
+});
+
+const updateUserSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').optional(),
+  email: z.string().email('Invalid email address').optional(),
+  password: z.string().min(6, 'Password must be at least 6 characters').optional(),
+  role: z.enum(['ADMIN', 'USER'] as const).optional(),
+});
 
 const handleError = (error: unknown, res: Response) => {
   if (error instanceof z.ZodError) {
@@ -55,14 +62,22 @@ const handleError = (error: unknown, res: Response) => {
   }
 };
 
-const mapUser = (user: { id: string; name: string; email: string; role: string; createdAt: Date }): User => ({
-  ...user,
+const mapUserToResponse = (user: { 
+  id: string; 
+  name: string; 
+  email: string; 
+  role: string;
+  createdAt: Date;
+}): User => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
   role: user.role as UserRole,
   createdAt: user.createdAt.toISOString()
 });
 
-// Get all users (admin only)
-router.get('/', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+// Get all users
+router.get('/', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     const { page = '1', limit = '10' } = req.query;
     const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
@@ -86,7 +101,7 @@ router.get('/', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) 
     const response: ApiSuccessResponse<UsersResponse> = {
       status: 'success',
       data: {
-        users: users.map(mapUser),
+        users: users.map(mapUserToResponse),
         meta: {
           total,
           page: parseInt(page as string),
@@ -104,8 +119,8 @@ router.get('/', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) 
   }
 });
 
-// Get single user (admin only)
-router.get('/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+// Get single user
+router.get('/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.params.id },
@@ -124,7 +139,7 @@ router.get('/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Respons
 
     const response: ApiSuccessResponse<UserResponse> = {
       status: 'success',
-      data: { user: mapUser(user) }
+      data: { user: mapUserToResponse(user) }
     };
 
     res.json(response);
@@ -133,10 +148,10 @@ router.get('/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Respons
   }
 });
 
-// Create user (admin only)
-router.post('/', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+// Create user
+router.post('/', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
-    const data = userSchema.parse(req.body);
+    const data = createUserSchema.parse(req.body);
 
     const existingUser = await prisma.user.findUnique({
       where: { email: data.email },
@@ -159,7 +174,7 @@ router.post('/', protect, restrictTo(UserRole.ADMIN), async (req, res: Response)
 
     const response: ApiSuccessResponse<UserResponse> = {
       status: 'success',
-      data: { user: mapUser(user) }
+      data: { user: mapUserToResponse(user) }
     };
 
     res.status(201).json(response);
@@ -168,10 +183,10 @@ router.post('/', protect, restrictTo(UserRole.ADMIN), async (req, res: Response)
   }
 });
 
-// Update user (admin only)
-router.patch('/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+// Update user
+router.patch('/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
-    const data = userSchema.partial().parse(req.body) as UpdateUserInput;
+    const data = updateUserSchema.parse(req.body);
 
     if (data.email) {
       const existingUser = await prisma.user.findFirst({
@@ -200,7 +215,7 @@ router.patch('/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Respo
 
     const response: ApiSuccessResponse<UserResponse> = {
       status: 'success',
-      data: { user: mapUser(user) }
+      data: { user: mapUserToResponse(user) }
     };
 
     res.json(response);
@@ -209,8 +224,8 @@ router.patch('/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Respo
   }
 });
 
-// Delete user (admin only)
-router.delete('/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+// Delete user
+router.delete('/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     await prisma.user.delete({
       where: { id: req.params.id },

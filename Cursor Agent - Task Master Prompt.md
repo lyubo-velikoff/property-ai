@@ -250,7 +250,20 @@ Blockers: [Any issues encountered, if any]
 ---
 
 # User Input:
-[TASK]: Edit property edit is not really working. Produces an error below. Can you investigate and fix it.
+[TASK]: In the admin panel, we have a page /admin/properties/:id. When we update the form and submit we are getting an error. The error you can see below. I want you to have a look at the error and take a systematic approach. We don't want to change any ui elements, want to keep the styling and visuals as they are and we want to only focus on analysing why the backend is returning an error and if the front end is the cause of it. I would recommend you run curl requests periodically to verify any response that you want to verify directly from the database endpoint for edit property. 
+{
+    "status": "error",
+    "message": "Invalid input data",
+    "code": "VALIDATION_ERROR",
+    "errors": {
+        "type": [
+            "Invalid enum value. Expected 'APARTMENT' | 'HOUSE' | 'VILLA' | 'OFFICE' | 'SHOP' | 'WAREHOUSE' | 'LAND', received 'COMMERCIAL'"
+        ],
+        "contact_info": [
+            "Expected object, received string"
+        ]
+    }
+}
 [PROJECT OVERVIEW]: https://docs.google.com/document/d/1XyYaTE6ra2k4uzrQX62D8xqG1XZ8DMxW5ztA6AYTQ4M/edit?usp=sharing
 [MAIN BRANCH]: master
 [YOLO MODE]: on

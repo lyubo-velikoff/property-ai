@@ -1,61 +1,29 @@
 /**
  * Type of property
  */
-export enum PropertyType {
-  APARTMENT = 'APARTMENT',
-  HOUSE = 'HOUSE',
-  VILLA = 'VILLA',
-  OFFICE = 'OFFICE',
-  SHOP = 'SHOP',
-  WAREHOUSE = 'WAREHOUSE',
-  LAND = 'LAND'
-}
+export type PropertyType = 'APARTMENT' | 'HOUSE' | 'PLOT' | 'COMMERCIAL' | 'INDUSTRIAL';
 
 /**
  * Category of property listing
  */
-export enum PropertyCategory {
-  SALE = 'SALE',
-  RENT = 'RENT'
-}
+export type PropertyCategory = 'SALE' | 'RENT';
 
 /**
  * Type of location
  */
-export enum LocationType {
-  CITY = 'CITY',
-  SUBURB = 'SUBURB',
-  VILLAGE = 'VILLAGE',
-  SEASIDE = 'SEASIDE',
-  MOUNTAIN = 'MOUNTAIN'
-}
+export type LocationType = 'CITY' | 'SUBURB' | 'VILLAGE' | 'SEASIDE' | 'MOUNTAIN';
 
 /**
  * Supported currencies
  */
-export enum Currency {
-  EUR = 'EUR',
-  USD = 'USD',
-  BGN = 'BGN'
-}
+export type Currency = 'BGN' | 'EUR' | 'USD';
 
 /**
  * Construction types
  */
-export enum ConstructionType {
-  BRICK = 'BRICK',
-  PANEL = 'PANEL',
-  EPK = 'EPK',
-  CONCRETE = 'CONCRETE',
-  STEEL = 'STEEL',
-  WOOD = 'WOOD'
-}
+export type ConstructionType = 'BRICK' | 'PANEL' | 'EPK' | 'CONCRETE' | 'STEEL' | 'WOOD';
 
 /**
  * Furnishing status
  */
-export enum FurnishingType {
-  UNFURNISHED = 'UNFURNISHED',
-  SEMI_FURNISHED = 'SEMI_FURNISHED',
-  FULLY_FURNISHED = 'FULLY_FURNISHED'
-} 
+export type FurnishingType = 'UNFURNISHED' | 'SEMI_FURNISHED' | 'FULLY_FURNISHED'; 

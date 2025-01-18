@@ -1,9 +1,6 @@
 import { PaginatedResponse } from '../common/pagination';
 
-export enum UserRole {
-  ADMIN = 'ADMIN',
-  USER = 'USER'
-}
+export type UserRole = 'ADMIN' | 'USER';
 
 export interface User {
   id: string;

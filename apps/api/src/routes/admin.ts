@@ -5,6 +5,7 @@ import { protect, restrictTo } from '../middleware/auth';
 import { AppError } from '../middleware/error';
 import { upload } from '../config/multer';
 import { propertySchema } from './properties';
+import { USER_ROLES } from '../constants/roles';
 import { 
   ApiSuccessResponse, 
   ApiErrorResponse,
@@ -28,7 +29,7 @@ const userSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.nativeEnum(UserRole).default(UserRole.USER),
+  role: z.enum(['USER', 'ADMIN'] as const).default('USER'),
 }) satisfies z.ZodType<CreateUserInput>;
 
 const handleError = (error: unknown, res: Response) => {
@@ -85,7 +86,7 @@ const mapProperty = (property: any): Property => ({
 });
 
 // Get admin dashboard stats
-router.get('/stats', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+router.get('/stats', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     const [properties, messages, users] = await Promise.all([
       prisma.property.count(),
@@ -109,7 +110,7 @@ router.get('/stats', protect, restrictTo(UserRole.ADMIN), async (req, res: Respo
 });
 
 // Get all properties (admin)
-router.get('/properties', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+router.get('/properties', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -150,7 +151,7 @@ router.get('/properties', protect, restrictTo(UserRole.ADMIN), async (req, res: 
 });
 
 // Get single property (admin)
-router.get('/properties/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+router.get('/properties/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     const property = await prisma.property.findUnique({
       where: { id: req.params.id },
@@ -161,7 +162,7 @@ router.get('/properties/:id', protect, restrictTo(UserRole.ADMIN), async (req, r
     });
 
     if (!property) {
-      throw new AppError(404, 'Property not found');
+      throw new AppError('404', 'Property not found');
     }
 
     const response: ApiSuccessResponse<PropertyResponse> = {
@@ -179,7 +180,7 @@ router.get('/properties/:id', protect, restrictTo(UserRole.ADMIN), async (req, r
 router.patch(
   '/properties/:id',
   protect,
-  restrictTo(UserRole.ADMIN),
+  restrictTo(USER_ROLES.ADMIN),
   upload.array('image', 20),
   async (req, res: Response) => {
     try {
@@ -199,7 +200,7 @@ router.patch(
       });
 
       if (!existingProperty) {
-        throw new AppError(404, 'Property not found');
+        throw new AppError('404', 'Property not found');
       }
 
       // Update the property with the correct contact info reference
@@ -252,7 +253,7 @@ router.patch(
 );
 
 // Get all users (admin)
-router.get('/users', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+router.get('/users', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -296,7 +297,7 @@ router.get('/users', protect, restrictTo(UserRole.ADMIN), async (req, res: Respo
 });
 
 // Get single user (admin)
-router.get('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+router.get('/users/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: String(req.params.id) },
@@ -310,7 +311,7 @@ router.get('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: R
     });
 
     if (!user) {
-      throw new AppError(404, 'User not found');
+      throw new AppError('404', 'User not found');
     }
 
     const response: ApiSuccessResponse<UserResponse> = {
@@ -325,7 +326,7 @@ router.get('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: R
 });
 
 // Create user (admin)
-router.post('/users', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+router.post('/users', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     const data = userSchema.parse(req.body);
 
@@ -335,7 +336,7 @@ router.post('/users', protect, restrictTo(UserRole.ADMIN), async (req, res: Resp
     });
 
     if (existingUser) {
-      throw new AppError(400, 'User with this email already exists');
+      throw new AppError('400', 'User with this email already exists');
     }
 
     const user = await prisma.user.create({
@@ -361,7 +362,7 @@ router.post('/users', protect, restrictTo(UserRole.ADMIN), async (req, res: Resp
 });
 
 // Update user (admin)
-router.patch('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+router.patch('/users/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     const data = userSchema.partial().parse(req.body) as UpdateUserInput;
 
@@ -375,7 +376,7 @@ router.patch('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res:
       });
 
       if (existingUser) {
-        throw new AppError(400, 'User with this email already exists');
+        throw new AppError('400', 'User with this email already exists');
       }
     }
 
@@ -403,7 +404,7 @@ router.patch('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res:
 });
 
 // Delete user (admin)
-router.delete('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+router.delete('/users/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     await prisma.user.delete({
       where: { id: String(req.params.id) },
@@ -424,7 +425,7 @@ router.delete('/users/:id', protect, restrictTo(UserRole.ADMIN), async (req, res
 router.post(
   '/properties',
   protect,
-  restrictTo(UserRole.ADMIN),
+  restrictTo(USER_ROLES.ADMIN),
   upload.array('image', 20),
   async (req, res: Response) => {
     try {

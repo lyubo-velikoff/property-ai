@@ -13,9 +13,10 @@ import {
   LoginInput,
   AuthResponse,
   MeResponse,
-  UserRole,
+  type UserRole,
   User
 } from '@avalon/shared-types';
+import { USER_ROLES } from '../constants/roles';
 
 const router = Router();
 
@@ -103,7 +104,7 @@ router.post('/register', async (req, res, next) => {
         name: data.name,
         email: data.email,
         password: hashedPassword,
-        role: UserRole.USER
+        role: USER_ROLES.USER
       },
       select: {
         id: true,

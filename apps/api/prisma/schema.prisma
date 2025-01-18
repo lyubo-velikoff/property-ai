@@ -12,7 +12,7 @@ model User {
   email     String   @unique
   name      String
   password  String
-  role      String   @default("USER") // Can be "USER" or "ADMIN"
+  role      String   @default("USER")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -47,21 +47,21 @@ model Property {
   title            String
   description      String
   price            Float
-  currency         String            @default("BGN") // BGN or EUR
+  currency         String            @default("BGN")
   area_sqm         Float
   land_area_sqm    Float?
   floor            Int?
   total_floors     Int?
-  construction_type String?          // BRICK, EPK, PK, PANEL, WOOD_FLOOR
-  furnishing       String?           // FURNISHED, PARTIALLY_FURNISHED, UNFURNISHED
-  location_type    String            @default("CITY") // CITY or REGION
+  construction_type String?
+  furnishing       String?
+  location_type    String            @default("CITY")
   region           Region?           @relation(fields: [regionId], references: [id])
   regionId         Int?
   neighborhood     Neighborhood?     @relation(fields: [neighborhoodId], references: [id])
   neighborhoodId   Int?
   has_regulation   Boolean?
-  category         String            @default("SALE") // SALE or RENT
-  type             String            @default("APARTMENT") // APARTMENT, HOUSE, LAND, COMMERCIAL, INDUSTRIAL
+  category         String            @default("SALE")
+  type             String            @default("APARTMENT")
   featured         Boolean           @default(false)
   images           Image[]
   contact_info     ContactInfo?

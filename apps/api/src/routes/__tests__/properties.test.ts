@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import app from '../../server';
 import prisma from '../../lib/prisma';
 import jwt from 'jsonwebtoken';
-import { PropertyType, PropertyCategory, Currency, LocationType, UserRole } from '@avalon/shared-types';
+import { PropertyType, PropertyCategory, Currency, LocationType, type UserRole } from '@avalon/shared-types';
 
 describe('Property Routes', () => {
   let adminToken: string;

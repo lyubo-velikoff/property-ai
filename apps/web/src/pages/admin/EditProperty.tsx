@@ -23,10 +23,12 @@ export default function EditProperty() {
       
       // Append property data
       Object.entries(data).forEach(([key, value]) => {
-        if (key === 'contact_info') {
-          formData.append(key, JSON.stringify(value));
-        } else if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
+        if (value !== undefined && value !== null) {
+          if (key === 'contact_info') {
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, String(value));
+          }
         }
       });
 

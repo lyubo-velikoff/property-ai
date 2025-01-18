@@ -24,6 +24,7 @@ import {
   Property,
   UserRole
 } from '@avalon/shared-types';
+import { USER_ROLES } from '../constants/roles';
 
 const router: Router = Router();
 
@@ -31,19 +32,24 @@ export const propertySchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   price: z.coerce.number().positive('Price must be positive'),
-  currency: z.nativeEnum(Currency),
+  currency: z.enum(['BGN', 'EUR', 'USD'] as const) satisfies z.ZodType<Currency>,
   area_sqm: z.coerce.number().positive('Area must be positive'),
+  land_area_sqm: z.coerce.number().optional(),
   floor: z.coerce.number().optional(),
-  construction_type: z.nativeEnum(ConstructionType).optional(),
-  furnishing: z.nativeEnum(FurnishingType).optional(),
-  location_type: z.nativeEnum(LocationType).optional(),
-  category: z.nativeEnum(PropertyCategory).optional(),
-  type: z.nativeEnum(PropertyType).optional(),
+  total_floors: z.coerce.number().optional(),
+  construction_type: z.enum(['BRICK', 'PANEL', 'EPK', 'CONCRETE', 'STEEL', 'WOOD'] as const) satisfies z.ZodType<ConstructionType>,
+  furnishing: z.enum(['UNFURNISHED', 'SEMI_FURNISHED', 'FULLY_FURNISHED'] as const) satisfies z.ZodType<FurnishingType>,
+  location_type: z.enum(['CITY', 'SUBURB', 'VILLAGE', 'SEASIDE', 'MOUNTAIN'] as const) satisfies z.ZodType<LocationType>,
+  category: z.enum(['SALE', 'RENT'] as const) satisfies z.ZodType<PropertyCategory>,
+  type: z.enum(['APARTMENT', 'HOUSE', 'PLOT', 'COMMERCIAL', 'INDUSTRIAL'] as const) satisfies z.ZodType<PropertyType>,
   featured: z.coerce.boolean().optional(),
+  has_regulation: z.coerce.boolean().optional(),
   contact_info: z.object({
     phone: z.string().min(6, 'Phone must be at least 6 characters'),
     email: z.string().email('Invalid email address')
-  }).optional()
+  }),
+  region_id: z.coerce.number().optional(),
+  neighborhood_id: z.coerce.number().optional()
 }) satisfies z.ZodType<CreatePropertyInput>;
 
 const propertyInclude = {
@@ -141,11 +147,11 @@ router.get('/', async (req: Request, res: Response) => {
     const where: Prisma.PropertyWhereInput = {};
 
     // Apply filters
-    if (type) where.type = type as PropertyType;
-    if (category) where.category = category as PropertyCategory;
-    if (location_type) where.location_type = location_type as LocationType;
-    if (construction_type) where.construction_type = construction_type as ConstructionType;
-    if (furnishing) where.furnishing = furnishing as FurnishingType;
+    if (type) where.type = type;
+    if (category) where.category = category;
+    if (location_type) where.location_type = location_type;
+    if (construction_type) where.construction_type = construction_type;
+    if (furnishing) where.furnishing = furnishing;
     if (featured) where.featured = featured === 'true';
 
     // Handle price range when both min and max are provided
@@ -277,18 +283,25 @@ router.get('/:id', async (req: Request, res: Response) => {
 router.post(
   '/',
   protect,
-  restrictTo(UserRole.ADMIN),
+  restrictTo(USER_ROLES.ADMIN),
   upload.array('image', 20),
   async (req, res: Response) => {
     try {
       // Parse fields from multipart/form-data
+      const { region_id, neighborhood_id, ...rest } = req.body;
       const parsedBody = {
-        ...req.body,
+        ...rest,
         price: req.body.price ? parseInt(req.body.price) : undefined,
         area_sqm: req.body.area_sqm ? parseInt(req.body.area_sqm) : undefined,
+        land_area_sqm: req.body.land_area_sqm ? parseInt(req.body.land_area_sqm) : undefined,
         floor: req.body.floor ? parseInt(req.body.floor) : undefined,
+        total_floors: req.body.total_floors ? parseInt(req.body.total_floors) : undefined,
         featured: req.body.featured === 'true',
+        has_regulation: req.body.has_regulation === 'true',
+        region_id: region_id ? parseInt(region_id) : undefined,
+        neighborhood_id: neighborhood_id ? parseInt(neighborhood_id) : undefined,
         contact_info: req.body.contact_info ? JSON.parse(req.body.contact_info) : undefined,
+        features: req.body.features ? req.body.features.split(',').map(Number) : undefined
       };
 
       const data = propertySchema.parse(parsedBody);
@@ -342,11 +355,31 @@ router.post(
 router.patch(
   '/:id',
   protect,
-  restrictTo(UserRole.ADMIN),
+  restrictTo(USER_ROLES.ADMIN),
   upload.array('image', 20),
   async (req, res: Response) => {
     try {
-      const data = propertySchema.partial().parse(req.body) as UpdatePropertyInput;
+      // Parse fields from multipart/form-data
+      const { region_id, neighborhood_id, ...rest } = req.body;
+      const parsedBody = {
+        ...rest,
+        price: req.body.price ? parseInt(req.body.price) : undefined,
+        area_sqm: req.body.area_sqm ? parseInt(req.body.area_sqm) : undefined,
+        land_area_sqm: req.body.land_area_sqm ? parseInt(req.body.land_area_sqm) : undefined,
+        floor: req.body.floor ? parseInt(req.body.floor) : undefined,
+        total_floors: req.body.total_floors ? parseInt(req.body.total_floors) : undefined,
+        featured: req.body.featured === 'true',
+        has_regulation: req.body.has_regulation === 'true',
+        contact_info: req.body.contact_info ? JSON.parse(req.body.contact_info) : undefined,
+        features: req.body.features ? req.body.features.split(',').map(Number) : undefined
+      };
+
+      const validatedData = propertySchema.partial().parse({
+        ...parsedBody,
+        region_id: region_id ? parseInt(region_id) : undefined,
+        neighborhood_id: neighborhood_id ? parseInt(neighborhood_id) : undefined,
+      }) as UpdatePropertyInput;
+
       const files = req.files as Express.Multer.File[];
       const baseUrl = `${req.protocol}://${req.get('host')}`;
 
@@ -360,28 +393,36 @@ router.patch(
         throw new AppError('Property not found', '404');
       }
 
+      // Prepare update data without region_id and neighborhood_id
+      const { region_id: _rid, neighborhood_id: _nid, ...updateData } = validatedData;
+
       // Update the property with the correct contact info reference
       const property = await prisma.property.update({
         where: { id: req.params.id },
         data: {
-          title: data.title,
-          description: data.description,
-          price: data.price,
-          currency: data.currency,
-          area_sqm: data.area_sqm,
-          floor: data.floor,
-          construction_type: data.construction_type,
-          furnishing: data.furnishing,
-          location_type: data.location_type,
-          category: data.category,
-          type: data.type,
-          featured: data.featured,
-          contact_info: data.contact_info ? {
-            update: {
-              phone: data.contact_info.phone,
-              email: data.contact_info.email,
+          ...updateData,
+          // Handle region relation
+          region: validatedData.region_id ? {
+            connect: { id: validatedData.region_id }
+          } : undefined,
+          // Handle neighborhood relation
+          neighborhood: validatedData.neighborhood_id ? {
+            connect: { id: validatedData.neighborhood_id }
+          } : undefined,
+          // Handle contact info
+          contact_info: validatedData.contact_info ? {
+            upsert: {
+              create: {
+                phone: validatedData.contact_info.phone,
+                email: validatedData.contact_info.email,
+              },
+              update: {
+                phone: validatedData.contact_info.phone,
+                email: validatedData.contact_info.email,
+              },
             },
           } : undefined,
+          // Handle images
           ...(files.length > 0 && {
             images: {
               deleteMany: {},
@@ -390,6 +431,15 @@ router.patch(
               })),
             },
           }),
+          // Handle features
+          ...(parsedBody.features && {
+            features: {
+              deleteMany: {},
+              create: parsedBody.features.map((featureId: number) => ({
+                featureId
+              }))
+            }
+          })
         },
         include: propertyInclude,
       });
@@ -407,7 +457,7 @@ router.patch(
 );
 
 // Delete property (admin only)
-router.delete('/:id', protect, restrictTo(UserRole.ADMIN), async (req, res: Response) => {
+router.delete('/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
     await prisma.property.delete({
       where: { id: req.params.id },

@@ -1,4 +1,4 @@
-import { Router, Response, Request } from 'express';
+import { Router, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
 import { protect, restrictTo } from '../middleware/auth';
@@ -6,29 +6,20 @@ import { AppError } from '../middleware/error';
 import { 
   ApiSuccessResponse, 
   ApiErrorResponse,
-  ApiErrorCode,
-  ContactMessage, 
-  ContactMessageResponse, 
-  ContactMessagesResponse,
-  UserRole
+  type UserRole,
+  type ContactMessage,
+  type ContactMessagesResponse,
+  type ContactMessageResponse,
+  ApiErrorCode 
 } from '@avalon/shared-types';
+import { USER_ROLES } from '../constants/roles';
 
-const router: Router = Router();
+const router = Router();
 
-const createMessageSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
-  message: z.string().min(1),
-});
-
-const mapContactMessage = (message: any): ContactMessage => ({
-  id: message.id,
-  name: message.name,
-  email: message.email,
-  message: message.message,
-  isRead: message.isRead,
-  createdAt: message.createdAt.toISOString(),
-  updatedAt: message.updatedAt.toISOString(),
+const contactSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
 const handleError = (error: unknown, res: Response) => {
@@ -62,57 +53,53 @@ const handleError = (error: unknown, res: Response) => {
   }
 };
 
-// Create contact message
-router.post('/', async (req: Request, res: Response) => {
-  try {
-    const data = createMessageSchema.parse(req.body);
-
-    const message = await prisma.contactMessage.create({
-      data
-    });
-
-    const response: ApiSuccessResponse<ContactMessageResponse> = {
-      status: 'success',
-      data: { message: mapContactMessage(message) }
-    };
-
-    res.status(201).json(response);
-  } catch (error) {
-    handleError(error, res);
-  }
+const mapContactToResponse = (message: { 
+  id: string; 
+  name: string; 
+  email: string; 
+  message: string;
+  isRead: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}): ContactMessage => ({
+  id: message.id,
+  name: message.name,
+  email: message.email,
+  message: message.message,
+  isRead: message.isRead,
+  createdAt: message.createdAt.toISOString(),
+  updatedAt: message.updatedAt.toISOString()
 });
 
 // Get all messages (admin only)
-router.get('/messages', protect, restrictTo(UserRole.ADMIN), async (req: Request, res: Response) => {
+router.get('/', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const skip = (page - 1) * limit;
+    const { page = '1', limit = '10' } = req.query;
+
+    const skip = (parseInt(page as string) - 1) * parseInt(limit as string);
+    const take = parseInt(limit as string);
 
     const [messages, total] = await Promise.all([
       prisma.contactMessage.findMany({
         skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
+        take,
+        orderBy: { createdAt: 'desc' }
       }),
-      prisma.contactMessage.count(),
+      prisma.contactMessage.count()
     ]);
-
-    const totalPages = Math.ceil(total / limit);
-    const hasNextPage = page < totalPages;
 
     const response: ApiSuccessResponse<ContactMessagesResponse> = {
       status: 'success',
       data: {
-        data: messages.map(mapContactMessage),
+        data: messages.map(mapContactToResponse),
         meta: {
           total,
-          page,
-          pageSize: limit,
-          totalPages,
-          hasNextPage,
-          hasPreviousPage: page > 1,
-        },
+          page: parseInt(page as string),
+          pageSize: parseInt(limit as string),
+          totalPages: Math.ceil(total / parseInt(limit as string)),
+          hasNextPage: skip + parseInt(limit as string) < total,
+          hasPreviousPage: parseInt(page as string) > 1
+        }
       }
     };
 
@@ -122,23 +109,67 @@ router.get('/messages', protect, restrictTo(UserRole.ADMIN), async (req: Request
   }
 });
 
-// Mark message as read (admin only)
-router.patch('/messages/:id/read', protect, restrictTo(UserRole.ADMIN), async (req: Request, res: Response) => {
+// Get single message (admin only)
+router.get('/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
-    const { id } = req.params;
-
-    const message = await prisma.contactMessage.update({
-      where: { id: String(id) },
-      data: { isRead: true },
+    const message = await prisma.contactMessage.findUnique({
+      where: { id: req.params.id }
     });
 
     if (!message) {
-      throw new AppError('Message not found', 404);
+      throw new AppError('Message not found', '404');
     }
 
     const response: ApiSuccessResponse<ContactMessageResponse> = {
       status: 'success',
-      data: { message: mapContactMessage(message) }
+      data: { message: mapContactToResponse(message) }
+    };
+
+    res.json(response);
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// Create message (public)
+router.post('/', async (req, res: Response) => {
+  try {
+    const data = contactSchema.parse(req.body);
+
+    const message = await prisma.contactMessage.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        message: data.message
+      }
+    });
+
+    const response: ApiSuccessResponse<ContactMessageResponse> = {
+      status: 'success',
+      data: { message: mapContactToResponse(message) }
+    };
+
+    res.status(201).json(response);
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
+// Mark message as read (admin only)
+router.patch('/:id/read', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
+  try {
+    const message = await prisma.contactMessage.update({
+      where: { id: req.params.id },
+      data: { isRead: true }
+    });
+
+    if (!message) {
+      throw new AppError('Message not found', '404');
+    }
+
+    const response: ApiSuccessResponse<ContactMessageResponse> = {
+      status: 'success',
+      data: { message: mapContactToResponse(message) }
     };
 
     res.json(response);
@@ -148,17 +179,15 @@ router.patch('/messages/:id/read', protect, restrictTo(UserRole.ADMIN), async (r
 });
 
 // Delete message (admin only)
-router.delete('/messages/:id', protect, restrictTo(UserRole.ADMIN), async (req: Request, res: Response) => {
+router.delete('/:id', protect, restrictTo(USER_ROLES.ADMIN), async (req, res: Response) => {
   try {
-    const { id } = req.params;
-
     await prisma.contactMessage.delete({
-      where: { id: String(id) },
+      where: { id: req.params.id }
     });
 
     const response: ApiSuccessResponse<null> = {
       status: 'success',
-      data: null,
+      data: null
     };
 
     res.json(response);
