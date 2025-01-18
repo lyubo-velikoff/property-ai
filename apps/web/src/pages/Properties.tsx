@@ -1,13 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { FunnelIcon } from '@heroicons/react/24/outline';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Pagination, usePagination } from '@avalon/shared-ui';
 import PropertyCard from '../components/properties/PropertyCard';
 import PropertyCardSkeleton from '../components/properties/PropertyCardSkeleton';
 import { getProperties } from '../services/propertyService';
-import type { 
-  Property, 
+import type {
+  Property,
   GetPropertiesParams,
   PropertyType,
   PropertyCategory,
@@ -16,19 +15,6 @@ import type {
 import { propertyTypeLabels, locationTypeLabels, categoryLabels } from '../constants/property';
 
 declare module 'react-transition-group';
-
-const regions = [
-  'Всички райони',
-  'Русе център',
-  'Здравец',
-  'Дружба',
-  'Възраждане',
-  'Чародейка',
-  'Ялта',
-  'Родина',
-  'Цветница',
-  'Централна градска част',
-];
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -50,7 +36,7 @@ export default function Properties() {
     goToPage
   } = usePagination<Property>({
     pageSize: 9,
-    fetchData: async (page, pageSize) => {
+    fetchData: async (page: number, pageSize: number) => {
       const response = await getProperties(filters, page, pageSize);
       return {
         data: response.data,
@@ -59,11 +45,17 @@ export default function Properties() {
     }
   });
 
-  // Initial data fetch
+  // Handle URL parameter changes
   useEffect(() => {
     const page = Number(searchParams.get('page')) || 1;
-    goToPage(page);
-  }, [searchParams.toString()]);
+    const urlParams = new URLSearchParams(searchParams);
+    const hasFilters = Array.from(urlParams.keys()).some(key => key !== 'page');
+
+    // If we have filters but no page param, or if we're explicitly changing page
+    if ((hasFilters && !searchParams.has('page')) || searchParams.has('page')) {
+      goToPage(hasFilters ? 1 : page);
+    }
+  }, [searchParams]);
 
   const handleFilterChange = (key: string, value: string | undefined) => {
     const newParams = new URLSearchParams(searchParams);
@@ -72,9 +64,8 @@ export default function Properties() {
     } else {
       newParams.delete(key);
     }
-    newParams.delete('page'); // Reset to first page when filters change
+    newParams.delete('page'); // Reset to page 1 when filters change
     setSearchParams(newParams);
-    goToPage(1); // Force a refetch when filters change
   };
 
   const handlePageChange = (page: number) => {
@@ -85,7 +76,7 @@ export default function Properties() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[rgb(var(--color-dark-bg))]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="bg-white dark:bg-[rgb(var(--color-dark-bg-secondary))] shadow sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
@@ -190,7 +181,7 @@ export default function Properties() {
             <div>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <TransitionGroup component={null}>
-                  {properties.map((property) => (
+                  {properties.map((property: Property) => (
                     <CSSTransition key={property.id} timeout={500} classNames="fade">
                       <PropertyCard {...property} />
                     </CSSTransition>

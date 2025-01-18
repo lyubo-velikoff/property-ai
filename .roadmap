@@ -1,3 +1,4 @@
+- Analyse the code base and remoe unused code. Make sure to present me what the plan is following the execution protocol and present me the plan to approve before proceeding.
 - There is no root level pnpm test. Can you add one so that my all apps and and packages are tested in one go? I think some of the current pnpm test commands run a --watch flag, can you remove that?
 - Filter functionality in the apps/web app does not seem to be working.
 http://localhost:5173/properties?type=INDUSTRIAL&category=RENT&location_type=VILLAGE this is an example parameters that get updated in the url. As a safety measure, can you double check the current api types we are using in the web project against the api project located in apps/api. They might be a bit out of date but make sure you don't update api types.
