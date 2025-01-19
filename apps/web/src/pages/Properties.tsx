@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Pagination, usePagination } from '@avalon/shared-ui';
@@ -19,13 +19,21 @@ declare module 'react-transition-group';
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const filters: GetPropertiesParams = {
+  const filters = useMemo<GetPropertiesParams>(() => ({
     type: (searchParams.get('type')?.toUpperCase() as PropertyType) || undefined,
     category: (searchParams.get('category')?.toUpperCase() as PropertyCategory) || undefined,
     location_type: (searchParams.get('location_type')?.toUpperCase() as LocationType) || undefined,
     min_price: searchParams.get('min_price') || undefined,
     max_price: searchParams.get('max_price') || undefined
-  };
+  }), [searchParams]);
+
+  const fetchData = useCallback(async (page: number, pageSize: number) => {
+    const response = await getProperties(filters, page, pageSize);
+    return {
+      data: response.data,
+      totalPages: response.meta.totalPages
+    };
+  }, [filters]);
 
   const {
     data: properties,
@@ -36,28 +44,14 @@ export default function Properties() {
     goToPage
   } = usePagination<Property>({
     pageSize: 9,
-    fetchData: async (page: number, pageSize: number) => {
-      const response = await getProperties(filters, page, pageSize);
-      return {
-        data: response.data,
-        totalPages: response.meta.totalPages
-      };
-    }
+    fetchData
   });
 
   // Handle URL parameter changes
   useEffect(() => {
     const page = Number(searchParams.get('page')) || 1;
-    const urlParams = new URLSearchParams(searchParams);
-    const hasFilters = Array.from(urlParams.keys()).some(key => key !== 'page');
-
-    // Always go to page 1 when filters change
-    if (hasFilters && !searchParams.has('page')) {
-      goToPage(1);
-    } else if (searchParams.has('page')) {
-      goToPage(page);
-    }
-  }, [searchParams, goToPage, filters]); // Added filters to dependencies
+    goToPage(page);
+  }, [searchParams, goToPage]);
 
   const handleFilterChange = (key: string, value: string | undefined) => {
     const newParams = new URLSearchParams(searchParams);
