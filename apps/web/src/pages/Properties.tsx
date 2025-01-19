@@ -51,11 +51,13 @@ export default function Properties() {
     const urlParams = new URLSearchParams(searchParams);
     const hasFilters = Array.from(urlParams.keys()).some(key => key !== 'page');
 
-    // If we have filters but no page param, or if we're explicitly changing page
-    if ((hasFilters && !searchParams.has('page')) || searchParams.has('page')) {
-      goToPage(hasFilters ? 1 : page);
+    // Always go to page 1 when filters change
+    if (hasFilters && !searchParams.has('page')) {
+      goToPage(1);
+    } else if (searchParams.has('page')) {
+      goToPage(page);
     }
-  }, [searchParams]);
+  }, [searchParams, goToPage, filters]); // Added filters to dependencies
 
   const handleFilterChange = (key: string, value: string | undefined) => {
     const newParams = new URLSearchParams(searchParams);
