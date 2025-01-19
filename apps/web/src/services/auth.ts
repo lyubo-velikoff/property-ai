@@ -1,5 +1,5 @@
-import api from '../lib/api';
-import type { ApiResponse, AuthResponse, User } from '../types/api';
+import api from "../lib/api";
+import type { ApiResponse, AuthResponse, User } from "../types/api";
 
 export interface LoginData {
   email: string;
@@ -12,30 +12,35 @@ export interface RegisterData {
   password: string;
 }
 
+export interface GetUserResponse {
+  data: {
+    data: User;
+  };
+}
+
 export const login = async (data: LoginData): Promise<AuthResponse> => {
-  const response = await api.post<{ user: User; token: string }>('/auth/login', data);
-  console.log('Raw API Response:', response);
-  console.log('Response data:', response.data);
+  const response = await api.post<AuthResponse>("/auth/login", data);
   return response.data;
 };
 
 export const register = async (data: RegisterData): Promise<AuthResponse> => {
-  const response = await api.post<ApiResponse<AuthResponse>>('/auth/register', data);
+  const response = await api.post<ApiResponse<AuthResponse>>(
+    "/auth/register",
+    data
+  );
   return response.data.data;
 };
 
-export const getCurrentUser = async (): Promise<User> => {
+export async function getCurrentUser(): Promise<User | null> {
   try {
-    const response = await api.get<{ user: User }>('/auth/me');
-    console.log('Get current user response:', response);
-    return response.data.user;
+    const response = await api.get<GetUserResponse>("/auth/me");
+    return response.data.data.data;
   } catch (error) {
-    console.error('Failed to get current user:', error);
-    throw error;
+    return null;
   }
-};
+}
 
 export const logout = () => {
-  localStorage.removeItem('token');
-  window.location.href = '/admin/login';
-}; 
+  localStorage.removeItem("token");
+  window.location.href = "/admin/login";
+};

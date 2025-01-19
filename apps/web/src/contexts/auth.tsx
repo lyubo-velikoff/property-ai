@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { User } from '../types/api';
 import { getCurrentUser, login as loginApi, register as registerApi, logout as logoutApi } from '../services/auth';
 import type { LoginData, RegisterData } from '../services/auth';
@@ -19,113 +19,86 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [authVerified, setAuthVerified] = useState(false);
+  const [isLoading, setLoading] = useState(true);
 
   // Initial auth check
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setIsLoading(false);
-      setAuthVerified(true);
-      return;
-    }
-
     const verifyAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        console.log('Verifying authentication...');
         const userData = await getCurrentUser();
-        console.log('User data received:', userData);
-        setUser(userData);
-        
-        // Only redirect if we haven't verified auth yet
-        if (!authVerified && window.location.pathname === '/admin/login') {
-          navigate('/admin');
+        if (userData) {
+          setUser(userData);
+        } else {
+          localStorage.removeItem('token');
         }
       } catch (error) {
-        console.error('Auth verification failed:', error);
         localStorage.removeItem('token');
         setUser(null);
-        
-        // Only redirect if we haven't verified auth yet
-        if (!authVerified && window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
-          navigate('/admin/login');
-        }
       } finally {
-        setIsLoading(false);
-        setAuthVerified(true);
+        setLoading(false);
       }
     };
 
     verifyAuth();
-  }, [navigate, authVerified]);
+  }, []);
 
-  const login = async (data: LoginData) => {
+  const handleLogin = async (credentials: LoginData): Promise<void> => {
     try {
-      console.log('Logging in...');
-      const response = await loginApi(data);
-      console.log('Login successful:', response);
-      
-      // Set token first
+      const response = await loginApi(credentials);
       localStorage.setItem('token', response.token);
-      // Then update user state
       setUser(response.user);
-      // Reset auth verification flag
-      setAuthVerified(false);
-      navigate('/admin');
+      // Get the redirect path from location state or default to /admin
+      const from = (location.state as any)?.from?.pathname || '/admin';
+      navigate(from, { replace: true });
     } catch (error) {
-      console.error('Login failed:', error);
       localStorage.removeItem('token');
       setUser(null);
       throw error;
     }
   };
 
-  const register = async (data: RegisterData) => {
+  const handleRegister = async (data: RegisterData): Promise<void> => {
     try {
-      console.log('Registering...');
       const response = await registerApi(data);
-      console.log('Registration successful:', response);
       localStorage.setItem('token', response.token);
       setUser(response.user);
-      // Reset auth verification flag
-      setAuthVerified(false);
       navigate('/');
     } catch (error) {
-      console.error('Registration failed:', error);
       localStorage.removeItem('token');
       setUser(null);
       throw error;
     }
   };
 
-  const logout = () => {
-    console.log('Logging out...');
+  const handleLogout = () => {
     logoutApi();
     localStorage.removeItem('token');
     setUser(null);
-    // Reset auth verification flag
-    setAuthVerified(false);
     navigate('/admin/login');
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     isLoading,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'ADMIN',
-    login,
-    register,
-    logout,
+    login: handleLogin,
+    register: handleRegister,
+    logout: handleLogout,
     setUser,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      <div data-testid="auth-provider" data-user={JSON.stringify({ user })}>
-        {children}
-      </div>
+      {children}
     </AuthContext.Provider>
   );
 };

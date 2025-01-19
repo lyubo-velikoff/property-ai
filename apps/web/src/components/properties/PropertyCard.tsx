@@ -44,7 +44,7 @@ export default function PropertyCard({
       to={`/properties/${id}`}
       className="flex flex-col overflow-hidden transition-all bg-white rounded-lg shadow-lg hover:shadow-xl dark:shadow-[rgb(var(--color-dark-bg))] dark:bg-[rgb(var(--color-dark-bg-secondary))] group"
     >
-      <div className="relative flex-shrink-0 h-48 overflow-hidden">
+      <div className="overflow-hidden relative flex-shrink-0 h-48">
         <img
           src={images?.[0]?.url || '/images/property-placeholder.webp'}
           alt={title}
@@ -56,7 +56,7 @@ export default function PropertyCard({
           }}
         />
       </div>
-      <div className="z-10 mr-3 -mt-3 text-right">
+      <div className="z-10 -mt-3 mr-3 text-right">
         <span className="inline-flex px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md shadow-sm">
           {categoryLabels[category] || category}
         </span>
@@ -68,7 +68,7 @@ export default function PropertyCard({
           </h3>
         </div>
         <div className="mt-4">
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between items-center">
             <span className="text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">
               {formattedPrice}
             </span>

@@ -1,6 +1,4 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import api from '../../lib/api';
 import { useAuth } from '../../contexts/auth';
 import LoadingSpinner from '../LoadingSpinner';
 
@@ -11,25 +9,20 @@ interface Props {
 
 export default function ProtectedRoute({ children, requireAdmin = true }: Props) {
   const location = useLocation();
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading, isAuthenticated } = useAuth();
 
   // Show loading state while checking auth
-  if (authLoading) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  // If no token exists, redirect to login
-  if (!localStorage.getItem('token')) {
-    return <Navigate to="/admin/login" state={{ from: location }} replace />;
-  }
-
-  // If no user after loading, redirect to login
-  if (!user) {
+  // If not authenticated, redirect to login
+  if (!isAuthenticated) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
   // Check admin access if required
-  if (requireAdmin && user.role !== 'ADMIN') {
+  if (requireAdmin && user?.role !== 'ADMIN') {
     return <Navigate to="/" replace />;
   }
 
