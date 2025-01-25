@@ -371,6 +371,7 @@ router.post(
                 }
               }
             : undefined,
+          // Handle images
           ...(files.length > 0 && {
             images: {
               create: files.map((file) => ({

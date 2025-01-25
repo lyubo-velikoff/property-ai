@@ -7,7 +7,8 @@ import type {
   LocationType,
   PropertyCategory,
   PropertyType,
-  Currency
+  Currency,
+  Image
 } from '@avalon/shared-types';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useQuery } from '@tanstack/react-query';
@@ -20,6 +21,7 @@ import {
   categories, 
   currencies 
 } from '../../constants/property';
+import ImagePreview from './ImagePreview';
 
 interface PropertyFeature {
   featureId: number;
@@ -27,6 +29,7 @@ interface PropertyFeature {
 
 interface PropertyWithFeatures extends Property {
   features?: PropertyFeature[];
+  images?: Image[];
 }
 
 interface PropertyFormProps {
@@ -91,6 +94,9 @@ export default function PropertyForm({ initialData, onSubmit, isSubmitting, onCa
 
   const [data, setData] = useState<CreatePropertyInput>(() => prepareInitialData(initialData));
   const [images, setImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<Image[]>(
+    initialData?.images || []
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedFeatures, setSelectedFeatures] = useState<number[]>(
     initialData?.features?.map(f => f.featureId) || []
@@ -218,6 +224,14 @@ export default function PropertyForm({ initialData, onSubmit, isSubmitting, onCa
     if (e.target.files) {
       setImages(Array.from(e.target.files));
     }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveExistingImage = (id: string) => {
+    setExistingImages(prev => prev.filter(img => img.id !== id));
   };
 
   return (
@@ -642,94 +656,60 @@ export default function PropertyForm({ initialData, onSubmit, isSubmitting, onCa
 
         {/* Images Section */}
         <div className="p-6 bg-white rounded-lg shadow-sm dark:bg-[rgb(var(--color-dark-bg-secondary))]">
-          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Изображения</h3>
-          {initialData?.images && initialData.images.length > 0 && (
+          <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-[rgb(var(--color-dark-text))]">Снимки</h3>
+          <div className="space-y-4">
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
-                Текущи изображения
+              <label className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                Качете снимки
               </label>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                {initialData.images.map((image) => (
-                  <div key={image.id} className="relative group">
-                    <img
-                      src={image.url}
-                      alt={initialData.title}
-                      className="object-cover w-full h-32 rounded-lg"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.onerror = null;
-                        target.src = '/images/property-placeholder.webp';
-                      }}
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-[rgb(var(--color-dark-border))] border-dashed rounded-md">
+                <div className="space-y-1 text-center">
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
+                  </svg>
+                  <div className="flex text-sm text-gray-600 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                    <label
+                      htmlFor="images"
+                      className="relative cursor-pointer rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500"
+                    >
+                      <span>Качете снимки</span>
+                      <input
+                        id="images"
+                        name="images"
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={handleImageChange}
+                      />
+                    </label>
+                    <p className="pl-1">или ги провлачете тук</p>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Image Upload */}
-          <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">
-              {initialData?.images?.length ? 'Добави нови изображения' : 'Изображения'}
-            </label>
-            <div className="flex justify-center px-6 pt-5 pb-6 mt-1 border-2 border-gray-300 border-dashed rounded-md dark:border-gray-600">
-            <div className="space-y-1 text-center">
-                <svg
-                  className="w-12 h-12 mx-auto text-gray-400"
-                  stroke="currentColor"
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                  <label
-                    htmlFor="images"
-                    className="relative font-medium rounded-md cursor-pointer text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500"
-                  >
-                    <span>Качи файлове</span>
-                  <input
-                      id="images"
-                      name="images"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageChange}
-                      className="sr-only"
-                  />
-                </label>
-                <p className="pl-1">или ги провлачете тук</p>
+                  <p className="text-xs text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">
+                    PNG, JPG до 10MB
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  PNG, JPG, WEBP до 10MB
-                </p>
               </div>
             </div>
-            {images.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-[rgb(var(--color-dark-text-secondary))]">Избрани файлове:</h4>
-                <ul className="mt-2 divide-y divide-gray-200 dark:divide-gray-700">
-                  {Array.from(images).map((file, index) => (
-                    <li key={index} className="flex items-center justify-between py-2">
-                      <span className="text-sm text-gray-500 dark:text-[rgb(var(--color-dark-text-secondary))]">{file.name}</span>
-                  <button
-                    type="button"
-                        onClick={() => setImages(images.filter((_, i) => i !== index))}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                  >
-                        <XMarkIcon className="w-5 h-5" />
-                  </button>
-                    </li>
-              ))}
-                </ul>
-            </div>
-          )}
+
+            <ImagePreview 
+              images={images} 
+              existingImages={existingImages}
+              onRemove={handleRemoveImage}
+              onRemoveExisting={handleRemoveExistingImage}
+              className="mt-4" 
+            />
           </div>
         </div>
 
